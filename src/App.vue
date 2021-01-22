@@ -76,4 +76,20 @@ header {
 section {margin: 1em auto; padding: 1em; width: 90%;}
 div {margin: 1em auto;}
 label + * {margin-left: 1em;}
+
+.v-easy-dialog--backdrop {
+  margin: 0;
+  background-color: transparent;
+  .v-easy-dialog--backdrop-btn {
+    background-color: lightgrey;
+    opacity: .5;
+  }
+  .v-easy-dialog--content-container {
+    background-color: white;
+    padding: 1em;
+    border-radius: .25em;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  }
+}
 </style>

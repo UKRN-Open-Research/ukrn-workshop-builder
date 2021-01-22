@@ -16,6 +16,7 @@
     "mavon-editor": "^2.9.1",
     "node-fetch": "^2.6.1",
     "query-string": "^6.13.8",
+    "v-easy-dialog": "^1.0.6",
     "vue": "^2.6.11",
     "vue-router": "^3.4.9",
     "vuedraggable": "^2.24.3"

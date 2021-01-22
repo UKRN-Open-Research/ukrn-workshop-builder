@@ -13,7 +13,7 @@
     </draggable>
     <div>
       <button @click="beginAddLesson">Add a new item <font-awesome-icon icon="plus-circle"/></button>
-      <AddLesson @addLesson="addLesson" v-if="addingLesson" :lessonList="lessonsAvailableToAdd"/>
+      <AddLesson name="add-lesson" @addLesson="addLesson" :show="addingLesson" :lessonList="lessonsAvailableToAdd"/>
     </div>
   </section>
 </template>
