@@ -1,36 +1,42 @@
 <template>
-  <section class="workshop">
-    <header><h2><TextEditable v-model="workshopName"/></h2></header>
+  <section class="workshop section light">
     <div v-if="status.content" :class="status.class">
       <p>{{ status.content }}</p>
       <p>{{ status.details }}</p>
     </div>
-    <div>
-      <button @click="refreshTemplate">Refresh workshop template details</button>
+    <div class="columns">
+      <header class="column"><h2 class="title"><TextEditable v-model="workshopName"/></h2></header>
+      <div class="column">
+        <b-field>
+          <p class="control"><b-button type="is-primary" label="Workshop topic" /></p>
+          <b-select
+                  :placeholder="findingWorkshops? 'Loading workshop list' : 'Select a workshop topic'"
+                  :class="findingWorkshops? 'is-loading' : ''"
+                  v-model="workshop" id="selectWorkshop"
+                  :disabled="workshop !== null || findingWorkshops"
+          >
+            <option v-if="!workshopList.length" disabled>Fetching workshop list</option>
+            <option v-for="ws in workshopList" v-bind:value="ws.value" v-bind:key="ws.value">
+              {{ ws.name }}
+            </option>
+          </b-select>
+        </b-field>
+      </div>
+      <div v-if="workshop" class="column">
+        <b-button @click="refreshTemplate" class="is-warning">Refresh workshop template details</b-button>
+      </div>
     </div>
-    <div v-if="findingWorkshops">Fetching workshop list <font-awesome-icon icon="spinner" class="fa-spin"/></div>
-    <div v-else>
-      <label for="selectWorkshop">Workshop topic:</label>
-      <select v-model="workshop" id="selectWorkshop" :disabled="workshop !== null">
-        <option v-if="!workshopList.length" disabled>Fetching workshop list</option>
-        <option v-for="ws in workshopList" v-bind:value="ws.value" v-bind:key="ws.value">
-          {{ ws.name }}
-        </option>
-      </select>
-      <CustomiseWorkshop v-if="workshop && template" :template="template" :workshop="workshop"/>
-    </div>
+    <CustomiseWorkshop v-if="workshop && template" :template="template" :workshop="workshop"/>
   </section>
 </template>
 
 <script>
   import CustomiseWorkshop from "./CustomiseWorkshop";
   import TextEditable from "./TextEditable";
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 export default {
   components: {
     CustomiseWorkshop,
-    TextEditable,
-    FontAwesomeIcon
+    TextEditable
   },
   name: 'SelectWorkshop',
   props: {
@@ -99,8 +105,6 @@ export default {
 
   .workshop {
     background-color: $colour-workshop-main;
-    border: .25em solid $colour-workshop-dark;
-    margin: 1em auto;
   }
 
 </style>
