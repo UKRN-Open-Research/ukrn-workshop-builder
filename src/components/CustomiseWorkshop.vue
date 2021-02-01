@@ -8,15 +8,9 @@
     <br/>
     <div class="card-content">
       <p v-if="episodeSearchInProgress">Fetching episode list <b-icon icon="spinner" custom-class="fa-spin"/></p>
-      <ChooseEpisodes v-else class="card section is-info" v-model="episodes" :episodes-available="episodesAvailable"/>
+      <ChooseEpisodes v-else class="card section is-info" v-model="episodes" :episodes-available="episodesAvailable" @save="save"/>
     </div>
 
-    <b-modal v-model="isEditingTemplate" scroll="keep" @close="toastSave">
-      <div class="card">
-        <header class="card-header-title">Edit template (saved automatically)</header>
-        <mavon-editor class="card-content" v-model="currentTemplate" language="en" defaultOpen="edit" @change="templateDirty = true"/>
-      </div>
-    </b-modal>
   </div>
 </template>
 
@@ -27,10 +21,7 @@ export default {
   components: {
     ChooseEpisodes
   },
-  props: {
-    template: {type: String, required: true},
-    workshop: {type: String, required: true}
-  },
+  props: {},
   data: function() {
     return {
       isEditingTemplate: false,
@@ -68,7 +59,7 @@ export default {
     },
     refreshLessonList: function() {
       // Update episodes
-      if(!this.template || !this.workshop || this.episodeSearchInProgress)
+      if(!this.$store.state.template || !this.$store.state.workshop || this.episodeSearchInProgress)
         return;
       // Query GitHub for episode repositories with the appropriate tags
       if(!this.episodeSearchInProgress) {
@@ -80,6 +71,10 @@ export default {
                 .then(r => {this.episodeSearchInProgress = false; return this.processLessons(r.items, 0)})
                 .catch(e => {this.episodeSearchInProgress = false; console.error(e)})
       }
+    },
+    // Pass the episode list up to the parent for saving
+    save: function() {
+      this.$emit('save', {episodes: this.episodes});
     }
   },
   watch: {},

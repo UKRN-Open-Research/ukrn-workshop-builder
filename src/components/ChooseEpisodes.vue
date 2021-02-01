@@ -30,7 +30,7 @@
                 <span class="owner">{{ episode.owner }}: </span>
                 {{ episode.title }}
               </span>
-              <b-icon :icon="props.open ? 'caret-up' : 'caret-down'" class="card-content caret" size="is-medium"/>
+              <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
               <div class="action-icons">
                 <b-button icon-right="cog" size="is-medium" title="Edit episode settings" />
                 <a :href="episode.link" target="_blank" title="Open episode website in a new tab">
@@ -65,6 +65,17 @@
     <b-modal v-model="addingEpisodes" class="" aria-modal>
       <AddEpisodes name="add-episode" @addEpisodes="addEpisodes" :episodeList="episodesAvailableToAdd"/>
     </b-modal>
+
+    <footer class="content">
+      <b-button icon-left="arrow-right"
+                icon-right="github"
+                type="is-primary is-inverted"
+                size="is-large"
+                @click="$emit('save')"
+      >
+        Save to GitHub
+      </b-button>
+    </footer>
   </section>
 </template>
 

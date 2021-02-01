@@ -1,80 +1,133 @@
 <template>
   <section class="workshop section light">
-    <div v-if="status.content" :class="status.class">
-      <p>{{ status.content }}</p>
-      <p>{{ status.details }}</p>
-    </div>
-    <div class="columns">
-      <header class="column"><h2 class="title"><TextEditable v-model="workshopName"/></h2></header>
-      <div class="column">
-        <b-field>
-          <p class="control"><b-button type="is-primary" label="Workshop topic" /></p>
+    <b-collapse class="card content"
+                animation="slide"
+                aria-id="select-existing-workshop"
+                :open="false"
+    >
+      <template #trigger="props">
+        <div class="card-header"
+             role="button"
+             aria-controls="select-existing-workshop"
+        >
+              <span class="card-header-title">Select existing workshop to edit</span>
+          <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
+        </div>
+      </template>
+
+      <div class="card-content">
+        <div class="content">
+          Here will be a way of selecting existing workshops from your repositories...
+        </div>
+      </div>
+    </b-collapse>
+
+    <section class="card content">
+      <header class="card-header">
+        <h1 class="card-header-title">Create a new repository</h1>
+      </header>
+      <div class="columns card-content">
+        <div class="column">
+          The workshop topic is used to choose which lessons will be likely to be useful for you. You'll still be able to select lessons outside your workshop topic.
+        </div>
+        <div class="column">
           <b-select
-                  :placeholder="findingWorkshops? 'Loading workshop list' : 'Select a workshop topic'"
-                  :class="findingWorkshops? 'is-loading' : ''"
+                  :placeholder="$store.state.template.fetchInProgress? 'Loading workshop list' : 'Select a workshop topic'"
+                  :class="$store.state.template.fetchInProgress? 'is-loading' : ''"
                   v-model="workshop" id="selectWorkshop"
-                  :disabled="workshop !== null || findingWorkshops"
+                  :disabled="$store.state.template === null || $store.state.template.fetchInProgress"
           >
-            <option v-if="!workshopList.length" disabled>Fetching workshop list</option>
-            <option v-for="ws in workshopList" v-bind:value="ws.value" v-bind:key="ws.value">
-              {{ ws.name }}
+            <option v-if="!topicList.length" disabled>Fetching workshop list</option>
+            <option v-for="topic in topicList" v-bind:value="topic.value" v-bind:key="topic.value">
+              {{ topic.name }}
             </option>
           </b-select>
-        </b-field>
+          <div v-if="workshop" class="column">
+            <b-button @click="refreshTemplate" class="is-info is-inverted">Refresh workshop template details</b-button>
+          </div>
+        </div>
       </div>
-      <div v-if="workshop" class="column">
-        <b-button @click="refreshTemplate" class="is-warning">Refresh workshop template details</b-button>
+      <div class="columns card-content">
+        <div class="column">
+          <p>
+            We have created a configuration file for your workshop. Now we will go through some steps to customise the file. If you would like to, you can skip these steps and/or customise the _config.yml file yourself using this button.
+          </p>
+          <p>The updates will save automatically after editing. Please only do this if you know what you're doing!</p>
+        </div>
+        <div class="columns card-content">
+          <b-button icon-left="cog" type="is-warning" @click="editConfig">Edit _config.yml</b-button>
+        </div>
       </div>
-    </div>
-    <CustomiseWorkshop v-if="workshop && template" :template="template" :workshop="workshop"/>
+      <div class="columns card-content">
+        <div class="column">
+          <p>
+            Let's give your workshop a customised name. This should include the workshop topic and distinguish it from other workshops on the same topic. Good examples are <em>MRC CBU Preregistration Workshop</em> and <em>Oxford NDORMS Open Data Workshop</em>. Click the current title to edit it.
+          </p>
+        </div>
+        <div class="columns card-content">
+          <header class="column"><h2 class="title"><TextEditable v-model="workshopName"/></h2></header>
+        </div>
+      </div>
+
+    </section>
+
+    <b-modal v-model="isEditingTemplate" scroll="keep" @close="toastSave">
+      <div class="card">
+        <header class="card-header-title">Edit template (saved automatically)</header>
+        <mavon-editor class="card-content" v-model="currentTemplate" language="en" defaultOpen="edit" @change="templateDirty = currentTemplate === template"/>
+      </div>
+    </b-modal>
   </section>
 </template>
 
 <script>
-  import CustomiseWorkshop from "./CustomiseWorkshop";
   import TextEditable from "./TextEditable";
 export default {
   components: {
-    CustomiseWorkshop,
     TextEditable
   },
   name: 'SelectWorkshop',
   props: {
-    // templateDetails should be {owner: string, repository: string} for navigating GitHub
-    templateDetails: {type: Object, required: true}
+    templateRepository: {type: String, required: false}
   },
   data: function() {
     return {
-      status: {content: "Fetching Workshop Template details...", class: "info", details: null},
-      template: null,
-      workshop: null,
-      workshopList: [],
-      workshopName: "New workshop",
-      findingWorkshops: false
+      status: {content: "Fetching Workshop Template details...", class: "is-info", details: null},
+      currentTemplate: this.template,
+      topicList: [],
+      isEditingTemplate: false,
+      templateDirty: false
     }
   },
-  computed: {},
+  computed: {
+    workshop: {
+      get: function() {return this.$store.state.workshop},
+      set: function(topic) {
+        this.$store.dispatch('initWorkshop', {
+          topic, template: this.$store.state.template.master
+        });
+      },
+    },
+    template: {
+      get: function() {return this.$store.state.workshop.config},
+      set: function(v) {this.$store.commit('workshop/updateConfig', v)}
+    },
+    workshopName: {
+      get: function() {console.log(this.$store.getters['workshop/name']);return this.$store.getters.workshop.name},
+      set: function(n) {this.$store.commit('workshop/updateName', n)}
+    }
+  },
   methods: {
     refreshTemplate: function() {
-      if(this.findingWorkshops)
+      if(this.$store.state.template.fetchInProgress || this.templateRepository === "")
         return;
-      this.findingWorkshops = true;
-      fetch(`https://api.github.com/repos/${this.templateDetails.owner}/${this.templateDetails.repository}/contents/_config.yml`)
-              .then(r => r.json())
-              .then(j => atob(j.content))
-              .then(c => {
-                this.findingWorkshops = false;
-                this.template = c;
-                this.status = {content: null};
-                this.findWorkshops();
-              })
-              .catch(e => {
-                this.findingWorkshops = false;
-                this.status = {content: "Error fetching template details.", class: "error", details: e}
-              });
+      this.$store.dispatch('fetchTemplateMaster', this.templateRepository)
+        .then(() => this.findWorkshops());
     },
     findWorkshops: function() {
-      const text = /#: WORKSHOP TOPICS :#\n(.+\n)+#\/#/g.exec(this.template)[0];
+      if(this.$store.state.template.master === null)
+        return;
+      const text = /#: WORKSHOP TOPICS :#\n(.+\n)+#\/#/g.exec(this.$store.state.template.master)[0];
       const _list = [];
       const re = /\n# (.+)/g;
       let m;
@@ -89,10 +142,31 @@ export default {
           _list.push({name, value});
         }
       } while (m);
-      this.workshopList = _list;
+      this.topicList = _list;
+    },
+    editConfig: function() {
+      this.currentTemplate = this.template;
+      this.isEditingTemplate = true;
+    },
+    toastSave: function() {
+      if(this.templateDirty) {
+        this.templateDirty = false;
+        this.$buefy.toast.open({
+          message: '_config.yml file updated',
+          type: 'is-success'
+        });
+        this.template = this.currentTemplate;
+      }
+    },
+    save: function(child) {
+      this.$emit('save', {
+        ...child,
+        name: this.workshopName,
+        template: this.template
+      })
     }
   },
-  created() {
+  mounted() {
     this.refreshTemplate();
   }
 }
@@ -104,7 +178,7 @@ export default {
   $colour-workshop-dark: darkgreen;
 
   .workshop {
-    background-color: $colour-workshop-main;
+    /*background-color: $colour-workshop-main;*/
   }
 
 </style>
