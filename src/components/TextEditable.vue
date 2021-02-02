@@ -1,7 +1,7 @@
 <template>
   <span class="wrapper" title="Click to edit text" icon-right="">
     <span ref="text" class="text" :contenteditable="enabled" @blur="input" @keydown="keydown">{{ value }}</span>
-    <b-icon class="edit-icon" icon="pencil-alt"/>
+    <b-icon class="edit-icon" icon="lead-pencil"/>
   </span>
 </template>
 
@@ -23,7 +23,7 @@ export default {
     input: function(e) {
       const value = e.target.innerText.replace(/\n/g, '');
       this.$refs.text.innerText = value;
-      this.$emit('addLesson', value);
+      this.$emit('input', value);
     }
   }
 }

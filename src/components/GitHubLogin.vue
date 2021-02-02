@@ -4,7 +4,7 @@
          v-if="$store.state.github.code !== ''"
     >
       <b-icon icon="github" :class="$store.state.github.loginInProgress === ''? 'is-warning' : 'is-success'"/>
-      <p v-if="$store.state.github.loginInProgress">Logging in <b-icon icon="loading"/></p>
+      <p v-if="$store.state.github.loginInProgress">Logging in <b-icon icon="loading" custom-class="mdi-spin"/></p>
       <p v-else>Logged in as {{ $store.state.github.login }}</p>
     </div>
     <b-button v-else

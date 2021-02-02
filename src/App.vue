@@ -31,7 +31,7 @@
         <p class="explainer content">
           We will create the workshop from a <a :href="templateRepository">template</a>. There are a few steps we need to go through to make sure the version of the template we create for you is properly customised for your workshop.
         </p>
-        <SelectWorkshop :template-repository="templateRepository"/>
+        <SelectWorkshop :template-repository="templateRepository" @pickLesson="activeStep = 3"/>
       </b-step-item>
 
       <b-step-item step="4" label="Lessons" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep > 2">

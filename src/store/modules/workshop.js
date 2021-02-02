@@ -10,53 +10,32 @@ export default {
         updateConfig: function(store, cfg) {store.config = cfg},
         setPushed: function(store, value) {store.pushed = value}
     },
-    getters: {
-        name: state => {
-            const match = /^topic: (.+)$/gm.exec(state.config);
-            if(match)
-                return match[1];
-            return "";
-        }
-    },
     actions: {
         initWorkshop: {
             root: true,
             handler (nsContext, payload) {
                 // Customise workshop template text
-                let cfg = payload.template;
-                cfg = setTopic(cfg, payload.topic);
-                nsContext.commit('updateConfig', cfg);
-                nsContext.commit('setBaseConfig', cfg);
-                console.log(`Initialised ${payload.topic} workshop`)
+                nsContext.commit('updateConfig', payload);
+                nsContext.commit('setBaseConfig', payload);
+                console.log(`Initialised workshop`)
             }
         },
         pushWorkshopToGitHub: {
             root: true,
-            handler (nsContext, payload) {
-                console.log(payload);
-                nsContext.commit('setPushed', true);
+            handler (nsContext) {
+                console.log(`Pushing workshop!`);
+                fetch(``, {
+                    method: "POST",
+                    body: JSON.stringify({config: nsContext.state.config})
+                })
+                    .then(r => {
+                        if(r.status !== 200)
+                            throw new Error(`Push workshop received ${r.statusText} (${r.status})`);
+                        console.log(r)
+                        nsContext.commit('setPushed', true);
+                    })
+                    .catch(e => console.error(e));
             }
-        },
-        updateName (nsContext, name) {
-            const newCFG = setName(nsContext.store.config, name);
-            nsContext.commit('updateConfig', newCFG);
         }
     }
 };
-
-function ymlClean(str) {
-    let s = str;
-    s = s.replace(/'/g, '"');
-    s = s.replace(/[^a-zA-Z0-9_'; .]/g, '');
-    return s;
-}
-
-function setTopic(cfg, topic) {
-    let C = `TOPIC:::${topic}\n${cfg}`;
-    return C;
-}
-
-function setName(cfg, name) {
-    let C = cfg.replace(/^topic:.+$/gm, `topic: ${ymlClean(name)}`);
-    return C;
-}

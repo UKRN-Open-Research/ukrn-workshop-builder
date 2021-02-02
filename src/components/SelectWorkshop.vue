@@ -16,8 +16,9 @@
       </template>
 
       <div class="card-content">
-        <div class="content">
-          Here will be a way of selecting existing workshops from your repositories...
+        <div class="content is-inline-flex">
+          <b-icon icon="alert" type="is-warning"/>
+          <p>TODO: Here will be a way of selecting existing workshops from your repositories...</p>
         </div>
       </div>
     </b-collapse>
@@ -31,19 +32,35 @@
           The workshop topic is used to choose which lessons will be likely to be useful for you. You'll still be able to select lessons outside your workshop topic.
         </div>
         <div class="column">
-          <b-select
-                  :placeholder="$store.state.template.fetchInProgress? 'Loading workshop list' : 'Select a workshop topic'"
-                  :class="$store.state.template.fetchInProgress? 'is-loading' : ''"
-                  v-model="workshop" id="selectWorkshop"
-                  :disabled="$store.state.template === null || $store.state.template.fetchInProgress"
+          <div class="is-inline-flex"
+               :title="topicListLocked? 'Warning: changing the topic will refresh the template and your changes will be lost.' : ''"
           >
-            <option v-if="!topicList.length" disabled>Fetching workshop list</option>
-            <option v-for="topic in topicList" v-bind:value="topic.value" v-bind:key="topic.value">
-              {{ topic.name }}
-            </option>
-          </b-select>
-          <div v-if="workshop" class="column">
-            <b-button @click="refreshTemplate" class="is-info is-inverted">Refresh workshop template details</b-button>
+            <b-button v-if="$store.state.template.fetchInProgress" disabled>
+              Loading workshop list
+              <b-icon/>
+              <b-icon custom-class="mdi-spin" icon="loading"/>
+            </b-button>
+            <b-select v-else
+                      placeholder="Select a workshop topic"
+                      v-model="workshop" id="selectWorkshop"
+                      :disabled="$store.state.template === null || topicListLocked"
+            >
+              <option v-if="!topicList.length" disabled>Fetching workshop list</option>
+              <option v-for="topic in topicList" v-bind:value="topic.value" v-bind:key="topic.value">
+                {{ topic.name }}
+              </option>
+            </b-select>
+            <div @mouseenter="iconLocked = false"
+                 @mouseleave="iconLocked = true"
+            >
+              <b-button v-if="topicListLocked"
+                        :icon-left="iconLocked? 'lock' : 'lock-open'"
+                        :type="template === $store.state.workshop.baseConfig? 'is-info' : 'is-danger'"
+                        @click="topicListLocked = false"
+              >
+                Unlock
+              </b-button>
+            </div>
           </div>
         </div>
       </div>
@@ -65,26 +82,45 @@
           </p>
         </div>
         <div class="columns card-content">
-          <header class="column"><h2 class="title"><TextEditable v-model="workshopName"/></h2></header>
+          <b-field label="Workshop title">
+            <b-input v-model="workshopName"/>
+          </b-field>
         </div>
+      </div>
+      <div class="card-content">
+        <b-button icon-left="github"
+                  @click="pushWorkshop"
+                  expanded
+        >
+          Create repository {{ $store.state.github.login }}/ukrn-{{ workshopTopic }}-workshop
+        </b-button>
       </div>
 
     </section>
 
+    <nav class="content"
+         v-if="$store.state.workshop.pushed"
+    >
+      <b-button icon-right="chevron-right"
+                type="is-primary"
+                @click="$emit('pickLesson')"
+      >
+        Pick lessons
+      </b-button>
+    </nav>
+
     <b-modal v-model="isEditingTemplate" scroll="keep" @close="toastSave">
       <div class="card">
         <header class="card-header-title">Edit template (saved automatically)</header>
-        <mavon-editor class="card-content" v-model="currentTemplate" language="en" defaultOpen="edit" @change="templateDirty = currentTemplate === template"/>
+        <mavon-editor class="card-content" v-model="currentTemplate" language="en" defaultOpen="edit"/>
       </div>
     </b-modal>
   </section>
 </template>
 
 <script>
-  import TextEditable from "./TextEditable";
 export default {
   components: {
-    TextEditable
   },
   name: 'SelectWorkshop',
   props: {
@@ -96,38 +132,67 @@ export default {
       currentTemplate: this.template,
       topicList: [],
       isEditingTemplate: false,
-      templateDirty: false
+      topicListLocked: false,
+      iconLocked: true
     }
   },
   computed: {
     workshop: {
       get: function() {return this.$store.state.workshop},
       set: function(topic) {
-        this.$store.dispatch('initWorkshop', {
-          topic, template: this.$store.state.template.master
-        });
+        this.topicListLocked = true;
+        let cfg = this.$store.state.template.master;
+        cfg = cfg.replace(/^workshop-topic:.+$/gm, `workshop-topic: "${ymlClean(topic, true)}"`);
+        this.$store.dispatch('initWorkshop', cfg);
+        this.currentTemplate = this.template;
       },
     },
     template: {
       get: function() {return this.$store.state.workshop.config},
-      set: function(v) {this.$store.commit('workshop/updateConfig', v)}
+      set: function(v) {
+        console.log('workshop/updateConfig')
+        this.$store.commit('workshop/updateConfig', v);
+        this.currentTemplate = this.template;
+        this.$forceUpdate();
+      }
     },
+    templateDirty: function() {return this.currentTemplate !== this.template},
     workshopName: {
-      get: function() {console.log(this.$store.getters['workshop/name']);return this.$store.getters.workshop.name},
-      set: function(n) {this.$store.commit('workshop/updateName', n)}
+      get: function() {
+          const match = /^title: "(.+)"$/gm.exec(this.currentTemplate);
+          if(match)
+            return match[1];
+          return "";
+      },
+      set: function(n) {
+        let C = this.currentTemplate.replace(/^title:.+$/gm, `title: "${ymlClean(n, true)}"`);
+        this.currentTemplate = C;
+        this.toastSave();
+      }
+    },
+    workshopTopic: function() {
+      const match = /^workshop-topic: "(.+)"$/gm.exec(this.currentTemplate);
+      if(match)
+        return match[1];
+      return "";
     }
   },
   methods: {
     refreshTemplate: function() {
-      if(this.$store.state.template.fetchInProgress || this.templateRepository === "")
+      console.log(`refreshTemplate(${this.templateRepository})`)
+      if(this.$store.state.template.fetchInProgress || this.templateRepository === "" || this.topicList.length)
         return;
       this.$store.dispatch('fetchTemplateMaster', this.templateRepository)
-        .then(() => this.findWorkshops());
+        .then(() => {
+          this.findWorkshops();
+          setTimeout(this.refreshTemplate, 100);
+        });
     },
     findWorkshops: function() {
-      if(this.$store.state.template.master === null)
+      const match = /#: WORKSHOP TOPICS :#\n(.+\n)+#\/#/g.exec(this.$store.state.template.master);
+      if(!match)
         return;
-      const text = /#: WORKSHOP TOPICS :#\n(.+\n)+#\/#/g.exec(this.$store.state.template.master)[0];
+      const text = match[0];
       const _list = [];
       const re = /\n# (.+)/g;
       let m;
@@ -150,7 +215,6 @@ export default {
     },
     toastSave: function() {
       if(this.templateDirty) {
-        this.templateDirty = false;
         this.$buefy.toast.open({
           message: '_config.yml file updated',
           type: 'is-success'
@@ -158,17 +222,27 @@ export default {
         this.template = this.currentTemplate;
       }
     },
-    save: function(child) {
-      this.$emit('save', {
-        ...child,
-        name: this.workshopName,
-        template: this.template
-      })
+    pushWorkshop: function() {
+      this.toastSave();
+      this.$store.dispatch('pushWorkshopToGitHub')
     }
   },
   mounted() {
-    this.refreshTemplate();
+    this.refreshTemplate()
   }
+}
+
+/**
+ * Clean a string for YAML
+ * @param str {string} input
+ * @return {string}
+ */
+function ymlClean(str, justQuotes = false) {
+let s = str;
+s = s.replace(/'/g, '"');
+if(!justQuotes)
+  s = s.replace(/[^a-zA-Z0-9_'; .]/g, '');
+return s;
 }
 </script>
 

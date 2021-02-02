@@ -11,6 +11,11 @@ const store = new Vuex.Store({
         github,
         template,
         workshop
+    },
+    computed: {
+        ...Vuex.mapGetters({
+            workshopName: 'workshop/name'
+        })
     }
 });
 

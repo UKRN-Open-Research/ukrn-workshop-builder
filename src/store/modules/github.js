@@ -48,7 +48,6 @@ export default {
                     return r.json()
                 })
                 .then(r => {
-                    console.log(r)
                     if(!r.token)
                         throw new Error(`Response had no token ${r}`);
                     nsContext.dispatch('readResponse', r);
