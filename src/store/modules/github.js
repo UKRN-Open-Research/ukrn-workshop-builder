@@ -3,7 +3,6 @@ export default {
     state: {
         code: "",
         login: "",
-        repository: "",
         token: "",
         errors: [],
         loginInProgress: false
@@ -18,7 +17,6 @@ export default {
         setCode (state, code) {state.code = code},
         setLogin (state, name) {state.login = name},
         setLoginFlag (state, f) {state.loginInProgress = f},
-        setRepository (state, r) {state.repository = r},
         setToken (state, t) {state.token = t},
         addError (state, e) {state.errors.push(e)}
     },
@@ -39,13 +37,13 @@ export default {
                 return nsContext.commit('addError', "Cannot login with empty code");
             nsContext.commit('setLoginFlag', true);
             fetch(
-                '/.netlify/functions/getToken',
-                {method: "POST", headers: {github: nsContext.state.code}}
+                '/.netlify/functions/githubAPI',
+                {method: "POST", headers: {"task": "redeemCode", "github-code": nsContext.state.code}}
             )
                 .then(r => {
                     if(r.status !== 200)
-                        throw new Error(`${r.statusText} (${r.status})`);
-                    return r.json()
+                        throw new Error(`GitHub login received ${r.statusText} (${r.statusCode})`);
+                    return r.json();
                 })
                 .then(r => {
                     if(!r.token)
@@ -63,7 +61,6 @@ export default {
         },
         readResponse (nsContext, payload) {
             nsContext.commit('setLogin', payload.login || "");
-            nsContext.commit('setRepository', payload.repository || "");
             nsContext.commit('setToken', payload.token || "");
         }
     }

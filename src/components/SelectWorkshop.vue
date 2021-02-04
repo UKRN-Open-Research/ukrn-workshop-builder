@@ -1,32 +1,61 @@
 <template>
-  <section class="workshop section light">
-    <b-collapse class="card content"
+  <section class="card content" @mouseenter="checkUserRepositories" @focus="checkUserRepositories">
+    <b-collapse class=""
                 animation="slide"
                 aria-id="select-existing-workshop"
-                :open="false"
+                :open="!createNew"
+                @open="createNew = false"
     >
       <template #trigger="props">
         <div class="card-header"
              role="button"
              aria-controls="select-existing-workshop"
         >
-              <span class="card-header-title">Select existing workshop to edit</span>
+          <span class="card-header-title">Select existing workshop to edit</span>
           <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
         </div>
       </template>
 
       <div class="card-content">
-        <div class="content is-inline-flex">
-          <b-icon icon="alert" type="is-warning"/>
-          <p>TODO: Here will be a way of selecting existing workshops from your repositories...</p>
+        <div class="content columns" v-if="userRepositories.length">
+          <div class="column">
+            <p>You already have a repository which is tagged with the topic "ukrn-workshop". You can select it here:</p>
+          </div>
+          <div class="column">
+            https://github.com/{{ $store.state.github.login }}/
+            <b-select v-model="remoteRepository" :loading="fetchRemoteRepositoryFlag">
+              <option v-for="repo in userRepositories" :key="repo">
+                {{ repo }}
+              </option>
+            </b-select>
+          </div>
+        </div>
+        <div class="content columns" v-else>
+          <div class="column">
+            <p>You don't have any repositories tagged with the topic "ukrn-workshop". If you think this is a mistake, or you have just created one, you can refresh the search using this button.</p>
+          </div>
+          <div class="column">
+            <b-button @click="getUserRepositories" :loading="userRepoSearchFlag">Check again</b-button>
+          </div>
         </div>
       </div>
     </b-collapse>
+    <b-collapse class=""
+                animation="slide"
+                aria-id="select-existing-workshop"
+                :open="createNew"
+                @open="createNew = true"
+    >
+      <template #trigger="props">
+        <div class="card-header"
+             role="button"
+             aria-controls="select-existing-workshop"
+        >
+          <span class="card-header-title">Create a new workshop</span>
+          <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
+        </div>
+      </template>
 
-    <section class="card content">
-      <header class="card-header">
-        <h1 class="card-header-title">Create a new repository</h1>
-      </header>
       <div class="columns card-content">
         <div class="column">
           The workshop topic is used to choose which lessons will be likely to be useful for you. You'll still be able to select lessons outside your workshop topic.
@@ -42,11 +71,12 @@
             </b-button>
             <b-select v-else
                       placeholder="Select a workshop topic"
-                      v-model="workshop" id="selectWorkshop"
+                      v-model="workshop"
+                      id="selectWorkshop"
                       :disabled="$store.state.template === null || topicListLocked"
             >
               <option v-if="!topicList.length" disabled>Fetching workshop list</option>
-              <option v-for="topic in topicList" v-bind:value="topic.value" v-bind:key="topic.value">
+              <option v-for="topic in topicList" :value="topic.value" :key="topic.value">
                 {{ topic.name }}
               </option>
             </b-select>
@@ -55,7 +85,7 @@
             >
               <b-button v-if="topicListLocked"
                         :icon-left="iconLocked? 'lock' : 'lock-open'"
-                        :type="template === $store.state.workshop.baseConfig? 'is-info' : 'is-danger'"
+                        :type="$store.state.workshop.config === $store.state.workshop.baseConfig && !$store.state.workshop.pushed? 'is-info' : 'is-danger'"
                         @click="topicListLocked = false"
               >
                 Unlock
@@ -64,57 +94,17 @@
           </div>
         </div>
       </div>
-      <div class="columns card-content">
-        <div class="column">
-          <p>
-            We have created a configuration file for your workshop. Now we will go through some steps to customise the file. If you would like to, you can skip these steps and/or customise the _config.yml file yourself using this button.
-          </p>
-          <p>The updates will save automatically after editing. Please only do this if you know what you're doing!</p>
-        </div>
-        <div class="columns card-content">
-          <b-button icon-left="cog" type="is-warning" @click="editConfig">Edit _config.yml</b-button>
-        </div>
-      </div>
-      <div class="columns card-content">
-        <div class="column">
-          <p>
-            Let's give your workshop a customised name. This should include the workshop topic and distinguish it from other workshops on the same topic. Good examples are <em>MRC CBU Preregistration Workshop</em> and <em>Oxford NDORMS Open Data Workshop</em>. Click the current title to edit it.
-          </p>
-        </div>
-        <div class="columns card-content">
-          <b-field label="Workshop title">
-            <b-input v-model="workshopName"/>
-          </b-field>
-        </div>
-      </div>
       <div class="card-content">
         <b-button icon-left="github"
                   @click="pushWorkshop"
                   expanded
+                  v-if="workshopTopic"
+                  :loading="createRepositoryFlag"
         >
           Create repository {{ $store.state.github.login }}/ukrn-{{ workshopTopic }}-workshop
         </b-button>
       </div>
-
-    </section>
-
-    <nav class="content"
-         v-if="$store.state.workshop.pushed"
-    >
-      <b-button icon-right="chevron-right"
-                type="is-primary"
-                @click="$emit('pickLesson')"
-      >
-        Pick lessons
-      </b-button>
-    </nav>
-
-    <b-modal v-model="isEditingTemplate" scroll="keep" @close="toastSave">
-      <div class="card">
-        <header class="card-header-title">Edit template (saved automatically)</header>
-        <mavon-editor class="card-content" v-model="currentTemplate" language="en" defaultOpen="edit"/>
-      </div>
-    </b-modal>
+    </b-collapse>
   </section>
 </template>
 
@@ -128,12 +118,16 @@ export default {
   },
   data: function() {
     return {
+      createNew: true,
+      createRepositoryFlag: false,
+      fetchRemoteRepositoryFlag: false,
       status: {content: "Fetching Workshop Template details...", class: "is-info", details: null},
-      currentTemplate: this.template,
       topicList: [],
-      isEditingTemplate: false,
       topicListLocked: false,
-      iconLocked: true
+      iconLocked: true,
+      userRepositories: [],
+      userRepoSearchFlag: false,
+      userReposChecked: false
     }
   },
   computed: {
@@ -144,34 +138,21 @@ export default {
         let cfg = this.$store.state.template.master;
         cfg = cfg.replace(/^workshop-topic:.+$/gm, `workshop-topic: "${ymlClean(topic, true)}"`);
         this.$store.dispatch('initWorkshop', cfg);
-        this.currentTemplate = this.template;
       },
     },
-    template: {
-      get: function() {return this.$store.state.workshop.config},
-      set: function(v) {
-        console.log('workshop/updateConfig')
-        this.$store.commit('workshop/updateConfig', v);
-        this.currentTemplate = this.template;
-        this.$forceUpdate();
-      }
-    },
-    templateDirty: function() {return this.currentTemplate !== this.template},
-    workshopName: {
-      get: function() {
-          const match = /^title: "(.+)"$/gm.exec(this.currentTemplate);
-          if(match)
-            return match[1];
-          return "";
+    remoteRepository: {
+      get: function() {return this.$store.state.workshop.remoteRepository},
+      set: function(repo) {
+        if(this.fetchRemoteRepositoryFlag)
+          return;
+        this.fetchRemoteRepositoryFlag = true;
+        this.$store.dispatch('loadRemoteWorkshop', {
+          user: this.$store.state.github.login, repository: repo})
+          .then(() => this.fetchRemoteRepositoryFlag = false);
       },
-      set: function(n) {
-        let C = this.currentTemplate.replace(/^title:.+$/gm, `title: "${ymlClean(n, true)}"`);
-        this.currentTemplate = C;
-        this.toastSave();
-      }
     },
     workshopTopic: function() {
-      const match = /^workshop-topic: "(.+)"$/gm.exec(this.currentTemplate);
+      const match = /^workshop-topic: "(.+)"$/gm.exec(this.$store.state.workshop.config);
       if(match)
         return match[1];
       return "";
@@ -209,26 +190,50 @@ export default {
       } while (m);
       this.topicList = _list;
     },
-    editConfig: function() {
-      this.currentTemplate = this.template;
-      this.isEditingTemplate = true;
-    },
-    toastSave: function() {
-      if(this.templateDirty) {
-        this.$buefy.toast.open({
-          message: '_config.yml file updated',
-          type: 'is-success'
-        });
-        this.template = this.currentTemplate;
-      }
-    },
     pushWorkshop: function() {
-      this.toastSave();
-      this.$store.dispatch('pushWorkshopToGitHub')
+      if(this.createRepositoryFlag)
+        return;
+      this.createRepositoryFlag = true;
+      this.$store.dispatch('pushWorkshopToGitHub', {
+        templateRepository: this.templateRepository,
+        repoName: `ukrn-${this.workshopTopic}-workshop`,
+        topic: this.workshopTopic
+      })
+        .then(() => this.createRepositoryFlag = false);
+    },
+    getUserRepositories: function() {
+      if(this.userRepoSearchFlag)
+        return;
+      this.userRepoSearchFlag = true;
+      const url = `https://api.github.com/search/repositories?q=topic:ukrn-workshop+user:${this.$store.state.github.login}`;
+      console.log(url)
+      return fetch(url, {
+        headers: {"accept": "application/vnd.github.mercy-preview+json"}
+      })
+        .then(async r => {return {r:r, j: await r.json()}})
+        .then(resp => {
+          this.userRepoSearchFlag = false;
+          if(resp.r.status !== 200) {
+            console.error(`${resp.r.statusCode} (${resp.r.status}): ${resp.j.error}`);
+            return;
+          }
+          this.userRepositories = resp.j.items.map(i => i.name);
+        })
+        .catch(e => {
+          this.userRepoSearchFlag = false;
+          console.error(e);
+        })
+    },
+    checkUserRepositories: function() {
+      if(!this.userReposChecked) {
+        this.userReposChecked = true;
+        this.getUserRepositories()
+                .then(() => this.createNew = !this.userRepositories.length);
+      }
     }
   },
   mounted() {
-    this.refreshTemplate()
+    this.refreshTemplate();
   }
 }
 

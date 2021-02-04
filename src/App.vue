@@ -26,17 +26,22 @@
         <GitHubLogin/>
       </b-step-item>
 
-      <b-step-item step="3" label="Workshop" icon="circle-edit-outline" :type="stepType(3)" :clickable="latestStep > 1">
+      <b-step-item step="3" label="Select workshop" icon="circle-edit-outline" :type="stepType(3)" :clickable="latestStep > 1">
         <h1 class="title has-text-centered">Create a workshop</h1>
         <p class="explainer content">
-          We will create the workshop from a <a :href="templateRepository">template</a>. There are a few steps we need to go through to make sure the version of the template we create for you is properly customised for your workshop.
+          We will create the workshop from a <a :href="`https://github.com/${templateRepository}`">template</a>. There are a few steps we need to go through to make sure the version of the template we create for you is properly customised for your workshop.
         </p>
-        <SelectWorkshop :template-repository="templateRepository" @pickLesson="activeStep = 3"/>
+        <SelectWorkshop :template-repository="templateRepository"/>
       </b-step-item>
 
-      <b-step-item step="4" label="Lessons" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep > 2">
+      <b-step-item step="4" label="Customize workshop" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep > 2">
+        <h1 class="title has-text-centered">Customize workshop</h1>
+        <CustomiseWorkshop @pickLesson="activeStep = 4"/>
+      </b-step-item>
+
+      <b-step-item step="5" label="Lessons" icon="check-box-multiple-outline" :type="stepType(5)" :clickable="latestStep > 4">
         <h1 class="title has-text-centered">Select lessons</h1>
-        <CustomiseWorkshop/>
+
       </b-step-item>
     </b-steps>
   </div>
@@ -57,7 +62,7 @@ export default {
   },
   data: function() {
     return {
-      templateRepository: "https://api.github.com/repos/UKRN-Open-Research/workshop-template",
+      templateRepository: "UKRN-Open-Research/workshop-template",
       activeStep: 0,
       preambleRead: false,
       workshopTemplate: null,
@@ -65,7 +70,9 @@ export default {
   },
   computed: {
     latestStep: function() {
-      if(this.$store.state.workshop.pushed)
+      if(this.$store.state.workshop.customized)
+        return 4;
+      if(this.$store.state.workshop.remoteRepository !== "")
         return 3;
       if(this.$store.state.github.login)
         return 2;
@@ -83,31 +90,6 @@ export default {
     readPreamble: function() {
       this.preambleRead = true;
       this.activeStep = 1;
-    },
-    save: function(data) {
-      console.log({savingData: data})
-      fetch('/.netlify/functions/save', {
-        method: 'POST',
-        headers: {
-          "github-token": this.$store.state.github.token,
-          "github-user": this.$store.state.github.login,
-          "github-user-repos": this.$store.state.github.repository
-        },
-        body: JSON.stringify({data})
-      })
-              .then(r => {
-                if(r.status !== 200)
-                  throw new Error(`${r.statusText} (${r.status})`);
-                return r.json();
-              })
-              .then(r => {
-                this.$buefy.toast.open({
-                  message: 'Saved to GitHub',
-                  type: 'is-success'
-                });
-                console.log(r)
-              })
-              .catch(e => console.error(e))
     },
     stepType: function(myStepNum) {
       const n = myStepNum - 1;

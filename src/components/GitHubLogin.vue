@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     loginRequest: function() {
-      window.location = `https://github.com/login/oauth/authorize?client_id=${process.env.VUE_APP_GITHUB_ID}`;
+      window.location = `https://github.com/login/oauth/authorize?client_id=${process.env.VUE_APP_GITHUB_ID}&scope=public_repo repo`;
     }
   },
   mounted: function() {}

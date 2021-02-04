@@ -13,11 +13,11 @@ export default {
     actions: {
         fetchTemplateMaster: {
             root: true,
-            handler (nsContext, url) {
+            handler (nsContext, repo) {
                 if(nsContext.state.fetchInProgress)
                     return;
                 nsContext.commit('setSearchFlag', true);
-                fetch(`${url}/contents/_config.yml`)
+                fetch(`https://api.github.com/repos/${repo}/contents/_config.yml`)
                     .then(r => r.json())
                     .then(j => atob(j.content))
                     .then(c => {
