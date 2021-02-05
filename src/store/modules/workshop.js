@@ -7,7 +7,9 @@ export default {
         config: null,
         pushed: false,
         remoteRepository: "",
-        customized: false
+        customized: false,
+        episodes: [],
+        errors: []
     },
     mutations: {
         setBaseConfig: function(store, cfg) {store.baseConfig = cfg},
@@ -16,7 +18,13 @@ export default {
         setRemote: function(store, value) {store.remoteRepository = value},
         setRemoteConfigSHA: function(store, value) {store.remoteConfigSHA = value},
         updateLastPushedConfig: function(store) {store.lastPushedConfig = store.config},
-        setCustomized: function(store, value) {store.customized = value}
+        setCustomized: function(store, value) {store.customized = value},
+        setEpisodes: function(store, value) {store.episodes = value},
+        addEpisode: function(store, value) {store.episodes.push(value)},
+        addError: function(state, e) {state.errors.push(e)}
+    },
+    getters: {
+
     },
     actions: {
         registerPush (nsContext, sha) {
@@ -32,6 +40,7 @@ export default {
                 nsContext.commit('updateConfig', payload);
                 nsContext.commit('setBaseConfig', payload);
                 console.log(`Initialised workshop`)
+                nsContext.dispatch('fetchEpisodes');
             }
         },
         loadRemoteWorkshop: {
@@ -49,7 +58,6 @@ export default {
                     .then(r => {
                         if(r.status !== 200)
                             throw new Error(`loadRemoteWorkshop received ${r.statusText} (${r.status})`);
-                        console.log(r)
                         return r.json();
                     })
                     .then(j => {
@@ -59,9 +67,14 @@ export default {
                         nsContext.commit('setRemoteConfigSHA', j.sha);
                         nsContext.dispatch('registerPush');
                         nsContext.commit('setRemote', payload.repository);
+                        nsContext.commit('setCustomized', true);
                         console.log(`Initialised workshop from remote ${payload.user}/${payload.repository}`);
+                        nsContext.dispatch('fetchEpisodes');
                     })
-                    .catch(e => console.error(e));
+                    .catch(e => {
+                        console.error(e);
+                        nsContext.commit('addError', e);
+                    });
             }
         },
         pushWorkshopToGitHub: {
@@ -86,7 +99,10 @@ export default {
                         nsContext.dispatch('registerPush');
                         nsContext.commit('setRemote', j.name);
                     })
-                    .catch(e => console.error(e));
+                    .catch(e => {
+                        console.error(e);
+                        nsContext.commit('addError', e);
+                    });
             }
         },
         commitWorkshopConfigChanges: {
@@ -110,9 +126,64 @@ export default {
                     })
                     .then(json => {
                         nsContext.dispatch('registerPush', json.sha);
+                        nsContext.commit('setCustomized', true);
                     })
-                    .catch(e => console.error(e));
+                    .catch(e => {
+                        console.error(e);
+                        nsContext.commit('addError', e);
+                    });
             }
+        },
+        fetchEpisodes(nsContext) {
+            fetch(`/.netlify/functions/githubAPI`, {
+                method: "POST",
+                headers: {task: "fetchEpisodes"},
+                body: JSON.stringify({
+                    token: nsContext.rootState.github.token,
+                    user: nsContext.rootState.github.login,
+                    repository: nsContext.state.remoteRepository
+                })
+            })
+                .then(r => {
+                    if(r.status !== 200)
+                        throw new Error(`fetchEpisodes received ${r.statusText} (${r.status})`);
+                    return r.json();
+                })
+                .then(json => {
+                    nsContext.commit('setEpisodes', json.episodes.map(e => {
+                        e.content = atob(e.content);
+                        return e;
+                    }));
+                })
+                .catch(e => {
+                    console.error(e);
+                    nsContext.commit('addError', e);
+                });
+        },
+        updateEpisode(nsContext, payload) {
+            fetch(`/.netlify/functions/githubAPI`, {
+                method: "POST",
+                headers: {task: "updateFile"},
+                body: JSON.stringify({
+                    token: nsContext.rootState.github.token,
+                    file: payload.episode
+                })
+            })
+                .then(r => {
+                    if(r.status !== 200)
+                        throw new Error(`updateEpisode received ${r.statusText} (${r.status})`);
+                    return r.json();
+                })
+                .then(json => {
+                    // TODO: handle update response (update local episode)
+                    nsContext.commit('setEpisodes', nsContext.state.episodes.map(e =>
+                        e.url === json.url? json : e
+                    ))
+                })
+                .catch(e => {
+                    console.error(e);
+                    nsContext.commit('addError', e);
+                });
         }
     }
 };

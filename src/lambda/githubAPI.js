@@ -19,6 +19,10 @@ async function main(event, context, callback) {
             return fetchConfig(event, context, callback);
         case "updateConfig":
             return updateConfig(event, context, callback);
+        case "fetchEpisodes":
+            return fetchEpisodes(event, context, callback);
+        case "updateFile":
+            return updateFile(event, context, callback);
         default:
             if(event.headers.task)
                 callback(`Unrecognised githubAPI task requested: ${event.headers.task}`);
@@ -218,4 +222,106 @@ function updateConfig(event, context, callback) {
             console.error(e);
             callback(e);
         })
+}
+
+/**
+ * Fetch all episodes in the repository
+ * @param event {object} request details
+ * @param context {object} environment details
+ * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+ */
+function fetchEpisodes(event, context, callback) {
+    const episodes = [];
+    const d = JSON.parse(event.body);
+
+    _fetchEpisodesOfType(d, "episodes")
+        .then(eps => episodes.push(...eps.filter(e => e !== null)))
+        .then(() => _fetchEpisodesOfType(d, "episodes_rmd"))
+        .then(eps => episodes.push(...eps.filter(e => e !== null)))
+        .then(() => callback(null, {
+            statusCode: 200,
+            statusText: "OK",
+            body: JSON.stringify({episodes})
+        }))
+        .catch(e => {
+            console.error(e);
+            callback(e);
+        });
+}
+
+/**
+ * Fetch all episodes of a given type
+ * @param d {object} github request details
+ * @param type {"episodes"|"episodes_rmd"} github search path
+ */
+async function _fetchEpisodesOfType(d, type) {
+    const episodeList = await fetch(`https://api.github.com/repos/${d.user}/${d.repository}/contents/_${type}`, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${d.token}`
+        }
+    })
+        .then(async r => {return {r, json: await r.json()}})
+        .then(resp => {
+            if(resp.r.status !== 200)
+                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.errors.join('\n')}`);
+            return resp.json;
+        });
+
+    return await Promise.all(episodeList.map(ep => {
+        if(ep.type !== "file" || /^[._]/.test(ep.name))
+            return null;
+        return fetch(ep.url, {
+            method: "GET",
+            headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${d.token}`
+            }
+        })
+            .then(async r => {return {r, json: await r.json()}})
+            .then(resp => {
+                if(resp.r.status !== 200)
+                    throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.errors.join('\n')}`);
+                return resp.json;
+            })
+    }));
+}
+
+
+/**
+ * Replace a file with a new version via github commit
+ * @param event {object} request details
+ * @param context {object} environment details
+ * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+ */
+function updateFile(event, context, callback) {
+    const d = JSON.parse(event.body);
+    fetch(d.file.url, {
+        method: "PUT",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${d.token}`
+        },
+        body: {
+            content: d.file.content,
+            message: `${d.file.name} update by UKRN Workshop Builder`,
+            sha: d.file.sha
+        }
+    })
+        .then(async r => {return {r, json: await r.json()}})
+        .then(resp => {
+            if(resp.r.status !== 200)
+                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.errors.join('\n')}`);
+            // Handle success
+            callback(null, {
+                statusCode: 200,
+                statusText: "OK",
+                body: JSON.stringify(resp.json)
+            });
+        })
+        .catch(e => {
+            console.error(e);
+            callback(e);
+        });
 }

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Buefy from 'buefy'
-// import 'buefy/dist/buefy.css'
+// import 'buefy/dist/buefy.css' // Overwritten in App.vue's <style>area
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 

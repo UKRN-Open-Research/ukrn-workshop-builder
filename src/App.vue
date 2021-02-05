@@ -20,7 +20,7 @@
       <b-step-item step="2" label="GitHub" icon="github" :type="stepType(2)" :clickable="latestStep > 0">
         <h1 class="title has-text-centered">Github login</h1>
         <p class="explainer content">
-          <a href="https://github.com/" title="GitHub is a version-control and collaborative working platform.">GitHub.com</a> is used to create your workshop website. We use a part of GitHub called <em>GitHub Pages</em> which will take a <dfn title="collection of files making up a project">repository</dfn> and turn it into a website.
+          <a href="https://github.com/" title="GitHub is a version-control and collaborative working platform.">GitHub.com</a> is used to create your workshop website. We use a part of GitHub called <em>GitHub Pages</em> which will take a <b-tooltip label="A repository is a collection of files making up a project" dashed>repository</b-tooltip> and turn it into a website.
         </p>
         <p class="explainer content">If you don't have a GitHub account, you will be able to create one here.</p>
         <GitHubLogin/>
@@ -36,12 +36,12 @@
 
       <b-step-item step="4" label="Customize workshop" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep > 2">
         <h1 class="title has-text-centered">Customize workshop</h1>
-        <CustomiseWorkshop @pickLesson="activeStep = 4"/>
+        <CustomiseWorkshop @pickLesson="activeStep = 5"/>
       </b-step-item>
 
-      <b-step-item step="5" label="Lessons" icon="check-box-multiple-outline" :type="stepType(5)" :clickable="latestStep > 4">
-        <h1 class="title has-text-centered">Select lessons</h1>
-
+      <b-step-item step="5" label="Schedule" icon="check-box-multiple-outline" :type="stepType(5)" :clickable="latestStep > 3">
+        <h1 class="title has-text-centered">Construct schedule</h1>
+        <MakeSchedule/>
       </b-step-item>
     </b-steps>
   </div>
@@ -52,10 +52,13 @@ import SelectWorkshop from './components/SelectWorkshop'
 import GitHubLogin from './components/GitHubLogin'
 import CustomiseWorkshop from "./components/CustomiseWorkshop";
 import store from './store/store.js'
+import MakeSchedule
+  from "./components/MakeSchedule";
 
 export default {
   name: 'App',
   components: {
+    MakeSchedule,
     SelectWorkshop,
     GitHubLogin,
     CustomiseWorkshop

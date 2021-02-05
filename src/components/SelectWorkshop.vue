@@ -205,7 +205,7 @@ export default {
       if(this.userRepoSearchFlag)
         return;
       this.userRepoSearchFlag = true;
-      const url = `https://api.github.com/search/repositories?q=topic:ukrn-workshop+user:${this.$store.state.github.login}`;
+      const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-workshop+user:${this.$store.state.github.login}`;
       console.log(url)
       return fetch(url, {
         headers: {"accept": "application/vnd.github.mercy-preview+json"}

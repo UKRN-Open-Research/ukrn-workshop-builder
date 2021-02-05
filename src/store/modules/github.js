@@ -7,7 +7,7 @@ export default {
         errors: [],
         loginInProgress: false
     },
-    computed: {
+    getters: {
         lastError: function() {
             const Es = this.state.errors.length;
             return Es? this.state.errors[Es - 1] : null
