@@ -9,7 +9,8 @@ export default {
         remoteRepository: "",
         customized: false,
         episodes: [],
-        errors: []
+        errors: [],
+        outstandingChanges: []
     },
     mutations: {
         setBaseConfig: function(store, cfg) {store.baseConfig = cfg},
@@ -21,6 +22,8 @@ export default {
         setCustomized: function(store, value) {store.customized = value},
         setEpisodes: function(store, value) {store.episodes = value},
         addEpisode: function(store, value) {store.episodes.push(value)},
+        addOutstandingChange: function(store, value) {store.outstandingChanges.push(value)},
+        clearOutstandingChanges: function(store) {store.outstandingChanges = []},
         addError: function(state, e) {state.errors.push(e)}
     },
     getters: {
@@ -161,29 +164,35 @@ export default {
                 });
         },
         updateEpisode(nsContext, payload) {
-            fetch(`/.netlify/functions/githubAPI`, {
-                method: "POST",
-                headers: {task: "updateFile"},
-                body: JSON.stringify({
-                    token: nsContext.rootState.github.token,
-                    file: payload.episode
+            // Update local
+            nsContext.commit('setEpisodes', nsContext.state.episodes.map(e =>
+                e.url === payload.episode.url? payload.episode : e
+            ));
+
+            if(payload.push)
+                fetch(`/.netlify/functions/githubAPI`, {
+                    method: "POST",
+                    headers: {task: "updateFile"},
+                    body: JSON.stringify({
+                        token: nsContext.rootState.github.token,
+                        file: payload.episode
+                    })
                 })
-            })
-                .then(r => {
-                    if(r.status !== 200)
-                        throw new Error(`updateEpisode received ${r.statusText} (${r.status})`);
-                    return r.json();
-                })
-                .then(json => {
-                    // TODO: handle update response (update local episode)
-                    nsContext.commit('setEpisodes', nsContext.state.episodes.map(e =>
-                        e.url === json.url? json : e
-                    ))
-                })
-                .catch(e => {
-                    console.error(e);
-                    nsContext.commit('addError', e);
-                });
+                    .then(r => {
+                        if(r.status !== 200)
+                            throw new Error(`updateEpisode received ${r.statusText} (${r.status})`);
+                        return r.json();
+                    })
+                    .then(json => {
+                        // TODO: handle update response (update local episode)
+                        console.log({updateEpisodeResponse: json})
+                    })
+                    .catch(e => {
+                        console.error(e);
+                        nsContext.commit('addError', e);
+                    });
+            else
+                nsContext.commit('addOutstandingChange', {type: "episode", url: payload.episode.url});
         }
     }
 };
