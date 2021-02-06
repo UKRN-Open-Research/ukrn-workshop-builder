@@ -3,39 +3,40 @@
           :list="items"
           @start="drag=true"
           @end="drag=false"
-          @change="(evt)=>$emit('change', evt)"
+          @change="change"
           group="items"
           class="episodeList"
   >
     <b-collapse v-for="item in items"
-                :key="item.metadata.name"
+                :key="item.metadata.url"
                 class="episode card"
                 :title="item.metadata.description"
                 animation="slide"
-                :aria-id="`item-details-${item.metadata.name}`"
+                :aria-id="`item-details-${item.metadata.url}`"
                 :open="false"
     >
       <template #trigger="props">
         <div
                 class="card-header"
                 role="button"
-                :aria-controls="`item-details-${item.metadata.name}`">
+                :aria-controls="`item-details-${item.metadata.url}`">
             <span class="card-header-title">
-              <span class="owner">{{ item.metadata.owner.login }}: </span>
-              {{ item.metadata.name }}
+              {{ item.yaml.title }}
             </span>
           <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
-          <div class="action-icons">
+          <div class="action-icons" @click="evt=>evt.stopPropagation()">
             <b-button icon-right="cog" size="is-medium" title="Edit episode settings" />
             <a :href="item.metadata.html_url" target="_blank" title="Open episode website in a new tab">
               <b-button icon-right="link" size="is-medium"/>
             </a>
-            <b-button icon-right="minus-circle"
+            <b-button v-if="dayId"
+                      icon-right="minus-circle"
                       size="is-medium"
                       title="Remove this episode"
                       class="del"
-                      @click="$emit('drop', item.metadata.name)"
-                      :type="isUnscheduled? 'is-danger' : 'is-info'"
+                      @click="$emit('assignItem', {itemURL: item.metadata.url, dayId: null})"
+                      :type="!dayId? 'is-danger' : 'is-info'"
+                      outlined
             />
           </div>
         </div>
@@ -58,17 +59,24 @@
 <script>
 import draggable from "vuedraggable"
 export default {
-  name: 'ChooseEpisodes',
+  name: 'ArrangeItems',
   components: {draggable},
   props: {
     items: {type: Array, required: true}, // list of episodes selected
-    isUnscheduled: {type: Boolean, required: false, default: false}
+    dayId: {type: Number, required: false, default: null}
   },
   data: function() {
     return {}
   },
   computed: {},
-  methods: {},
+  methods: {
+    change(evt) {
+      // Only monitor add events because the store will handle removals
+      if(!evt.added)
+        return;
+      this.$emit('assignItem', {itemURL: evt.added.element.metadata.url, dayId: this.dayId})
+    }
+  },
   watch: {}
 }
 </script>
@@ -105,5 +113,5 @@ export default {
 
 </style>
 <style>
-  .modal-background {background-color: rgba(0, 0, 0, 0.5)}
+  .card-header-title {text-align: left;}
 </style>
