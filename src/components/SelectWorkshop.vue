@@ -147,7 +147,18 @@ export default {
           return;
         this.fetchRemoteRepositoryFlag = true;
         this.$store.dispatch('loadRemoteWorkshop', {
-          user: this.$store.state.github.login, repository: repo})
+          user: this.$store.state.github.login, repository: repo, callback: (e) => {
+            if(e !== null)
+              this.$buefy.toast.open({
+                message: `Error loading remote repository!`,
+                type: "is-danger"
+              });
+            else
+              this.$buefy.toast.open({
+                message: "Loaded remote repository content",
+                type: "is-success"
+              });
+          }})
           .then(() => this.fetchRemoteRepositoryFlag = false);
       },
     },

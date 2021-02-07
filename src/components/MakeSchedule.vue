@@ -6,29 +6,33 @@
              v-for="day in schedule.days.sort((a,b) => a.number > b.number)"
              :key="day.number"
         >
-          <header class="card-header">
+          <header class="card-header" v-if="!$store.state.workshop.fetchEpisodesFlag">
             <h1 class="card-header-title">Day {{ day.number }}</h1>
           </header>
-          <div class="card-content">
+          <b-skeleton size="is-large" animated :active="$store.state.workshop.fetchEpisodesFlag"/>
+          <div class="card-content" v-if="!$store.state.workshop.fetchEpisodesFlag">
             <ArrangeItems :items="day.items"
                           :dayId="day.number"
                           @assignItem="updateItemDay"
             />
           </div>
+          <b-skeleton size="is-medium" animated :active="$store.state.workshop.fetchEpisodesFlag"/>
         </div>
       </div>
       <div class="column">
         <div class="card-content card">
-          <header class="card-header">
+          <header class="card-header" v-if="!$store.state.workshop.fetchEpisodesFlag">
             <h1 class="card-header-title">Unassigned items</h1>
           </header>
-          <div class="card-content">
+          <b-skeleton size="is-large" animated :active="$store.state.workshop.fetchEpisodesFlag"/>
+          <div class="card-content" v-if="!$store.state.workshop.fetchEpisodesFlag">
             <ArrangeItems :items="schedule.unassignedItems"
                           :is-unscheduled="true"
                           @chage="updateItemDay"
                           @drop="itemUrl => updateItemDay(itemUrl, null)"
             />
           </div>
+          <b-skeleton size="is-medium" animated :active="$store.state.workshop.fetchEpisodesFlag"/>
           <div class="card-footer">
             <b-button class="card-footer-item" icon-left="plus">Add Items to Stash</b-button>
           </div>

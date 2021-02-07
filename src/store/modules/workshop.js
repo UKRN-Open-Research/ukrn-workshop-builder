@@ -9,8 +9,9 @@ export default {
         remoteRepository: "",
         customized: false,
         episodes: [],
-        errors: [],
-        outstandingChanges: []
+        outstandingChanges: [],
+        fetchEpisodesFlag: false,
+        errors: []
     },
     mutations: {
         setBaseConfig: function(store, cfg) {store.baseConfig = cfg},
@@ -24,6 +25,7 @@ export default {
         addEpisode: function(store, value) {store.episodes.push(value)},
         addOutstandingChange: function(store, value) {store.outstandingChanges.push(value)},
         clearOutstandingChanges: function(store) {store.outstandingChanges = []},
+        setFetchEpisodesFlag: function(store, value) {store.fetchEpisodesFlag = value},
         addError: function(state, e) {state.errors.push(e)}
     },
     getters: {
@@ -48,6 +50,11 @@ export default {
         },
         loadRemoteWorkshop: {
             root: true,
+            /**
+             * Load a remote workshop and then fetch the episodes in that workshop
+             * @param nsContext {object} namespaced context
+             * @param payload {{user: string, token: string, repository: string, callback: function(error: string)}}
+             */
             handler (nsContext, payload) {
                 // Fetch repo config from GitHub backend
                 fetch(`/.netlify/functions/githubAPI`, {
@@ -72,7 +79,7 @@ export default {
                         nsContext.commit('setRemote', payload.repository);
                         nsContext.commit('setCustomized', true);
                         console.log(`Initialised workshop from remote ${payload.user}/${payload.repository}`);
-                        nsContext.dispatch('fetchEpisodes');
+                        nsContext.dispatch('fetchEpisodes', payload.callback);
                     })
                     .catch(e => {
                         console.error(e);
@@ -137,7 +144,10 @@ export default {
                     });
             }
         },
-        fetchEpisodes(nsContext) {
+        fetchEpisodes(nsContext, callback) {
+            if(nsContext.state.fetchEpisodesFlag)
+                return;
+            nsContext.commit('setFetchEpisodesFlag', true);
             fetch(`/.netlify/functions/githubAPI`, {
                 method: "POST",
                 headers: {task: "fetchEpisodes"},
@@ -157,10 +167,14 @@ export default {
                         e.content = atob(e.content);
                         return e;
                     }));
+                    nsContext.commit('setFetchEpisodesFlag', false);
+                    callback(null);
                 })
                 .catch(e => {
                     console.error(e);
                     nsContext.commit('addError', e);
+                    nsContext.commit('setFetchEpisodesFlag', false);
+                    callback(e);
                 });
         },
         updateEpisode(nsContext, payload) {
@@ -181,15 +195,11 @@ export default {
                     .then(r => {
                         if(r.status !== 200)
                             throw new Error(`updateEpisode received ${r.statusText} (${r.status})`);
-                        return r.json();
-                    })
-                    .then(json => {
-                        // TODO: handle update response (update local episode)
-                        console.log({updateEpisodeResponse: json})
                     })
                     .catch(e => {
                         console.error(e);
                         nsContext.commit('addError', e);
+                        nsContext.commit('addOutstandingChange', {type: "episode", url: payload.episode.url});
                     });
             else
                 nsContext.commit('addOutstandingChange', {type: "episode", url: payload.episode.url});
