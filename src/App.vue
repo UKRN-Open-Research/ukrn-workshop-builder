@@ -1,5 +1,6 @@
 <template>
   <div id="app" class="">
+    <GitHubMenu/>
     <img alt="Vue logo" src="./assets/logo.png" class="vue-logo">
     <b-steps
             v-model="activeStep"
@@ -54,10 +55,12 @@ import CustomiseWorkshop from "./components/CustomiseWorkshop";
 import store from './store/store.js'
 import MakeSchedule
   from "./components/MakeSchedule";
+import GitHubMenu from "@/components/GitHubMenu";
 
 export default {
   name: 'App',
   components: {
+    GitHubMenu,
     MakeSchedule,
     SelectWorkshop,
     GitHubLogin,

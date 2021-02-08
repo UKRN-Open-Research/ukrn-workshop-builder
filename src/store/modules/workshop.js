@@ -10,7 +10,7 @@ export default {
         customized: false,
         episodes: [],
         outstandingChanges: [],
-        fetchEpisodesFlag: false,
+        busyFlag: false,
         errors: []
     },
     mutations: {
@@ -24,8 +24,35 @@ export default {
         setEpisodes: function(store, value) {store.episodes = value},
         addEpisode: function(store, value) {store.episodes.push(value)},
         addOutstandingChange: function(store, value) {store.outstandingChanges.push(value)},
-        clearOutstandingChanges: function(store) {store.outstandingChanges = []},
-        setFetchEpisodesFlag: function(store, value) {store.fetchEpisodesFlag = value},
+        /**
+         * Clear the outstanding changes for a file (or all files)
+         * @param store {object} current store
+         * @param [url=null] {string|null} url of the file with changes to clear
+         */
+        clearOutstandingChanges: function(store, url = null) {
+            if(url === null)
+                store.outstandingChanges = [];
+            else
+                store.outstandingChanges = store.outstandingChanges.filter(c => c.url !== url);
+        },
+        /**
+         * Update a file's SHA
+         * @param store {object} current store
+         * @param value {{url: string, sha: string}} file URL and new SHA
+         */
+        updateSHA(store, value) {
+            console.log({updateSHA: value})
+            if(value.url === store.config.url) {
+                store.remoteConfigSHA = value.sha;
+                return;
+            }
+            try {
+                store['episodes'].filter(e => e.url === value.url)[0].sha = value.sha;
+            } catch(e) {
+                console.error(e);
+            }
+        },
+        setBusyFlag: function(store, value) {store.busyFlag = value},
         addError: function(state, e) {state.errors.push(e)}
     },
     getters: {
@@ -56,6 +83,9 @@ export default {
              * @param payload {{user: string, token: string, repository: string, callback: function(error: string)}}
              */
             handler (nsContext, payload) {
+                if(nsContext.busyFlag)
+                    return;
+                nsContext.commit('setBusyFlag', true);
                 // Fetch repo config from GitHub backend
                 fetch(`/.netlify/functions/githubAPI`, {
                     method: "POST",
@@ -78,12 +108,15 @@ export default {
                         nsContext.dispatch('registerPush');
                         nsContext.commit('setRemote', payload.repository);
                         nsContext.commit('setCustomized', true);
+                        nsContext.commit('clearOutstandingChanges');
                         console.log(`Initialised workshop from remote ${payload.user}/${payload.repository}`);
+                        nsContext.commit('setBusyFlag', false);
                         nsContext.dispatch('fetchEpisodes', payload.callback);
                     })
                     .catch(e => {
                         console.error(e);
                         nsContext.commit('addError', e);
+                        nsContext.commit('setBusyFlag', false);
                     });
             }
         },
@@ -145,9 +178,9 @@ export default {
             }
         },
         fetchEpisodes(nsContext, callback) {
-            if(nsContext.state.fetchEpisodesFlag)
+            if(nsContext.state.busyFlag)
                 return;
-            nsContext.commit('setFetchEpisodesFlag', true);
+            nsContext.commit('setBusyFlag', true);
             fetch(`/.netlify/functions/githubAPI`, {
                 method: "POST",
                 headers: {task: "fetchEpisodes"},
@@ -167,13 +200,15 @@ export default {
                         e.content = atob(e.content);
                         return e;
                     }));
-                    nsContext.commit('setFetchEpisodesFlag', false);
+                    // Clear outstanding changes for each episode we just loaded
+                    json.episodes.map(e => e.url).forEach(url => nsContext.commit('clearOutstandingChanges', url));
+                    nsContext.commit('setBusyFlag', false);
                     callback(null);
                 })
                 .catch(e => {
                     console.error(e);
                     nsContext.commit('addError', e);
-                    nsContext.commit('setFetchEpisodesFlag', false);
+                    nsContext.commit('setBusyFlag', false);
                     callback(e);
                 });
         },
@@ -189,7 +224,7 @@ export default {
                     headers: {task: "updateFile"},
                     body: JSON.stringify({
                         token: nsContext.rootState.github.token,
-                        file: payload.episode
+                        file: {...payload.episode, content: btoa(payload.episode.content)}
                     })
                 })
                     .then(r => {
@@ -199,10 +234,63 @@ export default {
                     .catch(e => {
                         console.error(e);
                         nsContext.commit('addError', e);
-                        nsContext.commit('addOutstandingChange', {type: "episode", url: payload.episode.url});
+                        nsContext.commit('addOutstandingChange', {type: "episodes", url: payload.episode.url});
                     });
             else
-                nsContext.commit('addOutstandingChange', {type: "episode", url: payload.episode.url});
+                nsContext.commit('addOutstandingChange', {type: "episodes", url: payload.episode.url});
+        },
+        /**
+         * Send local changes to the remote repository
+         * @param nsContext {object} namespaced context
+         * @param payload {{callback: function(error: {null|string}, details?: {null|string})}} request details
+         */
+        commitChanges(nsContext, payload) {
+            if(nsContext.state.busyFlag)
+                return;
+            nsContext.commit('setBusyFlag', true);
+            let successes = 0;
+            Promise.all(nsContext.state.outstandingChanges.map(c => {
+                const matches = nsContext.state[c.type].filter(x => x.url === c.url);
+                if(!matches)
+                    throw new Error(`commitChanges cannot find file ${c.url} (type: ${c.type})`);
+                const file = matches[0];
+                console.log(`commitChanges to ${file.name}`)
+                return fetch('/.netlify/functions/githubAPI', {
+                    method: "POST", headers: {task: "updateFile"},
+                    body: JSON.stringify({
+                        token: nsContext.rootState.github.token,
+                        file: {...file, content: btoa(file.content)}
+                    })
+                })
+                    .then(r => {
+                        if (r.status !== 200)
+                            throw new Error(`commitChanges received ${r.statusText} (${r.status})`);
+                        return r.json();
+                    })
+                    .then(json => {
+                        successes++;
+                        nsContext.commit('updateSHA', {url: json.content.url, sha: json.content.sha});
+                        nsContext.commit('clearOutstandingChanges', c.url);
+                    })
+                    .catch(e => {
+                        console.log(`Error while updating ${c.url}: ${e}`)
+                    })
+            }))
+                .then(() => {
+                    if (nsContext.state.outstandingChanges.length)
+                        throw new Error(`Failed to commit changes to all files. Successes: ${successes}, Failures: ${nsContext.state.outstandingChanges.length}`)
+                })
+                .then(() => {
+                    if(typeof payload.callback === "function")
+                        payload.callback(null, `Saved changes to ${successes} files.`);
+                    nsContext.commit('setBusyFlag', false);
+                })
+                .catch(e => {
+                    if(typeof payload.callback === "function") payload.callback(
+                        e.message? `Error committing changes: ${e.message}` : e
+                    )
+                    nsContext.commit('setBusyFlag', false);
+                });
         }
     }
 };

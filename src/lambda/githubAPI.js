@@ -303,16 +303,18 @@ function updateFile(event, context, callback) {
             "accept": "application/vnd.github.mercy-preview+json",
             "authorization": `token ${d.token}`
         },
-        body: {
+        body: JSON.stringify({
             content: d.file.content,
             message: `${d.file.name} update by UKRN Workshop Builder`,
             sha: d.file.sha
-        }
+        })
     })
         .then(async r => {return {r, json: await r.json()}})
         .then(resp => {
-            if(resp.r.status !== 200)
-                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.errors.join('\n')}`);
+            if(resp.r.status !== 200) {
+                console.error(resp)
+                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.message}`);
+            }
             // Handle success
             callback(null, {
                 statusCode: 200,
