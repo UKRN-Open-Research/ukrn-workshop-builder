@@ -9,7 +9,7 @@
   >
     <b-collapse v-for="item in items"
                 :key="item.metadata.url"
-                class="episode card"
+                :class="`episode card ${item.remote? 'remote' : ''}`"
                 :title="item.metadata.description"
                 animation="slide"
                 :aria-id="`item-details-${item.metadata.url}`"
@@ -26,7 +26,7 @@
           <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
           <div class="action-icons" @click="evt=>evt.stopPropagation()">
             <b-button icon-right="cog" size="is-medium" title="Edit episode settings" />
-            <a :href="item.metadata.html_url" target="_blank" title="Open episode website in a new tab">
+            <a :href="getPagesLink(item)" target="_blank" title="Open episode website in a new tab">
               <b-button icon-right="link" size="is-medium"/>
             </a>
             <b-button v-if="dayId"
@@ -75,6 +75,11 @@ export default {
       if(!evt.added)
         return;
       this.$emit('assignItem', {itemURL: evt.added.element.metadata.url, dayId: this.dayId})
+    },
+    getPagesLink(item) {
+      const match = /github\.com\/([^/]+)\/([^/]+)/.exec(item.metadata.html_url);
+      const name = item.metadata.name.replace(/\.[a-zA-Z]+$/, "");
+      return `https://${match[1]}.github.io/${match[2]}/${name}`;
     }
   },
   watch: {}
@@ -94,6 +99,7 @@ export default {
     margin: .25em 1em;
     width: calc(100% - 2em);
     background-color: lightblue;
+    &.remote {background-color: orange;}
   }
   .action-icons {
     display: flex;

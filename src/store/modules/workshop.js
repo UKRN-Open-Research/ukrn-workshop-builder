@@ -9,6 +9,7 @@ export default {
         remoteRepository: "",
         customized: false,
         episodes: [],
+        remoteEpisodes: [],
         outstandingChanges: [],
         busyFlag: false,
         errors: []
@@ -23,6 +24,13 @@ export default {
         setCustomized: function(store, value) {store.customized = value},
         setEpisodes: function(store, value) {store.episodes = value},
         addEpisode: function(store, value) {store.episodes.push(value)},
+        addRemoteEpisodes: function(store, value) {value.episodes.forEach(e => {
+            const episodes = store.remoteEpisodes.filter(ep => ep.url === e.url);
+            if(episodes)
+                episodes[0] = e;
+            else
+                store.remoteEpisodes.push(e);
+        })},
         addOutstandingChange: function(store, value) {store.outstandingChanges.push(value)},
         /**
          * Clear the outstanding changes for a file (or all files)
@@ -111,7 +119,7 @@ export default {
                         nsContext.commit('clearOutstandingChanges');
                         console.log(`Initialised workshop from remote ${payload.user}/${payload.repository}`);
                         nsContext.commit('setBusyFlag', false);
-                        nsContext.dispatch('fetchEpisodes', payload.callback);
+                        nsContext.dispatch('fetchEpisodes', {callback: payload.callback});
                     })
                     .catch(e => {
                         console.error(e);
@@ -177,17 +185,27 @@ export default {
                     });
             }
         },
-        fetchEpisodes(nsContext, callback) {
+        /**
+         * Fetch the episodes in a repository
+         * @param nsContext {object} namespaced context
+         * @param payload {{callback: function(error?: string|null, message?: string|null), repository?: string|null}}
+         *  Callback function. Repository defaults to the user's remote repository, but if supplied will scrape a
+         *  different repository and save the episodes in remoteEpisodes, from where they can be installed into the
+         *  user's repository.
+         */
+        fetchEpisodes(nsContext, payload) {
             if(nsContext.state.busyFlag)
                 return;
             nsContext.commit('setBusyFlag', true);
+            const repository = payload.repository || nsContext.state.remoteRepository;
+            const saveAction = payload.repository? 'addRemoteEpisodes' : 'setEpisodes';
             fetch(`/.netlify/functions/githubAPI`, {
                 method: "POST",
                 headers: {task: "fetchEpisodes"},
                 body: JSON.stringify({
                     token: nsContext.rootState.github.token,
                     user: nsContext.rootState.github.login,
-                    repository: nsContext.state.remoteRepository
+                    repository
                 })
             })
                 .then(r => {
@@ -196,20 +214,22 @@ export default {
                     return r.json();
                 })
                 .then(json => {
-                    nsContext.commit('setEpisodes', json.episodes.map(e => {
+                    nsContext.commit(saveAction, json.episodes.map(e => {
                         e.content = atob(e.content);
                         return e;
                     }));
                     // Clear outstanding changes for each episode we just loaded
                     json.episodes.map(e => e.url).forEach(url => nsContext.commit('clearOutstandingChanges', url));
                     nsContext.commit('setBusyFlag', false);
-                    callback(null);
+                    if(typeof payload.callback === "function")
+                        payload.callback(null);
                 })
                 .catch(e => {
                     console.error(e);
                     nsContext.commit('addError', e);
                     nsContext.commit('setBusyFlag', false);
-                    callback(e);
+                    if(typeof payload.callback === "function")
+                        payload.callback(e);
                 });
         },
         updateEpisode(nsContext, payload) {
@@ -291,6 +311,14 @@ export default {
                     )
                     nsContext.commit('setBusyFlag', false);
                 });
+        },
+        /**
+         *
+         * @param nsContext {object} namespaced context
+         * @param payload {{episode: object}} remote episode to install
+         */
+        installRemoteEpisode(nsContext, payload) {
+            console.log(`Installing ${payload.episode.metadata.name} from ${payload.episode.metadata.url}`)
         }
     }
 };
