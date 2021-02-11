@@ -10,9 +10,7 @@ export default {
         // Error stack
         errors: [],
         // Busy flags indexed by their URLs or names
-        busyFlags: [],
-        // Save heavy processing work for files which haven't changed
-        file_cache: {}
+        busyFlags: []
 
         /*baseConfig: null,
         lastPushedConfig: null,
@@ -99,9 +97,9 @@ export default {
     },
     getters: {
         /**
-         * Return a File object from a URL with decoded content, busyflag, and file properties
+         * Return a File object from a URL with decoded content, busyflag, YAML content breakdown, and file properties
          * @param state
-         * @return {function(*=): {busyFlag: *, content: string}}
+         * @return {function(*=): {busyFlag: *, content: string, yaml: {...:*}, body: string|null}}
          * @constructor
          */
         File: (state, getters) => url => {
@@ -110,31 +108,21 @@ export default {
                 throw new Error(`Store has no file with URL: ${url}`);
             const file = match[0];
             // Process file content
-            if(state.file_cache[url] && state.file_cache[url].rawContent === file.content) {
-                try{
-                    const textContent = Base64.decode(file.content);
-                    const parsed = YAML.parseAllDocuments(textContent);
-                    const yamlText = textContent.substring(...parsed[0].range);
-                    const body = parsed.length > 1?
-                        textContent.substring(...parsed[1].range) : null;
-                    const yaml = YAML.parse(yamlText);
-                    state.file_cache[url] = {
-                        rawContent: file.content,
-                        content: textContent,
-                        yaml, body
-                    }
-                } catch(e) {
-                    state.file_cache[url] = {
-                        rawContent: file.content,
-                        content: Base64.decode(file.content),
-                        yaml: null,
-                        body: null
-                    }
-                }
+            const textContent = Base64.decode(file.content);
+            let yaml = null;
+            let body = null;
+            try{
+                const parsed = YAML.parseAllDocuments(textContent);
+                const yamlText = textContent.substring(...parsed[0].range);
+                body = parsed.length > 1?
+                    textContent.substring(...parsed[1].range) : null;
+                yaml = YAML.parse(yamlText);
+            } catch(e) {
+                state.commit('addError', e)
             }
             return {
                 ...file,
-                ...state.file_cache[url],
+                content: textContent, yaml, body,
                 busyFlag: () => getters.isBusy(url)
             }
         },
@@ -163,7 +151,7 @@ export default {
             const configFile = files.filter(f => f.path === '_config.yml');
             return {...repository, files,
                 busyFlag: () => getters.isBusy(url),
-                config: configFile.length? configFile[0] : null};
+                config: configFile.length? getters.File(configFile[0].url) : null};
         },
         isBusy: state => url => state.busyFlags.includes(url),
         lastError(state) {
@@ -231,6 +219,17 @@ export default {
                 array: 'files',
                 item: {...files[0], content: content}
             });
+        },
+        /**
+         * Set a file's content by specifying YAML + body
+         * @param nsContext
+         * @param url {string} URL of the file
+         * @param yaml {*[]} YAML key-value pairs of content to set
+         * @param [body=null] {string|null} body content
+         */
+        setFileContentFromYAML(nsContext, {url, yaml, body = null}) {
+            let content = `---\n${YAML.stringify(yaml)}\n---\n${body}`;
+            return nsContext.dispatch('setFileContent', {url, content, encode: true});
         },
         /**
          * Push a file to its remote repository and replace the current file with the remote version on success (keeps files sync'd with remote). Returns the newly sync'd file.
