@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+
 import github from "./modules/github";
 import template from "./modules/template";
 import workshop from "./modules/workshop";
@@ -12,10 +13,10 @@ const store = new Vuex.Store({
         template,
         workshop
     },
-    computed: {
-        ...Vuex.mapGetters({
-            workshopName: 'workshop/name'
-        })
+    state: {
+        topicList: [
+            'open-data', 'open-access', 'open-code', 'preprints', 'preregistration'
+        ]
     }
 });
 

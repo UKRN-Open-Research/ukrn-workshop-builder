@@ -2,6 +2,7 @@ const Base64 = require('js-base64');
 const YAML = require('yaml');
 export default {
     namespaced: true,
+    // State should only be manipulated internally
     state: {
         // Repositories indexed by their URLs
         repositories: [],
@@ -24,6 +25,7 @@ export default {
         outstandingChanges: [],
         busyFlag: false*/
     },
+    // Mutations should only be called internally
     mutations: {
         setItem(store, {array, item}) {
             const existing = store[array].filter(i => i.url === item.url);
@@ -34,11 +36,11 @@ export default {
             else
                 store[array].push(item);
         },
-        setBusyFlag(store, {url, value}) {
-            if(value)
-                store.busyFlags.push(url);
+        setBusyFlag(store, {flag, value}) {
+            if(value && !store.busyFlags.includes(flag))
+                store.busyFlags.push(flag);
             else
-                store.busyFlags = store.busyFlags.filter(s => s !== url);
+                store.busyFlags = store.busyFlags.filter(s => s !== flag);
         },
         setMainRepository(store, {url}) {
             if(!store.repositories.filter(r => r.url === url).length)
@@ -95,6 +97,7 @@ export default {
             }
         },*/
     },
+    // Getters are used to retrieve the state from the front end
     getters: {
         /**
          * Return a File object from a URL with decoded content, busyflag, YAML content breakdown, and file properties
@@ -129,7 +132,7 @@ export default {
         /**
          * Return a Repository object from a URL with its Files included. If empty, return the main repository.
          * @param state
-         * @return {function(*=): {files: []}}
+         * @return {function([url: string]): {files: []}}
          * @constructor
          */
         Repository: (state, getters) => url => {
@@ -149,17 +152,50 @@ export default {
                 .map(f => getters.File(f.url));
             // Check for a config file
             const configFile = files.filter(f => f.path === '_config.yml');
-            return {...repository, files,
+            const episodes = files.filter(f => /^_episodes/.test(f.path));
+            return {...repository, files, episodes,
                 busyFlag: () => getters.isBusy(url),
                 config: configFile.length? getters.File(configFile[0].url) : null};
         },
         isBusy: state => url => state.busyFlags.includes(url),
+        hasChanged: state => url => {
+            const files = state.files.filter(f => f.url === url);
+            if(!files.length)
+                throw new Error(`Cannot read hasChanged of unknown file: ${url}`);
+            return files[0].remoteContent !== files[0].content;
+        },
         lastError(state) {
             if(state.errors.length)
                 return state.errors[state.errors.length - 1];
             return null;
+        },
+        /**
+         * Return a list of the parse errors in the current config file
+         * @param state
+         * @return {function(...[*]=): string[]}
+         */
+        listConfigErrors: state => config => {
+            const existing = state.files.filter(f => f.url === config.url);
+            if(!existing.length)
+                throw new Error(`Cannot determine validity of unknown config: ${config.url}`);
+            const errors = [];
+            if(!config.yaml)
+                return ['no-yaml'];
+            if(!config.yaml.title)
+                errors.push('no-title');
+            else if(config.yaml.title === "My workshop")
+                errors.push('default-title');
+            if(!config.yaml['workshop-topic'])
+                errors.push('no-topic');
+            else if(config.yaml['workshop-topic'] === "TOPIC NOT SET")
+                errors.push('default-topic');
+            return errors;
+        },
+        isConfigValid: (state, getters) => config => {
+            return !getters.listConfigErrors(config).length;
         }
     },
+    // Actions are used to manipulate the state from the front end
     actions: {
         /**
          * Add a repository to the store
@@ -244,9 +280,12 @@ export default {
             const file = files[0];
             if(nsContext.getters.isBusy(url))
                 return null;
+            nsContext.commit('setBusyFlag', {flag: url, value: true});
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'pushFile'},
                 body: JSON.stringify({
+                    url: file.url,
+                    path: file.path,
                     content: file.content,
                     sha: file.sha,
                     token: nsContext.rootState.github.token
@@ -265,12 +304,12 @@ export default {
                         overwrite: true
                     }))
                 .then(() => {
-                    nsContext.commit('setBusyFlag', {url, value: false});
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
                     return nsContext.getters.File(url);
                 })
                 .catch(e => {
                     nsContext.commit('addError', e);
-                    nsContext.commit('setBusyFlag', {url, value: false});
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
                     console.error(e);
                     return null;
                 })
@@ -290,6 +329,7 @@ export default {
             const flag = "createRepository";
             if(nsContext.getters.isBusy(flag))
                 return null;
+            nsContext.commit('setBusyFlag', {flag, value: true});
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'createRepository'},
                 body: JSON.stringify({
@@ -307,6 +347,8 @@ export default {
                         ownerLogin: json.owner.login,
                         isMain: true
                     }))
+                .then(() => nsContext.getters.Repository())
+                .then(R => nsContext.dispatch('findRepositoryFiles', {url: R.url}))
                 .then(() => {
                     nsContext.commit('setBusyFlag', {flag, value: false});
                     return nsContext.getters.Repository();
@@ -329,6 +371,7 @@ export default {
             const flag = "findRepositories";
             if(nsContext.getters.isBusy(flag))
                 return null;
+            nsContext.commit('setBusyFlag', {flag, value: true});
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'findRepositories'},
                 body: JSON.stringify({
@@ -376,6 +419,7 @@ export default {
                 throw new Error(`Cannot fetch files for unknown repository: ${url}`)
             if(nsContext.getters.isBusy(url))
                 return null;
+            nsContext.commit('setBusyFlag', {flag: url, value: true});
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'findRepositoryFiles'},
                 body: JSON.stringify({
@@ -393,16 +437,58 @@ export default {
                         url: j.url, content: j.content, sha: j.sha, path: j.path,
                         overwrite
                     })));
-                    nsContext.commit('setBusyFlag', {url, value: false});
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
                     return nsContext.getters.Repository(url);
                 })
                 .catch(e => {
                     nsContext.commit('addError', e);
-                    nsContext.commit('setBusyFlag', {url, value: false});
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
                     console.error(e);
                     return null;
                 })
-        },/*
+        },
+        /**
+         * Set the Open Research topics of a repository
+         * @param nsContext
+         * @param topics {string[]}
+         * @return {null|Promise<any>}
+         */
+        setTopics(nsContext, {topics}) {
+            const main = nsContext.getters.Repository();
+            if(!main)
+                throw new Error(`Cannot set topics without a main repository.`);
+            const unknownTopics = topics.filter(t => !nsContext.rootState.topicList.includes(t));
+            if(unknownTopics.length)
+                throw new Error(`Cannot set unknown topics: ${unknownTopics.join(', ')}`);
+            if(nsContext.getters.isBusy(main.url))
+                return null;
+            nsContext.commit('setBusyFlag', {flag: main.url, value: true});
+            const topicSet = {};
+            nsContext.rootState.topicList.forEach(
+                t => topicSet[t] = topics.includes(t)
+            );
+            return fetch("/.netlify/functions/githubAPI", {
+                method: "POST", headers: {task: 'setTopics'},
+                body: JSON.stringify({
+                    url: main.url, topics: topicSet,
+                    token: nsContext.rootState.github.token
+                })
+            })
+                .then(r => {
+                    if(r.status !== 200)
+                        return null;
+                    return r.json();
+                })
+                .then(() => nsContext.commit('setBusyFlag', {flag: main.url, value: false}))
+                .then(() => nsContext.dispatch('findRepositories', {topics}))
+                .catch(e => {
+                    nsContext.commit('addError', e);
+                    nsContext.commit('setBusyFlag', {flag: main.url, value: false});
+                    console.error(e);
+                    return null;
+                })
+        }
+        /*
         loadRemoteWorkshop: {
             root: true,
             /!**

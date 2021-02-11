@@ -34,10 +34,25 @@
         </div>
       </div>
       <div class="content">
-        <b-field label="Create new repository...">
-          <b-input placeholder="New repository name" type="search"/>
+        <b-field label="Create new repository..."
+                 label-position="on-border"
+                 :message="newRepositoryName === newRepositoryNameSafe? '' : `Repository will be created as ${newRepositoryNameSafe}`"
+        >
+          <b-input placeholder="New repository name"
+                   type="search"
+                   v-model="newRepositoryName"
+                   expanded
+                   :disabled="$store.getters['workshop/isBusy']('createRepository')"
+          />
           <p class="control">
-            <b-button class="button is-primary" icon-left="github" icon-right="plus">
+            <b-button class="button is-primary"
+                      icon-left="github"
+                      icon-right="plus"
+                      type="is-primary"
+                      :disabled="!newRepositoryNameSafe"
+                      :loading="$store.getters['workshop/isBusy']('createRepository')"
+                      @click="createRepository"
+            >
               Create repository
             </b-button>
           </p>
@@ -114,6 +129,7 @@ export default {
   data: function() {
     return {
       chosenTemplateRepository: this.templateRepository,
+      newRepositoryName: "",
       remoteRepositoryURL: null
     }
   },
@@ -122,13 +138,15 @@ export default {
       return this.$store.state.workshop.repositories
               .filter(r => r.ownerLogin === this.$store.state.github.login);
     },
+    newRepositoryNameSafe() {
+      return this.newRepositoryName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()
+    }
   },
   methods: {
     checkUserRepositories() {
       console.log(`checkUserRepositories(user=${this.$store.state.github.login})`)
       this.$store.dispatch('workshop/findRepositories', {
-        owner: this.$store.state.github.login,
-        topics: ["ukrn-workshop", "ukrn-open-research"]
+        owner: this.$store.state.github.login
       });
     },
     chooseWorkshop() {
@@ -137,7 +155,19 @@ export default {
               {url: this.remoteRepositoryURL});
       // Load repositories with the same topic
       this.$store.dispatch('workshop/findRepositoryFiles',
-              {url: this.remoteRepositoryURL});
+              {url: this.remoteRepositoryURL})
+      // Look up workshops with the same topic
+      .then(R => {
+        if(R.config)
+          return this.$store.dispatch('workshop/findRepositories', {
+          topics: [R.config.yaml['workshop-topic']]
+        });
+      })
+    },
+    createRepository() {
+      this.$store.dispatch('workshop/createRepository', {
+        name: this.newRepositoryNameSafe, template: this.chosenTemplateRepository
+      })
     }
   },
   mounted() {}

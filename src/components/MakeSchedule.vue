@@ -91,16 +91,15 @@ export default {
     }
   },
   computed: {
-    allItems() {
-      return [
-          // ...this.$store.state.workshop.episodes.map(ep => episodeToScheduleItem(ep)),
-          // ...this.$store.state.workshop.remoteEpisodes.map(ep => episodeToScheduleItem(ep, true))
-      ];
+    allEpisodes() {
+      return this.$store.state.workshop.files
+              .filter(f => /^_episodes/.test(f.url))
+              .map(f => this.$store.getters['workshop/File'](f.url))
     },
     // The schedule is a representation of the episodes in a workshop arranged by day and time
     schedule: function() {
       const schedule = {days: [], unassignedItems: []};
-      this.allItems.forEach(item => {
+      this.allEpisodes.forEach(item => {
         // Items without valid day/start_time inputs are unassigned
         if(!item.yaml.day || item.yaml.start_time)
           return schedule.unassignedItems.push(item);
@@ -144,7 +143,7 @@ export default {
       }
     },
     updateItemDay(payload) {
-      const items = this.allItems.filter(i => i.metadata.url === payload.itemURL);
+      const items = this.allEpisodes.filter(i => i.metadata.url === payload.itemURL);
       if(!items)
         throw new Error("Invalid itemURL for update");
       items[0].yaml.day = payload.dayId;

@@ -17,16 +17,18 @@ async function main(event, context, callback) {
             return findRepositories(event, context, callback);
         case "findRepositoryFiles":
             return findRepositoryFiles(event, context, callback);
-        /*case "createRepository":
+        case "createRepository":
             return createRepository(event, context, callback);
-        case "fetchConfig":
+        case "pushFile":
+            return pushFile(event, context, callback);
+        case "setTopics":
+            return setTopics(event, context, callback);
+        /*case "fetchConfig":
             return fetchConfig(event, context, callback);
         case "updateConfig":
             return updateConfig(event, context, callback);
         case "fetchEpisodes":
-            return fetchEpisodes(event, context, callback);
-        case "updateFile":
-            return updateFile(event, context, callback);*/
+            return fetchEpisodes(event, context, callback);*/
         default:
             if(event.headers.task)
                 callback(`Unrecognised githubAPI task requested: ${event.headers.task}`);
@@ -96,7 +98,7 @@ function findRepositories(event, context, callback) {
         topics = '+' + d.topics.map(t => `topic:${t}`).join('+');
     if(d.user)
         user = `+user:${user}`;
-    const url = `https://api.github.com/search/repositories?q=fork:true${user}${topics}`;
+    const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-open-research${user}${topics}`;
     console.log(`findRepositories(${url})`)
     return fetch(url, {
         method: "GET", headers: {
@@ -117,7 +119,6 @@ function findRepositories(event, context, callback) {
 
 async function findRepositoryFiles(event, context, callback) {
     const d = JSON.parse(event.body);
-    const output = [];
     const files = [
         d.includeConfig? `${d.url}/contents/_config.yml` : null
     ];
@@ -161,82 +162,146 @@ async function findRepositoryFiles(event, context, callback) {
         .catch(e => {console.error(e); callback(e)})
 }
 
-
-
-/*
-
-
-/!**
- * Create a repository on GitHub for the currently authorised user
- * @param event {object} request details
- * @param context {object} environment details
- * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
- *!/
+/**
+* Create a repository on GitHub for the currently authorised user
+* @param event {object} request details
+* @param context {object} environment details
+* @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+*/
 function createRepository(event, context, callback) {
     const d = JSON.parse(event.body);
-    fetch(`https://api.github.com/repos/${d.templateRepository}/generate`, {
+    let output = null;
+    fetch(`https://api.github.com/repos/${d.template}/generate`, {
         method: "POST",
         headers: {
             "accept": "application/vnd.github.baptiste-preview+json",
             "authorization": `token ${d.token}`
         },
         body: JSON.stringify({
-            name: d.repoName,
+            name: d.name,
             private: false
         })
     })
-        .then(async r => {return {r, json: await r.json()}})
-        .then(resp => {
-            if(resp.r.status !== 201)
-                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.errors.join('\n')}`);
-            // Handle success
-            setTopics(resp.json, event, context, callback);
-        })
+        .then(r => checkResponseCode(r, 201))
+        .then(json => output = json)
+        .then(() => fetch(`${output.url}/topics`, {
+            method: "PUT",
+            headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${d.token}`
+            },
+            body: JSON.stringify({
+                names: ['ukrn-open-research', 'ukrn-workshop']
+            })
+        }))
+        .then(r => checkResponseCode(r, 200))
+        .then(() => callback(null, {
+            statusCode: 200, statusText: "OK", body: JSON.stringify(output)
+        }))
         .catch(e => {
             console.error(e);
             callback(e);
         })
 }
 
-/!**
- * Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily
- * @param create_response {object} response from creating the repository
- * @param event {object} request details
- * @param context {object} environment details
- * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
- *!/
-function setTopics(create_response, event, context, callback) {
+/**
+* Replace a file with a new version via github commit
+* @param event {object} request details
+* @param context {object} environment details
+* @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+*/
+function pushFile(event, context, callback) {
     const d = JSON.parse(event.body);
-    fetch(`https://api.github.com/repos/${create_response.full_name}/topics`, {
+    fetch(d.url, {
         method: "PUT",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
             "authorization": `token ${d.token}`
         },
         body: JSON.stringify({
-            names: [
-                'ukrn-open-research',
-                'ukrn-workshop',
-                d.topic
-            ]
+            content: d.content,
+            message: `${d.path} update by UKRN Workshop Builder`,
+            sha: d.sha
         })
     })
-        .then(async r => {return {r, json: await r.json()}})
-        .then(resp => {
-            if(resp.r.status !== 200)
-                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.errors.join('\n')}`);
-            // Handle success
-            callback(null, {
-                statusCode: 200,
-                statusText: "OK",
-                body: JSON.stringify({name: create_response.json.name})
+        .then(r => checkResponseCode(r, 200))
+        .then(json => fetch(json.content.url, {
+            method: "GET", headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${d.token}`
+            }
+        }))
+        .then(r => checkResponseCode(r, 200))
+        .then(json => callback(null, {
+            statusCode: 200,
+            statusText: "OK",
+            body: JSON.stringify(json)
+        }))
+        .catch(e => {
+            console.error(e);
+            callback(e);
+        });
+}
+
+/**
+* Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily
+* @param event {object} request details
+* @param context {object} environment details
+* @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+*/
+function setTopics(event, context, callback) {
+    const d = JSON.parse(event.body);
+    // Find current topics
+    getTopics(event)
+        .then(topics => {
+            const setTopics = d.topics;
+            // To protect against removal of customised topics we use this approach
+            topics.forEach(t => {
+                if(!Object.keys(setTopics).includes(t))
+                    setTopics[t] = true;
             });
+            return Object.keys(setTopics).filter(k => setTopics[k]);
         })
+        // Set topics
+        .then(topics => fetch(`${d.url}/topics`, {
+            method: "PUT",
+            headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${d.token}`
+            },
+            body: JSON.stringify({names: topics})
+        }))
+        .then(r => checkResponseCode(r, 200))
+        // Fetch final topic list for sanity
+        .then(() => getTopics(event))
+        .then(topics => callback(null, {
+            statusCode: 200, statusText: "OK", body: JSON.stringify(topics)
+        }))
         .catch(e => {
             console.error(e);
             callback(e);
         })
 }
+
+/**
+ * Get the topics associated with a repository
+ * @param event {{body: string, ...:*}}
+ * @return {Promise<Object>}
+ */
+function getTopics(event) {
+    const d = JSON.parse(event.body);
+    return fetch(`${d.url}/topics`, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${d.token}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200))
+        .then(json => json.names)
+}
+
+/*
 
 /!**
  * Fetch the configuration file _config.yml from a repository
@@ -389,43 +454,4 @@ async function _fetchEpisodesOfType(d, type) {
             })
     }));
 }
-
-
-/!**
- * Replace a file with a new version via github commit
- * @param event {object} request details
- * @param context {object} environment details
- * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
- *!/
-function updateFile(event, context, callback) {
-    const d = JSON.parse(event.body);
-    fetch(d.file.url, {
-        method: "PUT",
-        headers: {
-            "accept": "application/vnd.github.mercy-preview+json",
-            "authorization": `token ${d.token}`
-        },
-        body: JSON.stringify({
-            content: d.file.content,
-            message: `${d.file.name} update by UKRN Workshop Builder`,
-            sha: d.file.sha
-        })
-    })
-        .then(async r => {return {r, json: await r.json()}})
-        .then(resp => {
-            if(resp.r.status !== 200) {
-                console.error(resp)
-                throw new Error(`${resp.r.statusText} (${resp.r.status}): ${resp.json.message}`);
-            }
-            // Handle success
-            callback(null, {
-                statusCode: 200,
-                statusText: "OK",
-                body: JSON.stringify(resp.json)
-            });
-        })
-        .catch(e => {
-            console.error(e);
-            callback(e);
-        });
-}*/
+*/

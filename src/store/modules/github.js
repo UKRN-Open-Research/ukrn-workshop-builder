@@ -66,10 +66,7 @@ export default {
             if(payload.login && payload.token)
                 nsContext.dispatch(
                     'workshop/findRepositories',
-                    {
-                        owner: payload.login,
-                        topics: ["ukrn-workshop", "ukrn-open-research"]
-                    },
+                    {owner: payload.login},
                     {root: true}
                 );
         }

@@ -37,7 +37,7 @@
 
       <b-step-item step="4" label="Customize workshop" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep > 2">
         <h1 class="title has-text-centered">Customize workshop</h1>
-        <CustomiseWorkshop @pickLesson="activeStep = 5"/>
+        <CustomiseWorkshop @pickLesson="activeStep = 5" @goToCreateWorkshop="activeStep = 3"/>
       </b-step-item>
 
       <b-step-item step="5" label="Schedule" icon="check-box-multiple-outline" :type="stepType(5)" :clickable="latestStep > 3">
@@ -75,14 +75,29 @@ export default {
     }
   },
   computed: {
+    configReady() {
+      const R = this.$store.getters['workshop/Repository']();
+      if(!R)
+        return false;
+      if(!R.config)
+        return false;
+      if(!this.$store.getters['workshop/isConfigValid'](R.config) ||
+              this.$store.getters['workshop/hasChanged'](R.config.url)
+      )
+        return false;
+      return true;
+    },
     latestStep: function() {
-      if(this.$store.getters['workshop/Repository']() &&
-              this.$store.getters['workshop/Repository']().config)
+      // Check for a valid config file
+      if(this.configReady)
         return 4;
+      // Check for a main repository
       if(this.$store.getters['workshop/Repository']())
         return 3;
+      // Check for github login
       if(this.$store.state.github.login)
         return 2;
+      // Check for preamble reading
       if(this.preambleRead || this.$store.state.github.code !== "")
         return 1;
       return 0;
