@@ -70,9 +70,12 @@ export default {
   },
   computed: {
     template: {
-      get: function() {return this.$store.state.workshop.config},
+      get: function() {
+        try{return this.$store.getters['workshop/Repository']().config}
+        catch(e) {return null}
+      },
       set: function(v) {
-        this.$store.commit('workshop/updateConfig', v);
+        this.$store.commit('workshop/setFileContent', {url: v.url, content: v.content});
         this.currentTemplate = this.template;
         this.$forceUpdate();
       }

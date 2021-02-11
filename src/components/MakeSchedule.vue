@@ -93,8 +93,8 @@ export default {
   computed: {
     allItems() {
       return [
-          ...this.$store.state.workshop.episodes.map(ep => episodeToScheduleItem(ep)),
-          ...this.$store.state.workshop.remoteEpisodes.map(ep => episodeToScheduleItem(ep, true))
+          // ...this.$store.state.workshop.episodes.map(ep => episodeToScheduleItem(ep)),
+          // ...this.$store.state.workshop.remoteEpisodes.map(ep => episodeToScheduleItem(ep, true))
       ];
     },
     // The schedule is a representation of the episodes in a workshop arranged by day and time
@@ -173,14 +173,14 @@ export default {
  * @param [remote=false] {boolean} whether the episode is a member of a remote repository
  * @return {{metadata: {}, body: string, yaml: {}}}
  */
-function episodeToScheduleItem(E, remote = false) {
+/*function episodeToScheduleItem(E, remote = false) {
   const metadata = {...E};
   const content = YAML.parseAllDocuments(E.content);
   const yamlText = E.content.substring(...content[0].range);
   const body = E.content.substring(...content[1].range);
   const yaml = YAML.parse(yamlText);
   return {metadata, yaml, body, remote};
-}
+}*/
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

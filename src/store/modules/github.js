@@ -8,9 +8,9 @@ export default {
         loginInProgress: false
     },
     getters: {
-        lastError: function() {
-            const Es = this.state.errors.length;
-            return Es? this.state.errors[Es - 1] : null
+        lastError(state) {
+            const Es = state.errors.length;
+            return Es? state.errors[Es - 1] : null
         }
     },
     mutations: {
@@ -62,6 +62,16 @@ export default {
         readResponse (nsContext, payload) {
             nsContext.commit('setLogin', payload.login || "");
             nsContext.commit('setToken', payload.token || "");
+            // Look up the user's repositories
+            if(payload.login && payload.token)
+                nsContext.dispatch(
+                    'workshop/findRepositories',
+                    {
+                        owner: payload.login,
+                        topics: ["ukrn-workshop", "ukrn-open-research"]
+                    },
+                    {root: true}
+                );
         }
     }
 };

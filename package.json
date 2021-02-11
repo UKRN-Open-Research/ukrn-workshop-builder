@@ -13,6 +13,7 @@
     "@vue/cli-shared-utils": "^3.0.0",
     "buefy": "^0.9.4",
     "core-js": "^3.6.5",
+    "js-base64": "^3.6.0",
     "mavon-editor": "^2.9.1",
     "node-fetch": "^2.6.1",
     "query-string": "^6.13.8",

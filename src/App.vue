@@ -76,9 +76,10 @@ export default {
   },
   computed: {
     latestStep: function() {
-      if(this.$store.state.workshop.customized)
+      if(this.$store.getters['workshop/Repository']() &&
+              this.$store.getters['workshop/Repository']().config)
         return 4;
-      if(this.$store.state.workshop.remoteRepository !== "")
+      if(this.$store.getters['workshop/Repository']())
         return 3;
       if(this.$store.state.github.login)
         return 2;

@@ -4,15 +4,15 @@
       <b-menu-list>
         <b-menu-item icon="delete"
                      title="Discard local changes"
-                     :disabled="!$store.state.workshop.outstandingChanges.length"
+                     :disabled="true"
                      @click="reload"
         />
         <b-menu-item icon="content-save"
                      title="Save changes to GitHub"
-                     :disabled="!$store.state.workshop.outstandingChanges.length"
+                     :disabled="true"
                      @click="save"
         />
-        <b-icon icon="loading" custom-class="mdi-spin" v-if="$store.state.workshop.busyFlag"/>
+        <b-icon icon="loading" custom-class="mdi-spin" v-if="$store.state.workshop.busyFlags.length"/>
       </b-menu-list>
     </b-menu>
   </b-sidebar>
