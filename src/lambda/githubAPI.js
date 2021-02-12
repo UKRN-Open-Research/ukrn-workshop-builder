@@ -1,7 +1,9 @@
 exports.handler = main;
 import fetch from 'node-fetch'
 require('dotenv').config();
-const {VUE_APP_GITHUB_ID, GITHUB_APP_SECRET} = process.env;
+const {VUE_APP_GITHUB_ID, GITHUB_APP_SECRET, GITHUB_TOKEN_ENCRYPTION_KEY} = process.env;
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr(GITHUB_TOKEN_ENCRYPTION_KEY);
 
 /**
  * Process requests from a client
@@ -78,7 +80,8 @@ function redeemCode(event, context, callback) {
         }}))
         .then(r => r.json())
         .then(j => {
-            callback(null, {statusCode: 200, statusText: "OK", body: JSON.stringify({...j, token: access_token})})
+            callback(null, {statusCode: 200, statusText: "OK", body: JSON.stringify({
+                    ...j, token: cryptr.encrypt(access_token)})})
         })
         .catch(e => callback(e))
 }
@@ -103,7 +106,7 @@ function findRepositories(event, context, callback) {
     return fetch(url, {
         method: "GET", headers: {
             "accept": "application/vnd.github.mercy-preview+json",
-            "authorization": `token ${d.token}`
+            "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
         .then(r => checkResponseCode(r, 200))
@@ -132,7 +135,7 @@ async function findRepositoryFiles(event, context, callback) {
     Promise.all(dirs.map(dir => fetch(`${d.url}/contents/${dir}`, {
             method: "GET", headers: {
                 "accept": "application/vnd.github.v3+json",
-                "authorization": `token ${d.token}`
+                "authorization": `token ${cryptr.decrypt(d.token)}`
             }
         })
             .then(r => checkResponseCode(r, 200))
@@ -151,7 +154,7 @@ async function findRepositoryFiles(event, context, callback) {
                     method: "GET",
                     headers: {
                         "accept": "application/vnd.github.v3+json",
-                        "authorization": `token ${d.token}`
+                        "authorization": `token ${cryptr.decrypt(d.token)}`
                     }
                 })
                     .then(r => checkResponseCode(r, 200))
@@ -175,7 +178,7 @@ function createRepository(event, context, callback) {
         method: "POST",
         headers: {
             "accept": "application/vnd.github.baptiste-preview+json",
-            "authorization": `token ${d.token}`
+            "authorization": `token ${cryptr.decrypt(d.token)}`
         },
         body: JSON.stringify({
             name: d.name,
@@ -188,7 +191,7 @@ function createRepository(event, context, callback) {
             method: "PUT",
             headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${d.token}`
+                "authorization": `token ${cryptr.decrypt(d.token)}`
             },
             body: JSON.stringify({
                 names: ['ukrn-open-research', 'ukrn-workshop']
@@ -216,7 +219,7 @@ function pushFile(event, context, callback) {
         method: "PUT",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
-            "authorization": `token ${d.token}`
+            "authorization": `token ${cryptr.decrypt(d.token)}`
         },
         body: JSON.stringify({
             content: d.content,
@@ -228,7 +231,7 @@ function pushFile(event, context, callback) {
         .then(json => fetch(json.content.url, {
             method: "GET", headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${d.token}`
+                "authorization": `token ${cryptr.decrypt(d.token)}`
             }
         }))
         .then(r => checkResponseCode(r, 200))
@@ -267,7 +270,7 @@ function setTopics(event, context, callback) {
             method: "PUT",
             headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${d.token}`
+                "authorization": `token ${cryptr.decrypt(d.token)}`
             },
             body: JSON.stringify({names: topics})
         }))
@@ -294,7 +297,7 @@ function getTopics(event) {
         method: "GET",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
-            "authorization": `token ${d.token}`
+            "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
         .then(r => checkResponseCode(r, 200))
@@ -315,7 +318,7 @@ function fetchConfig(event, context, callback) {
         method: "GET",
         headers: {
             "accept": "application/vnd.github.v3+json",
-            "authorization": `token ${d.token}`
+            "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
         .then(async r => {return {r, json: await r.json()}})
@@ -366,7 +369,7 @@ function updateConfig(event, context, callback) {
                 method: "PUT",
                 headers: {
                     "accept": "application/vnd.github.mercy-preview+json",
-                    "authorization": `token ${d.token}`
+                    "authorization": `token ${cryptr.decrypt(d.token)}`
                 },
                 body: JSON.stringify({
                     content: d.config,
@@ -426,7 +429,7 @@ async function _fetchEpisodesOfType(d, type) {
         method: "GET",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
-            "authorization": `token ${d.token}`
+            "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
         .then(async r => {return {r, json: await r.json()}})
@@ -443,7 +446,7 @@ async function _fetchEpisodesOfType(d, type) {
             method: "GET",
             headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${d.token}`
+                "authorization": `token ${cryptr.decrypt(d.token)}`
             }
         })
             .then(async r => {return {r, json: await r.json()}})
