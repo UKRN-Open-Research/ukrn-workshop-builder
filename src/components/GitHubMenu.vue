@@ -30,7 +30,7 @@ export default {
   methods: {
     reload() {
       this.$store.dispatch('loadRemoteWorkshop', {
-        user: this.$store.state.github.login,
+        user: this.$store.getters['github/login'],
         repository: this.$store.state.workshop.remoteRepository,
         callback: (e) => {
           if(e !== null)

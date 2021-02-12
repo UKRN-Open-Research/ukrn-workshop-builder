@@ -41,32 +41,31 @@
       </div>
     </div>
 
-    <b-modal v-model="addRemoteItems" has-modal-card>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <h1 class="modal-card-title">Add items from a remote repository</h1>
+    <b-modal v-model="addRemoteItems" full-screen>
+      <div class="content">
+        <header class="title">
+          <h1 class="">Add items from a remote repository</h1>
         </header>
-        <div class="modal-card-body">
+        <div class="content">
           <p>Type the URL of a repository below. We will scan that repository for episodes and include them in your
             schedule options. You can then install these remote episodes and the episodes plus any files they depend on
             will be installed in your own repository.</p>
         </div>
-        <div class="modal-card-body is-inline-flex">
-          <b-autocomplete
-              rounded
-              v-model="remoteRepositoryName"
-              :data="filteredTopicRepositories"
-              placeholder="https://github.com/owner/repository"
-              icon="magnify"
-              clearable
-          >
-            <template #empty>No results found</template>
-          </b-autocomplete>
-          <b-button icon-left="plus-circle"
-                    @click="fetchEpisodesFromRepository"
-                    size="is-large"
-                    type="is-success"
-                    rounded
+        <b-autocomplete
+                v-model="remoteRepositoryName"
+                :data="filteredTopicRepositories.map(r => `${r.owner}/${r.name}`)"
+                placeholder="https://github.com/owner/repository"
+                icon="magnify"
+                clearable
+                expanded
+        >
+          <template #empty>No results found</template>
+        </b-autocomplete>
+        <div class="content cards">
+          <RemoteRepositoryView v-for="repo in filteredTopicRepositories"
+                                :key="repo.url"
+                                :repo="repo"
+                                @selectRepo="addRepositoryEpisodes"
           />
         </div>
       </div>
@@ -75,114 +74,113 @@
 </template>
 
 <script>
-import ArrangeItems from "./ArrangeItems";
-import YAML from 'yaml';
-export default {
-  name: 'MakeSchedule',
-  components: {
-    ArrangeItems
-  },
-  props: {},
-  data: function() {
-    return {
-      addRemoteItems: false,
-      remoteRepositoryName: "",
-      remoteRepositories: []
-    }
-  },
-  computed: {
-    allEpisodes() {
-      return this.$store.state.workshop.files
-              .filter(f => /^_episodes/.test(f.url))
-              .map(f => this.$store.getters['workshop/File'](f.url))
+  import ArrangeItems from "./ArrangeItems";
+  import RemoteRepositoryView from "./RemoteRepositoryView";
+  export default {
+    name: 'MakeSchedule',
+    components: {
+      RemoteRepositoryView,
+      ArrangeItems
     },
-    // The schedule is a representation of the episodes in a workshop arranged by day and time
-    schedule: function() {
-      const schedule = {days: [], unassignedItems: []};
-      this.allEpisodes.forEach(item => {
-        // Items without valid day/start_time inputs are unassigned
-        if(!item.yaml.day || item.yaml.start_time)
-          return schedule.unassignedItems.push(item);
-        const dayList = schedule.days.filter(d => d.number === item.yaml.day);
-        // create a new day for this item
-        if(!dayList.length)
-          schedule.days.push({number: item.yaml.day, items: [item]});
-        else
-          dayList[0].items.push(item);
-      });
-      // Pad schedule days and add an extra one at the end
-      let lastDay = Math.max(...schedule.days.map(d => d.number));
-      if(isNaN(lastDay) || lastDay < 0)
-        lastDay = 0;
-      for(let d = 1; d <= lastDay + 1; d++)
-        if(!schedule.days.filter(day => day.number === d).length)
-          schedule.days.push({number: d, items: []});
-      return schedule;
-    },
-    filteredTopicRepositories() {
-      return this.remoteRepositories.filter((option) => {
-        return option
-            .toString()
-            .toLowerCase()
-            .indexOf(this.name.toLowerCase()) >= 0
-      })
-    },
-    remoteRepositoryEpisodes() {
-      if(!this.remoteRepositoryName)
-        return [];
-      return this.remoteRepositories.filter(r => r.name === this.remoteRepositoryName)[0].episodes;
-    }
-  },
-  methods: {
-    updateEpisodeFromScheduleItem(item, push = false) {
-      const content = `---\n${YAML.stringify(item.yaml)}\n---\n${item.body}`;
-      if(content !== item.metadata.content) {
-        item.metadata.content = content;
-        // Dispatch the update episode backend
-        this.$store.dispatch('workshop/updateEpisode', {episode: item.metadata, push});
+    props: {},
+    data: function() {
+      return {
+        addRemoteItems: false,
+        remoteRepositoryName: ""
       }
     },
-    updateItemDay(payload) {
-      const items = this.allEpisodes.filter(i => i.metadata.url === payload.itemURL);
-      if(!items)
-        throw new Error("Invalid itemURL for update");
-      items[0].yaml.day = payload.dayId;
-      this.updateEpisodeFromScheduleItem(items[0])
+    computed: {
+      allItems() {
+        return this.$store.getters['workshop/RepositoriesByFilter'](
+                r => r || true
+        ).episodes
+      },
+      // The schedule is a representation of the episodes in a workshop arranged by day and time
+      schedule: function() {
+        console.log({episodes: this.allItems})
+        const schedule = {days: [], unassignedItems: []};
+        this.allItems.forEach(item => {
+          // Items without valid day/start_time inputs are unassigned
+          if(!item.yaml.day || item.yaml.start_time)
+            return schedule.unassignedItems.push(item);
+          const dayList = schedule.days.filter(d => d.number === item.yaml.day);
+          // create a new day for this item
+          if(!dayList.length)
+            schedule.days.push({number: item.yaml.day, items: [item]});
+          else
+            dayList[0].items.push(item);
+        });
+        // Pad schedule days and add an extra one at the end
+        let lastDay = Math.max(...schedule.days.map(d => d.number));
+        if(isNaN(lastDay) || lastDay < 0)
+          lastDay = 0;
+        for(let d = 1; d <= lastDay + 1; d++)
+          if(!schedule.days.filter(day => day.number === d).length)
+            schedule.days.push({number: d, items: []});
+        return schedule;
+      },
+      filteredTopicRepositories() {
+        return this.$store.getters['workshop/RepositoriesByFilter'](
+                r => `${r.owner}/${r.name}`
+                        .toLowerCase()
+                        .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0
+        )
+      },
+      remoteRepositoryEpisodes() {
+        if(!this.remoteRepositoryName)
+          return [];
+        return this.$store.getters['workshop/RepositoriesByFilter'](
+                r => r.name === this.remoteRepositoryName
+        )[0].episodes;
+      }
     },
-    fetchEpisodesFromRepository() {
-      // Close modal
-      this.addRemoteItems = false;
-      this.$store.commit('workshop/addRemoteEpisodes', {
-        episodes: this.remoteRepositoryEpisodes
-      })
+    methods: {
+      updateEpisode(episode, push = false) {
+        console.warn(`updateEpisode(${episode.name}, push=${push}) not yet implemented`)
+        /*const content = `---\n${YAML.stringify(episode.yaml)}\n---\n${episode.body}`;
+        if(content !== episode.metadata.content) {
+          episode.metadata.content = content;
+          // Dispatch the update episode backend
+          if(episode.remote && push)
+            this.$store.dispatch('workshop/installRemoteEpisodes', {
+              episodes: [episode.metadata], callback: (err, msg) => {
+                this.$buefy.toast.open({
+                  message: err? err : msg, type: err? "is-danger" : "is-success"
+                })
+              }
+            });
+          else if(episode.remote)
+            this.$store.commit('workshop/addRemoteEpisodes', {episodes: [episode.metadata]});
+          else
+            this.$store.dispatch('workshop/updateEpisode', {episode: episode.metadata, push});
+        }*/
+      },
+      updateItemDay(payload) {
+        const items = this.allItems.filter(i => i.metadata.url === payload.itemURL);
+        if(!items)
+          throw new Error("Invalid itemURL for update");
+        items[0].yaml.day = payload.dayId;
+        this.updateEpisode(items[0])
+      },
+      addRepositoryEpisodes(episodes) {
+        // Close modal
+        this.addRemoteItems = false;
+        this.$store.commit('workshop/addRemoteEpisodes', {episodes});
+      }
+    },
+    mounted() {
+      // TODO: search for and list repositories which have episodes for this topic
+      // Might be best to do this in the store on topic selection/workshop load
     }
-  },
-  mounted() {
-    // TODO: search for and list repositories which have episodes for this topic
-    // Might be best to do this in the store on topic selection/workshop load
   }
-}
-
-/**
- * Split an episode (github API result) into component parts.
- * Metadata is the raw episode.
- * YAML is a key-value breakdown of the yaml header.
- * Body is the contents of episode below the YAML header.
- * @param E {object} github episode object
- * @param [remote=false] {boolean} whether the episode is a member of a remote repository
- * @return {{metadata: {}, body: string, yaml: {}}}
- */
-/*function episodeToScheduleItem(E, remote = false) {
-  const metadata = {...E};
-  const content = YAML.parseAllDocuments(E.content);
-  const yamlText = E.content.substring(...content[0].range);
-  const body = E.content.substring(...content[1].range);
-  const yaml = YAML.parse(yamlText);
-  return {metadata, yaml, body, remote};
-}*/
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-
+  .cards {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
 </style>

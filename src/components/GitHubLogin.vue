@@ -1,20 +1,13 @@
 <template>
-  <div class="content">
-    <div class="content is-inline-flex"
-         v-if="$store.state.github.code !== ''"
-    >
-      <b-icon icon="github" :class="$store.state.github.loginInProgress === ''? 'is-warning' : 'is-success'"/>
-      <p v-if="$store.state.github.loginInProgress">Logging in <b-icon icon="loading" custom-class="mdi-spin"/></p>
-      <p v-else>Logged in as {{ $store.state.github.login }}</p>
-    </div>
-    <b-button v-else
-              @click="loginRequest"
+    <b-button @click="$store.getters['github/user']? $store.dispatch('github/logout') : loginRequest()"
               icon-left="github"
               size="is-medium"
+              :inverted="$store.getters['github/user']"
+              :loading="$store.state.github.loginInProgress"
     >
-      Log in to GitHub
+      <span v-if="$store.getters['github/user']">Logged in as {{ $store.getters['github/user'] }}</span>
+      <span v-else>Log in to GitHub</span>
     </b-button>
-  </div>
 </template>
 
 <script>
@@ -33,7 +26,14 @@ export default {
       window.location = `https://github.com/login/oauth/authorize?client_id=${process.env.VUE_APP_GITHUB_ID}&scope=public_repo repo`;
     }
   },
-  mounted: function() {}
+    mounted: function() {
+        // Check for a token to process
+        if(this.$store.getters['github/token'])
+            this.$store.dispatch('github/getUserDetails');
+        // Check for a code after the initial login stage attempt
+        else if(this.$store.getters['github/code'])
+            this.$store.dispatch('github/redeemCode');
+    }
 }
 </script>
 

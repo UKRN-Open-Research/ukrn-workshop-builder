@@ -12,18 +12,6 @@ export default {
         errors: [],
         // Busy flags indexed by their URLs or names
         busyFlags: []
-
-        /*baseConfig: null,
-        lastPushedConfig: null,
-        remoteConfigSHA: null,
-        config: null,
-        pushed: false,
-        remoteRepository: "",
-        customized: false,
-        episodes: [],
-        remoteEpisodes: [],
-        outstandingChanges: [],
-        busyFlag: false*/
     },
     // Mutations should only be called internally
     mutations: {
@@ -51,51 +39,6 @@ export default {
             });
         },
         addError: function(state, e) {state.errors.push(e)}
-        /*setBaseConfig: function(store, cfg) {store.baseConfig = cfg},
-        updateConfig: function(store, cfg) {store.config = cfg},
-        setPushed: function(store, value) {store.pushed = value},
-        setRemote: function(store, value) {store.remoteRepository = value},
-        setRemoteConfigSHA: function(store, value) {store.remoteConfigSHA = value},
-        updateLastPushedConfig: function(store) {store.lastPushedConfig = store.config},
-        setCustomized: function(store, value) {store.customized = value},
-        setEpisodes: function(store, value) {store.episodes = value},
-        addEpisode: function(store, value) {store.episodes.push(value)},
-        addRemoteEpisodes: function(store, value) {value.episodes.forEach(e => {
-            const episodes = store.remoteEpisodes.filter(ep => ep.url === e.url);
-            if(episodes)
-                episodes[0] = e;
-            else
-                store.remoteEpisodes.push(e);
-        })},
-        addOutstandingChange: function(store, value) {store.outstandingChanges.push(value)},
-        /!**
-         * Clear the outstanding changes for a file (or all files)
-         * @param store {object} current store
-         * @param [url=null] {string|null} url of the file with changes to clear
-         *!/
-        clearOutstandingChanges: function(store, url = null) {
-            if(url === null)
-                store.outstandingChanges = [];
-            else
-                store.outstandingChanges = store.outstandingChanges.filter(c => c.url !== url);
-        },
-        /!**
-         * Update a file's SHA
-         * @param store {object} current store
-         * @param value {{url: string, sha: string}} file URL and new SHA
-         *!/
-        updateSHA(store, value) {
-            console.log({updateSHA: value})
-            if(value.url === store.config.url) {
-                store.remoteConfigSHA = value.sha;
-                return;
-            }
-            try {
-                store['episodes'].filter(e => e.url === value.url)[0].sha = value.sha;
-            } catch(e) {
-                console.error(e);
-            }
-        },*/
     },
     // Getters are used to retrieve the state from the front end
     getters: {
@@ -130,6 +73,16 @@ export default {
             }
         },
         /**
+         * Return Files matched by a specified filter_function
+         * @param state
+         * @param getters
+         * @return {function(*=): *}
+         * @constructor
+         */
+        FilesByFilter: (state, getters) => filter_function => {
+            return state.files.filter(filter_function).map(f => getters.File(f.url))
+        },
+        /**
          * Return a Repository object from a URL with its Files included. If empty, return the main repository.
          * @param state
          * @return {function([url: string]): {files: []}}
@@ -151,11 +104,21 @@ export default {
                 .filter(f => f.url.indexOf(url) !== -1)
                 .map(f => getters.File(f.url));
             // Check for a config file
-            const configFile = files.filter(f => f.path === '_config.yml');
-            const episodes = files.filter(f => /^_episodes/.test(f.path));
+            const configFiles = getters.FilesByFilter(f => f.path === '_config.yml');
+            const episodes = getters.FilesByFilter(f => /^_episodes/.test(f.path));
             return {...repository, files, episodes,
                 busyFlag: () => getters.isBusy(url),
-                config: configFile.length? getters.File(configFile[0].url) : null};
+                config: configFiles.length? configFiles[0] : null};
+        },
+        /**
+         * Return Repositories matched by a specified filter_function
+         * @param state
+         * @param getters
+         * @return {function(*=): *}
+         * @constructor
+         */
+        RepositoriesByFilter: (state, getters) => filter_function => {
+            return state.repositories.filter(filter_function).map(r => getters.Repository(r.url))
         },
         isBusy: state => url => state.busyFlags.includes(url),
         hasChanged: state => url => {
@@ -288,7 +251,7 @@ export default {
                     path: file.path,
                     content: file.content,
                     sha: file.sha,
-                    token: nsContext.rootState.github.token
+                    token: nsContext.rootGetters['github/token']
                 })
             })
                 .then(r => {
@@ -333,7 +296,7 @@ export default {
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'createRepository'},
                 body: JSON.stringify({
-                    name, template, token: nsContext.rootState.github.token
+                    name, template, token: nsContext.rootGetters['github/token']
                 })
             })
                 .then(r => {
@@ -375,7 +338,7 @@ export default {
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'findRepositories'},
                 body: JSON.stringify({
-                    topics, owner, token: nsContext.rootState.github.token
+                    topics, owner, token: nsContext.rootGetters['github/token']
                 })
             })
                 .then(r => {
@@ -424,7 +387,7 @@ export default {
                 method: "POST", headers: {task: 'findRepositoryFiles'},
                 body: JSON.stringify({
                     url, includeEpisodes, includeConfig,
-                    token: nsContext.rootState.github.token
+                    token: nsContext.rootGetters['github/token']
                 })
             })
                 .then(r => {
@@ -471,7 +434,7 @@ export default {
                 method: "POST", headers: {task: 'setTopics'},
                 body: JSON.stringify({
                     url: main.url, topics: topicSet,
-                    token: nsContext.rootState.github.token
+                    token: nsContext.rootGetters['github/token']
                 })
             })
                 .then(r => {
@@ -488,243 +451,5 @@ export default {
                     return null;
                 })
         }
-        /*
-        loadRemoteWorkshop: {
-            root: true,
-            /!**
-             * Load a remote workshop and then fetch the episodes in that workshop
-             * @param nsContext {object} namespaced context
-             * @param payload {{user: string, token: string, repository: string, callback: function(error: string)}}
-             *!/
-            handler (nsContext, payload) {
-                if(nsContext.busyFlag)
-                    return;
-                nsContext.commit('setBusyFlag', true);
-                // Fetch repo config from GitHub backend
-                fetch(`/.netlify/functions/githubAPI`, {
-                    method: "POST",
-                    headers: {task: "fetchConfig"},
-                    body: JSON.stringify({
-                        token: nsContext.rootState.github.token,
-                        ...payload
-                    })
-                })
-                    .then(r => {
-                        if(r.status !== 200)
-                            throw new Error(`loadRemoteWorkshop received ${r.statusText} (${r.status})`);
-                        return r.json();
-                    })
-                    .then(j => {
-                        const cfg = atob(j.base64);
-                        nsContext.commit('updateConfig', cfg);
-                        nsContext.commit('setBaseConfig', cfg);
-                        nsContext.commit('setRemoteConfigSHA', j.sha);
-                        nsContext.dispatch('registerPush');
-                        nsContext.commit('setRemote', payload.repository);
-                        nsContext.commit('setCustomized', true);
-                        nsContext.commit('clearOutstandingChanges');
-                        console.log(`Initialised workshop from remote ${payload.user}/${payload.repository}`);
-                        nsContext.commit('setBusyFlag', false);
-                        nsContext.dispatch('fetchEpisodes', {callback: payload.callback});
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        nsContext.commit('addError', e);
-                        nsContext.commit('setBusyFlag', false);
-                    });
-            }
-        },
-        pushWorkshopToGitHub: {
-            root: true,
-            handler (nsContext, payload) {
-                console.log(`Pushing workshop!`);
-                fetch(`/.netlify/functions/githubAPI`, {
-                    method: "POST",
-                    headers: {task: "createRepository"},
-                    body: JSON.stringify({
-                        token: nsContext.rootState.github.token,
-                        ...payload
-                    })
-                })
-                    .then(r => {
-                        if(r.status !== 200)
-                            throw new Error(`Push workshop received ${r.statusText} (${r.status})`);
-                        console.log(r)
-                        return r.json();
-                    })
-                    .then(j => {
-                        nsContext.dispatch('registerPush');
-                        nsContext.commit('setRemote', j.name);
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        nsContext.commit('addError', e);
-                    });
-            }
-        },
-        commitWorkshopConfigChanges: {
-            root: true,
-            handler (nsContext) {
-                console.log("Pushing updated _config.yml to GitHub")
-                fetch(`/.netlify/functions/githubAPI`, {
-                    method: "POST",
-                    headers: {task: "updateConfig"},
-                    body: JSON.stringify({
-                        config: btoa(nsContext.state.config),
-                        token: nsContext.rootState.github.token,
-                        user: nsContext.rootState.github.login,
-                        repository: nsContext.state.remoteRepository
-                    })
-                })
-                    .then(r => {
-                        if(r.status !== 200)
-                            throw new Error(`commitWorkshopConfigChanges received ${r.statusText} (${r.status})`);
-                        return r.json();
-                    })
-                    .then(json => {
-                        nsContext.dispatch('registerPush', json.sha);
-                        nsContext.commit('setCustomized', true);
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        nsContext.commit('addError', e);
-                    });
-            }
-        },
-        /!**
-         * Fetch the episodes in a repository
-         * @param nsContext {object} namespaced context
-         * @param payload {{callback: function(error?: string|null, message?: string|null), repository?: string|null}}
-         *  Callback function. Repository defaults to the user's remote repository, but if supplied will scrape a
-         *  different repository and save the episodes in remoteEpisodes, from where they can be installed into the
-         *  user's repository.
-         *!/
-        fetchEpisodes(nsContext, payload) {
-            if(nsContext.state.busyFlag)
-                return;
-            nsContext.commit('setBusyFlag', true);
-            const repository = payload.repository || nsContext.state.remoteRepository;
-            const saveAction = payload.repository? 'addRemoteEpisodes' : 'setEpisodes';
-            fetch(`/.netlify/functions/githubAPI`, {
-                method: "POST",
-                headers: {task: "fetchEpisodes"},
-                body: JSON.stringify({
-                    token: nsContext.rootState.github.token,
-                    user: nsContext.rootState.github.login,
-                    repository
-                })
-            })
-                .then(r => {
-                    if(r.status !== 200)
-                        throw new Error(`fetchEpisodes received ${r.statusText} (${r.status})`);
-                    return r.json();
-                })
-                .then(json => {
-                    nsContext.commit(saveAction, json.episodes.map(e => {
-                        e.content = atob(e.content);
-                        return e;
-                    }));
-                    // Clear outstanding changes for each episode we just loaded
-                    json.episodes.map(e => e.url).forEach(url => nsContext.commit('clearOutstandingChanges', url));
-                    nsContext.commit('setBusyFlag', false);
-                    if(typeof payload.callback === "function")
-                        payload.callback(null);
-                })
-                .catch(e => {
-                    console.error(e);
-                    nsContext.commit('addError', e);
-                    nsContext.commit('setBusyFlag', false);
-                    if(typeof payload.callback === "function")
-                        payload.callback(e);
-                });
-        },
-        updateEpisode(nsContext, payload) {
-            // Update local
-            nsContext.commit('setEpisodes', nsContext.state.episodes.map(e =>
-                e.url === payload.episode.url? payload.episode : e
-            ));
-
-            if(payload.push)
-                fetch(`/.netlify/functions/githubAPI`, {
-                    method: "POST",
-                    headers: {task: "updateFile"},
-                    body: JSON.stringify({
-                        token: nsContext.rootState.github.token,
-                        file: {...payload.episode, content: btoa(payload.episode.content)}
-                    })
-                })
-                    .then(r => {
-                        if(r.status !== 200)
-                            throw new Error(`updateEpisode received ${r.statusText} (${r.status})`);
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        nsContext.commit('addError', e);
-                        nsContext.commit('addOutstandingChange', {type: "episodes", url: payload.episode.url});
-                    });
-            else
-                nsContext.commit('addOutstandingChange', {type: "episodes", url: payload.episode.url});
-        },
-        /!**
-         * Send local changes to the remote repository
-         * @param nsContext {object} namespaced context
-         * @param payload {{callback: function(error: {null|string}, details?: {null|string})}} request details
-         *!/
-        commitChanges(nsContext, payload) {
-            if(nsContext.state.busyFlag)
-                return;
-            nsContext.commit('setBusyFlag', true);
-            let successes = 0;
-            Promise.all(nsContext.state.outstandingChanges.map(c => {
-                const matches = nsContext.state[c.type].filter(x => x.url === c.url);
-                if(!matches)
-                    throw new Error(`commitChanges cannot find file ${c.url} (type: ${c.type})`);
-                const file = matches[0];
-                console.log(`commitChanges to ${file.name}`)
-                return fetch('/.netlify/functions/githubAPI', {
-                    method: "POST", headers: {task: "updateFile"},
-                    body: JSON.stringify({
-                        token: nsContext.rootState.github.token,
-                        file: {...file, content: btoa(file.content)}
-                    })
-                })
-                    .then(r => {
-                        if (r.status !== 200)
-                            throw new Error(`commitChanges received ${r.statusText} (${r.status})`);
-                        return r.json();
-                    })
-                    .then(json => {
-                        successes++;
-                        nsContext.commit('updateSHA', {url: json.content.url, sha: json.content.sha});
-                        nsContext.commit('clearOutstandingChanges', c.url);
-                    })
-                    .catch(e => {
-                        console.log(`Error while updating ${c.url}: ${e}`)
-                    })
-            }))
-                .then(() => {
-                    if (nsContext.state.outstandingChanges.length)
-                        throw new Error(`Failed to commit changes to all files. Successes: ${successes}, Failures: ${nsContext.state.outstandingChanges.length}`)
-                })
-                .then(() => {
-                    if(typeof payload.callback === "function")
-                        payload.callback(null, `Saved changes to ${successes} files.`);
-                    nsContext.commit('setBusyFlag', false);
-                })
-                .catch(e => {
-                    if(typeof payload.callback === "function") payload.callback(
-                        e.message? `Error committing changes: ${e.message}` : e
-                    )
-                    nsContext.commit('setBusyFlag', false);
-                });
-        },
-        /!**
-         *
-         * @param nsContext {object} namespaced context
-         * @param payload {{episode: object}} remote episode to install
-         *!/
-        installRemoteEpisode(nsContext, payload) {
-            console.log(`Installing ${payload.episode.metadata.name} from ${payload.episode.metadata.url}`)
-        }*/
     }
 };
