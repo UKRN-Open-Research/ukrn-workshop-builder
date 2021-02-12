@@ -8,18 +8,18 @@
           class="episodeList"
   >
     <b-collapse v-for="item in items"
-                :key="item.metadata.url"
+                :key="item.url"
                 :class="`episode card ${item.remote? 'remote' : ''}`"
-                :title="item.metadata.description"
+                :title="item.description"
                 animation="slide"
-                :aria-id="`item-details-${item.metadata.url}`"
+                :aria-id="`item-details-${item.url}`"
                 :open="false"
     >
       <template #trigger="props">
         <div
                 class="card-header"
                 role="button"
-                :aria-controls="`item-details-${item.metadata.url}`">
+                :aria-controls="`item-details-${item.url}`">
             <span class="card-header-title">
               {{ item.yaml.title }}
             </span>
@@ -34,7 +34,7 @@
                       size="is-medium"
                       title="Remove this episode"
                       class="del"
-                      @click="$emit('assignItem', {itemURL: item.metadata.url, dayId: null})"
+                      @click="$emit('assignItem', {item: item, dayId: ''})"
                       :type="!dayId? 'is-danger' : 'is-info'"
                       outlined
             />
@@ -74,12 +74,13 @@ export default {
       // Only monitor add events because the store will handle removals
       if(!evt.added)
         return;
-      this.$emit('assignItem', {itemURL: evt.added.element.metadata.url, dayId: this.dayId})
+      this.$emit('assignItem', {item: evt.added.element, dayId: this.dayId})
     },
     getPagesLink(item) {
-      const match = /github\.com\/([^/]+)\/([^/]+)/.exec(item.metadata.html_url);
-      const name = item.metadata.name.replace(/\.[a-zA-Z]+$/, "");
-      return `https://${match[1]}.github.io/${match[2]}/${name}`;
+      const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);
+      const name = /\/([^/]+)$/.exec(item.path);
+      const webDir = name[1].replace(/\.[^.]*$/, "");
+      return `https://${match[1]}.github.io/${match[2]}/${webDir}/`;
     }
   },
   watch: {}

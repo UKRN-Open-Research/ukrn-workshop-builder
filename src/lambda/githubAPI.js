@@ -42,6 +42,8 @@ async function main(event, context, callback) {
  * @return {Promise<object>}
  */
 async function checkResponseCode(response, code) {
+    console.log(`${response.url.replace("https://api.github.com/", "")}: ${response.status} - ${response.statusText}`);
+
     const json = await response.json();
     if(response.status !== code)
         throw new Error(`${response.statusText} (${response.status}): ${json.message}`);
@@ -94,7 +96,7 @@ function getUserDetails(event, context, callback) {
  * @param callback
  * @return {Promise<{r: Response, json: any}>}
  */
-function findRepositories(event, context, callback) {
+async function findRepositories(event, context, callback) {
     const d = JSON.parse(event.body);
     let topics = "";
     let user = "";
@@ -139,7 +141,8 @@ async function findRepositoryFiles(event, context, callback) {
                 "authorization": `token ${cryptr.decrypt(d.token)}`
             }
         })
-            .then(r => checkResponseCode(r, 200))
+            // Protect against 404 errors because some repos don't have some directories
+            .then(r => r.status === 404? [{}] : checkResponseCode(r, 200))
             .then(json => json.map(i => {
                 if(i.type === "file" && !/^[._]/.test(i.name))
                     return i.url;

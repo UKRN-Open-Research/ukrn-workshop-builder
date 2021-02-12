@@ -1,75 +1,87 @@
 <template>
-  <section class="card">
-    <div class="columns">
-      <div class="column">
-        <div class="card-content card"
-             v-for="day in schedule.days.sort((a,b) => a.number > b.number)"
-             :key="day.number"
-        >
-          <header class="card-header" v-if="!$store.state.workshop.busyFlag">
-            <h1 class="card-header-title">Day {{ day.number }}</h1>
-          </header>
-          <b-skeleton size="is-large" animated :active="$store.state.workshop.busyFlag"/>
-          <div class="card-content" v-if="!$store.state.workshop.busyFlag">
-            <ArrangeItems :items="day.items"
-                          :dayId="day.number"
-                          @assignItem="updateItemDay"
-            />
-          </div>
-          <b-skeleton size="is-medium" animated :active="$store.state.workshop.busyFlag"/>
-        </div>
+  <section>
+    <section class="card" v-if="!mainRepo">
+      <div class="card-content">
+        <p>No workshop detected.</p>
+        <b-button label="Go to create workshop section"
+                  icon-left="arrow-left"
+                  type="is-warning"
+                  @click="$emit('goToCreateWorkshop')"
+        />
       </div>
-      <div class="column">
-        <div class="card-content card">
-          <header class="card-header" v-if="!$store.state.workshop.busyFlag">
-            <h1 class="card-header-title">Unassigned items</h1>
-          </header>
-          <b-skeleton size="is-large" animated :active="$store.state.workshop.busyFlag"/>
-          <div class="card-content" v-if="!$store.state.workshop.busyFlag">
-            <ArrangeItems :items="schedule.unassignedItems"
-                          :is-unscheduled="true"
-                          @chage="updateItemDay"
-                          @drop="itemUrl => updateItemDay(itemUrl, null)"
-            />
-          </div>
-          <b-skeleton size="is-medium" animated :active="$store.state.workshop.busyFlag"/>
-          <div class="card-footer">
-            <b-button class="card-footer-item" icon-left="plus" @click="addRemoteItems = true">Add Items to Stash</b-button>
+    </section>
+    <section class="card" v-else>
+      <div class="columns">
+        <div class="column">
+          <div class="card-content card"
+               v-for="day in schedule.days.sort((a,b) => a.number > b.number)"
+               :key="day.number"
+          >
+            <header class="card-header" v-if="!mainRepo.busyFlag()">
+              <h1 class="card-header-title">Day {{ day.number }}</h1>
+            </header>
+            <b-skeleton size="is-large" animated :active="mainRepo.busyFlag()"/>
+            <div class="card-content" v-if="!mainRepo.busyFlag()">
+              <ArrangeItems :items="day.items"
+                            :dayId="day.number"
+                            @assignItem="updateItemDay"
+              />
+            </div>
+            <b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
           </div>
         </div>
+        <div class="column">
+          <div class="card-content card">
+            <header class="card-header" v-if="!mainRepo.busyFlag()">
+              <h1 class="card-header-title">Unassigned items</h1>
+            </header>
+            <b-skeleton size="is-large" animated :active="mainRepo.busyFlag()"/>
+            <div class="card-content" v-if="!mainRepo.busyFlag()">
+              <ArrangeItems :items="schedule.unassignedItems"
+                            :is-unscheduled="true"
+                            @chage="updateItemDay"
+                            @drop="item => updateItemDay({item, dayId: ''})"
+              />
+            </div>
+            <b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
+            <div class="card-footer">
+              <b-button class="card-footer-item" icon-left="plus" @click="addRemoteItems = true">Add Items to Stash</b-button>
+            </div>
+          </div>
 
+        </div>
       </div>
-    </div>
 
-    <b-modal v-model="addRemoteItems" full-screen>
-      <div class="content">
-        <header class="title">
-          <h1 class="">Add items from a remote repository</h1>
-        </header>
+      <b-modal v-model="addRemoteItems" full-screen>
         <div class="content">
-          <p>Type the URL of a repository below. We will scan that repository for episodes and include them in your
-            schedule options. You can then install these remote episodes and the episodes plus any files they depend on
-            will be installed in your own repository.</p>
+          <header class="title">
+            <h1 class="">Add items from a remote repository</h1>
+          </header>
+          <div class="content">
+            <p>Type the URL of a repository below. We will scan that repository for episodes and include them in your
+              schedule options. You can then install these remote episodes and the episodes plus any files they depend on
+              will be installed in your own repository.</p>
+          </div>
+          <b-autocomplete
+                  v-model="remoteRepositoryName"
+                  :data="filteredTopicRepositories.map(r => `${r.owner}/${r.name}`)"
+                  placeholder="https://github.com/owner/repository"
+                  icon="magnify"
+                  clearable
+                  expanded
+          >
+            <template #empty>No results found</template>
+          </b-autocomplete>
+          <div class="content cards">
+            <RemoteRepositoryView v-for="repo in filteredTopicRepositories"
+                                  :key="repo.url"
+                                  :repo="repo"
+                                  @selectRepo="addRepositoryEpisodes"
+            />
+          </div>
         </div>
-        <b-autocomplete
-                v-model="remoteRepositoryName"
-                :data="filteredTopicRepositories.map(r => `${r.owner}/${r.name}`)"
-                placeholder="https://github.com/owner/repository"
-                icon="magnify"
-                clearable
-                expanded
-        >
-          <template #empty>No results found</template>
-        </b-autocomplete>
-        <div class="content cards">
-          <RemoteRepositoryView v-for="repo in filteredTopicRepositories"
-                                :key="repo.url"
-                                :repo="repo"
-                                @selectRepo="addRepositoryEpisodes"
-          />
-        </div>
-      </div>
-    </b-modal>
+      </b-modal>
+    </section>
   </section>
 </template>
 
@@ -86,18 +98,31 @@
     data: function() {
       return {
         addRemoteItems: false,
-        remoteRepositoryName: ""
+        remoteRepositoryName: "",
+        availableEpisodes: []
       }
     },
     computed: {
+      mainRepo() {return this.$store.getters['workshop/Repository']();},
+      /**
+       * Return all the episodes in a Repository which has a matching topic.
+       */
       allItems() {
-        return this.$store.getters['workshop/RepositoriesByFilter'](
-                r => r || true
-        ).episodes
+        const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
+        const topics = this.$store.getters['workshop/Repository']().topics
+                .filter(t => this.$store.state.topicList.includes(t));
+        const topicRepos = this.$store.getters['workshop/RepositoriesByFilter'](r => {
+          for(let t of topics)
+            if(r.topics.includes(t))
+              return true;
+        });
+        const episodes = [];
+        topicRepos.forEach(R => episodes.push(...R.episodes));
+        // Add remote flag
+        return episodes.map(e => {return {...e, remote: !mainEpisodes.includes(e.url)}});
       },
       // The schedule is a representation of the episodes in a workshop arranged by day and time
       schedule: function() {
-        console.log({episodes: this.allItems})
         const schedule = {days: [], unassignedItems: []};
         this.allItems.forEach(item => {
           // Items without valid day/start_time inputs are unassigned
@@ -121,7 +146,8 @@
       },
       filteredTopicRepositories() {
         return this.$store.getters['workshop/RepositoriesByFilter'](
-                r => `${r.owner}/${r.name}`
+                r => !r.isMain &&
+                        `${r.owner}/${r.name}`
                         .toLowerCase()
                         .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0
         )
@@ -135,37 +161,36 @@
       }
     },
     methods: {
-      updateEpisode(episode, push = false) {
-        console.warn(`updateEpisode(${episode.name}, push=${push}) not yet implemented`)
-        /*const content = `---\n${YAML.stringify(episode.yaml)}\n---\n${episode.body}`;
-        if(content !== episode.metadata.content) {
-          episode.metadata.content = content;
-          // Dispatch the update episode backend
-          if(episode.remote && push)
-            this.$store.dispatch('workshop/installRemoteEpisodes', {
-              episodes: [episode.metadata], callback: (err, msg) => {
-                this.$buefy.toast.open({
-                  message: err? err : msg, type: err? "is-danger" : "is-success"
-                })
-              }
-            });
-          else if(episode.remote)
-            this.$store.commit('workshop/addRemoteEpisodes', {episodes: [episode.metadata]});
-          else
-            this.$store.dispatch('workshop/updateEpisode', {episode: episode.metadata, push});
-        }*/
+      /**
+       * Mark an episode as available for including in the current project
+       */
+      setEpisodeAvailable(E, available) {
+        if(this.availableEpisodes.includes(E.url) === available)
+          return;
+        if(available)
+          this.availableEpisodes.push(E.url);
+        else
+          this.availableEpisodes = this.availableEpisodes.filter(e => e!==E.url)
       },
-      updateItemDay(payload) {
-        const items = this.allItems.filter(i => i.metadata.url === payload.itemURL);
-        if(!items)
-          throw new Error("Invalid itemURL for update");
-        items[0].yaml.day = payload.dayId;
-        this.updateEpisode(items[0])
+      updateEpisode(episode) {
+        this.$store.dispatch('workshop/setFileContentFromYAML', {
+          url: episode.url, yaml: episode.yaml, body: episode.body
+        })
+      },
+      /**
+       * Update the scheduled day for an item
+       * @param item {object} item to update
+       * @param dayId {number|""} day to set
+       */
+      updateItemDay({item, dayId}) {
+        console.log(`${item.path} DAY => ${dayId}`)
+        item.yaml.day = dayId;
+        this.updateEpisode(item);
       },
       addRepositoryEpisodes(episodes) {
         // Close modal
         this.addRemoteItems = false;
-        this.$store.commit('workshop/addRemoteEpisodes', {episodes});
+        episodes.forEach(E => this.setEpisodeAvailable(E, true));
       }
     },
     mounted() {

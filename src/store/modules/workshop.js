@@ -4,13 +4,13 @@ export default {
     namespaced: true,
     // State should only be manipulated internally
     state: {
-        // Repositories indexed by their URLs
+        // Repositories {object[]}
         repositories: [],
-        // Files indexed by their URLs
+        // Files {object[]}
         files: [],
-        // Error stack
+        // Error stack {string[]}
         errors: [],
-        // Busy flags indexed by their URLs or names
+        // Busy flags {string[]}
         busyFlags: []
     },
     // Mutations should only be called internally
@@ -56,6 +56,7 @@ export default {
             // Process file content
             const textContent = Base64.decode(file.content);
             let yaml = null;
+            let yamlParseError = null;
             let body = null;
             try{
                 const parsed = YAML.parseAllDocuments(textContent);
@@ -64,12 +65,15 @@ export default {
                     textContent.substring(...parsed[1].range) : null;
                 yaml = YAML.parse(yamlText);
             } catch(e) {
-                state.commit('addError', e)
+                body = textContent;
+                yaml = {};
+                yamlParseError = e;
             }
             return {
                 ...file,
-                content: textContent, yaml, body,
-                busyFlag: () => getters.isBusy(url)
+                content: textContent, yaml, yamlParseError, body,
+                busyFlag: () => getters.isBusy(url),
+                hasChanged: () => getters.hasChanged(url)
             }
         },
         /**
@@ -100,12 +104,10 @@ export default {
                 throw new Error(`Store has no repository with URL: ${url}`);
             const repository = match[0];
             // Collect repository files
-            const files = state.files
-                .filter(f => f.url.indexOf(url) !== -1)
-                .map(f => getters.File(f.url));
+            const files = getters.FilesByFilter(f => f.url.indexOf(url) !== -1);
             // Check for a config file
-            const configFiles = getters.FilesByFilter(f => f.path === '_config.yml');
-            const episodes = getters.FilesByFilter(f => /^_episodes/.test(f.path));
+            const configFiles = files.filter(f => f.path === '_config.yml');
+            const episodes = files.filter(f => /^_episodes/.test(f.path));
             return {...repository, files, episodes,
                 busyFlag: () => getters.isBusy(url),
                 config: configFiles.length? configFiles[0] : null};
@@ -166,9 +168,10 @@ export default {
          * @param url {string}
          * @param ownerLogin {string} Name of the repository's owner
          * @param name {string} Name of the repository on GitHub
+         * @param topics {string[]} Repository GitHub topics
          * @param isMain {boolean} Whether the repository is the main repository we are working on
          */
-        addRepository(nsContext, {url, ownerLogin, name, isMain = false}) {
+        addRepository(nsContext, {url, ownerLogin, name, topics, isMain = false}) {
             if(isMain) {
                 const main = nsContext.state.repositories.filter(r => r.isMain);
                 if (main.length && main[0].url !== url)
@@ -176,7 +179,7 @@ export default {
             }
             nsContext.commit('setItem', {
                 array: 'repositories',
-                item: {url, ownerLogin, name, isMain}
+                item: {url, ownerLogin, name, topics, isMain}
             });
         },
         /**
@@ -305,11 +308,12 @@ export default {
                     return r.json();
                 })
                 .then(json => nsContext.dispatch('addRepository', {
-                        url: json.url,
-                        name: json.name,
-                        ownerLogin: json.owner.login,
-                        isMain: true
-                    }))
+                    url: json.url,
+                    name: json.name,
+                    ownerLogin: json.owner.login,
+                    topics: json.topics,
+                    isMain: true
+                }))
                 .then(() => nsContext.getters.Repository())
                 .then(R => nsContext.dispatch('findRepositoryFiles', {url: R.url}))
                 .then(() => {
@@ -355,6 +359,7 @@ export default {
                             .map(j => nsContext.dispatch('addRepository', {
                                 url: j.url,
                                 ownerLogin: j.owner.login,
+                                topics: j.topics,
                                 name: j.name
                             }))
                     );
@@ -449,6 +454,19 @@ export default {
                     nsContext.commit('setBusyFlag', {flag: main.url, value: false});
                     console.error(e);
                     return null;
+                })
+        },
+        saveRepositoryChanges(nsContext) {
+            return Promise.allSettled(nsContext.getters.Repository().files
+                .filter(F => F.hasChanged())
+                .map(F => nsContext.dispatch('pushFile', F.url))
+            )
+                .then(results => {
+                    const failures = results.filter(r => r === null).length;
+                    return {
+                        successes: results.length - failures,
+                        failures: failures
+                    };
                 })
         }
     }

@@ -30,7 +30,7 @@
                 {{ episode.name }}
             </b-dropdown-item>
             <b-dropdown-item v-if="repo.busyFlag" :focusable="false" custom>
-                <b-skeleton v-for="i in 3" :key="i" size="is-small" animated :active="repo.busyFlag"/>
+                <b-skeleton v-for="i in 3" :key="i" size="is-small" animated :active="repo.busyFlag()"/>
             </b-dropdown-item>
         </b-dropdown>
     </div>
