@@ -15,7 +15,7 @@ async function main(event, context, callback) {
     console.log(`New request: task=${event.headers.task}`)
     switch (event.headers.task) {
         case "redeemCode":
-            return redeemCode(event, context, callback);
+            return redeemCode(event, context);
         case "getUserDetails":
             return getUserDetails(event, context, callback);
         case "findRepositories":
@@ -59,38 +59,32 @@ async function checkResponseCode(response, code) {
 /**
  * Send a code to GitHub and request a token in exchange
  * @param event {object} request details
- * @param context {object} environment details
- * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
  */
-function redeemCode(event, context, callback) {
+async function redeemCode(event) {
     console.log(`Exchanging code ${event.headers['github-code']} for token`)
     const url = `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GITHUB_APP_SECRET}&code=${event.headers["github-code"]}`;
     console.log(`fetch(${url})`)
-    fetch(
-        url,
-        {headers: {"accept": "application/vnd.github.v3+json"}}
-    )
-        .then(r => {console.log(`GitHub responded`); return r})
-        .then(r => {console.log(`Received response ${r.status} - ${r.statusText}`); return r})
-        .then(r => {console.log(r); return r})
-        .then(r => checkResponseCode(r, 200))
-        .then(json => {
-            console.log({json})
-            const access_token = json.access_token;
-            console.log({access_token})
-            const encrypted_token = cryptr.encrypt(access_token);
-            console.log({encrypted_token})
-            const reply = {
-                statusCode: 200, statusText: "OK",
-                body: JSON.stringify({access_token: encrypted_token})
-            };
-            console.log(reply)
-            callback(null, reply)
-        })
-        .catch(e => {
-            console.error(e);
-            callback(e);
-        })
+    try {
+        const access_token = await fetch(
+            url,
+            {headers: {"accept": "application/vnd.github.v3+json"}}
+        )
+            .then(r => {console.log(`GitHub responded`); return r})
+            .then(r => {console.log(`Received response ${r.status} - ${r.statusText}`); return r})
+            .then(r => {console.log(r); return r})
+            .then(r => checkResponseCode(r, 200))
+            .then(json => json.access_token);
+        console.log({access_token})
+        const encrypted_token = cryptr.encrypt(access_token);
+        console.log({encrypted_token})
+        return {
+            statusCode: 200, statusText: "OK",
+            body: JSON.stringify({access_token: encrypted_token})
+        };
+    } catch(e) {
+        console.error(e);
+        return({statusCode: 500, body: e.toString()});
+    }
 }
 
 /**
