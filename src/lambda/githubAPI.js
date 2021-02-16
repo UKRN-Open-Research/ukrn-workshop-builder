@@ -70,6 +70,7 @@ function redeemCode(event, context, callback) {
         url,
         {headers: {"accept": "application/vnd.github.v3+json"}}
     )
+        .then(r => {console.log(`GitHub responded`); return r})
         .then(r => {console.log(`Received response ${r.status} - ${r.statusText}`); return r})
         .then(r => {console.log(r); return r})
         .then(r => checkResponseCode(r, 200))
