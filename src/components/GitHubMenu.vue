@@ -14,19 +14,18 @@
         <b-button icon-left="delete"
                   :label="expanded? 'Discard local changes' : ''"
                   :disabled="$store.getters['workshop/Repository']().files.filter(f => f.hasChanged()).length === 0"
-                  :loading="$store.state.workshop.busyFlags.length !== 0"
                   type="is-danger"
                   @click="reload"
         />
         <b-button icon-left="content-save"
                   :label="expanded? 'Save changes to GitHub' : ''"
                   :disabled="$store.getters['workshop/Repository']().files.filter(f => f.hasChanged()).length === 0"
-                  :loading="$store.state.workshop.busyFlags.length !== 0"
                   type="is-success"
                   @click="save"
         />
       </div>
     </div>
+    <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
   </div>
 </template>
 

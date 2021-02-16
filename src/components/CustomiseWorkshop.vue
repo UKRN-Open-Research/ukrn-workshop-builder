@@ -93,6 +93,7 @@
         </div>
       </b-modal>
     </div>
+    <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
   </section>
 </template>
 
