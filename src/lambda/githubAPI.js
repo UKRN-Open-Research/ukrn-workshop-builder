@@ -67,12 +67,19 @@ function redeemCode(event, context, callback) {
         {headers: {"accept": "application/vnd.github.v3+json"}}
     )
         .then(r => checkResponseCode(r, 200))
-        .then(json => callback(null, {
-            statusCode: 200, statusText: "OK", body: JSON.stringify({
-                access_token: cryptr.encrypt(json.access_token)
-            })
-        }))
-        .catch(e => callback(e))
+        .then(json => {
+            const reply = {
+                statusCode: 200, statusText: "OK", body: JSON.stringify({
+                    access_token: cryptr.encrypt(json.access_token)
+                })
+            };
+            console.log(reply.body);
+            callback(null, reply)
+        })
+        .catch(e => {
+            console.error(e);
+            callback(e);
+        })
 }
 
 /**

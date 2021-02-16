@@ -117,7 +117,8 @@ export default {
 
     testSomething() {
       fetch('/.netlify/functions/githubAPI')
-              .then(r => console.log(r))
+              .then(r => {console.log(r); return r.text()})
+              .then(t => console.log(t))
               .catch(e => console.log(e))
     }
   },
