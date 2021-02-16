@@ -12,6 +12,7 @@ const cryptr = new Cryptr(GITHUB_TOKEN_ENCRYPTION_KEY);
  * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
  */
 async function main(event, context, callback) {
+    console.log(`New request: task=${event.headers.task}`)
     switch (event.headers.task) {
         case "redeemCode":
             return redeemCode(event, context, callback);
@@ -62,6 +63,7 @@ async function checkResponseCode(response, code) {
  * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
  */
 function redeemCode(event, context, callback) {
+    console.log(`Exchanging code ${event.headers['github-code']} for token`)
     fetch(
         `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GITHUB_APP_SECRET}&code=${event.headers["github-code"]}`,
         {headers: {"accept": "application/vnd.github.v3+json"}}
