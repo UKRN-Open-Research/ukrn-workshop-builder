@@ -18,19 +18,19 @@ async function main(event, context, callback) {
             case "redeemCode":
                 return callback(null, await redeemCode(event));
             case "getUserDetails":
-                return await getUserDetails(event);
+                return callback(null, await getUserDetails(event));
             case "findRepositories":
-                return await findRepositories(event);
+                return callback(null, await findRepositories(event));
             case "findRepositoryFiles":
-                return await findRepositoryFiles(event);
+                return callback(null, await findRepositoryFiles(event));
             case "createRepository":
-                return await createRepository(event);
+                return callback(null, await createRepository(event));
             case "pushFile":
-                return await pushFile(event);
+                return callback(null, await pushFile(event));
             case "pullItem":
-                return await pullItem(event);
+                return callback(null, await pullItem(event));
             case "setTopics":
-                return await setTopics(event);
+                return callback(null, await setTopics(event));
             default:
                 if(event.headers.task)
                     throw new Error(`Unrecognised githubAPI task requested: ${event.headers.task}`);
@@ -38,9 +38,8 @@ async function main(event, context, callback) {
                     throw new Error("No githubAPI task specified");
         }
     } catch(e) {
-        console.error({statusCode: 500, body: e.toString()});
-        callback(e)
-        // return {statusCode: 500, body: e.toString()};
+        console.error(e);
+        callback(e);
     }
 }
 
@@ -64,7 +63,7 @@ function OK(obj) {
  * @return {Promise<object>}
  */
 async function checkResponseCode(response, code) {
-    console.log(`${response.url.replace("https://api.github.com/", "")}: ${response.status} - ${response.statusText}`);
+    console.log(`FETCH ${response.url.replace("https://api.github.com", "")}: ${response.status} - ${response.statusText}`);
 
     if(typeof code === 'number')
         code = [code];
