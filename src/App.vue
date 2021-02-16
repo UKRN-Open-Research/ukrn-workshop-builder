@@ -116,7 +116,9 @@ export default {
     },
 
     testSomething() {
-
+      fetch('/.netlify/functions/githubAPI')
+              .then(r => console.log(r))
+              .catch(e => console.log(e))
     }
   },
   mounted() {this.activeStep = this.latestStep},
