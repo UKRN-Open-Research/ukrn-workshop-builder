@@ -64,10 +64,13 @@ async function checkResponseCode(response, code) {
  */
 function redeemCode(event, context, callback) {
     console.log(`Exchanging code ${event.headers['github-code']} for token`)
+    const url = `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GITHUB_APP_SECRET}&code=${event.headers["github-code"]}`;
+    console.log(`fetch(${url})`)
     fetch(
-        `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GITHUB_APP_SECRET}&code=${event.headers["github-code"]}`,
+        url,
         {headers: {"accept": "application/vnd.github.v3+json"}}
     )
+        .then(r => {console.log(r); return r})
         .then(r => checkResponseCode(r, 200))
         .then(json => {
             console.log({json})
