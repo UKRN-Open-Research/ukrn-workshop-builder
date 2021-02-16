@@ -14,7 +14,7 @@
       <div class="columns">
         <div class="column">
           <div class="card-content card"
-               v-for="day in schedule.days.sort((a,b) => a.number > b.number)"
+               v-for="day in schedule.days.sort((a,b) => a.number < b.number? -1 : 1)"
                :key="day.number"
           >
             <header class="card-header" v-if="!mainRepo.busyFlag()">
@@ -45,10 +45,16 @@
             </div>
             <b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
             <div class="card-footer">
-              <b-button class="card-footer-item" icon-left="plus" @click="addRemoteItems = true">Add Items to Stash</b-button>
+              <b-button class="card-footer-item"
+                        icon-left="plus"
+                        :type="`is-primary ${allItems.length > 1? 'is-light' : ''}`"
+                        @click="addRemoteItems = true"
+              >
+                Add Items to Stash
+              </b-button>
             </div>
           </div>
-
+          <!-- TODO: ADD BREAKS AND ALLOW ORDERING -->
         </div>
       </div>
 
@@ -108,8 +114,10 @@
        * Return all the episodes in a Repository which has a matching topic.
        */
       allItems() {
+        if(!this.mainRepo.topics || !this.mainRepo.topics.length)
+          return [];
         const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
-        const topics = this.$store.getters['workshop/Repository']().topics
+        const topics = this.mainRepo.topics
                 .filter(t => this.$store.state.topicList.includes(t));
         const topicRepos = this.$store.getters['workshop/RepositoriesByFilter'](r => {
           for(let t of topics)
@@ -119,6 +127,7 @@
         const episodes = [];
         topicRepos.forEach(R => episodes.push(...R.episodes));
         // Add remote flag
+        console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories`)
         return episodes.map(e => {return {...e, remote: !mainEpisodes.includes(e.url)}});
       },
       // The schedule is a representation of the episodes in a workshop arranged by day and time
@@ -182,9 +191,28 @@
        * @param item {object} item to update
        * @param dayId {number|""} day to set
        */
-      updateItemDay({item, dayId}) {
-        console.log(`${item.path} DAY => ${dayId}`)
+      async updateItemDay({item, dayId, prevOrder, nextOrder}) {
+        console.log(`${item.path} DAY => ${dayId} [${prevOrder}, ${nextOrder}]`)
+        // Duplicate allow-multiple items
+        if(item.yaml['ukrn-wb-rules']
+                && item.yaml['ukrn-wb-rules'].includes('allow-multiple')
+                && dayId !== ""
+                && !item.yaml.day)
+          item = await this.$store.dispatch('workshop/duplicateFile', {url: item.url});
+        // TODO: Delete allow-multiple items when de-scheduled
+
         item.yaml.day = dayId;
+        // Place in the correct order
+        if(prevOrder && nextOrder && prevOrder === nextOrder) {
+          // TODO: implement recalculating item order values
+        } else if(!prevOrder && nextOrder)
+          item.yaml.order = Math.round(nextOrder / 2);
+        else if(prevOrder && !nextOrder)
+          item.yaml.order = Math.round(prevOrder + 100000);
+        else if(prevOrder && nextOrder)
+          item.yaml.order = Math.round(prevOrder + (nextOrder - prevOrder) / 2);
+        else
+          item.yaml.order = 100000;
         this.updateEpisode(item);
       },
       addRepositoryEpisodes(episodes) {

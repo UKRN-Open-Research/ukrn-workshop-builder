@@ -25,6 +25,8 @@ async function main(event, context, callback) {
             return createRepository(event, context, callback);
         case "pushFile":
             return pushFile(event, context, callback);
+        case "pullItem":
+            return pullItem(event, context, callback);
         case "setTopics":
             return setTopics(event, context, callback);
         default:
@@ -38,14 +40,17 @@ async function main(event, context, callback) {
 /**
  *
  * @param response {object} GitHub API response
- * @param code {number} status code to check for
+ * @param code {number|number[]} status code to check for
  * @return {Promise<object>}
  */
 async function checkResponseCode(response, code) {
     console.log(`${response.url.replace("https://api.github.com/", "")}: ${response.status} - ${response.statusText}`);
 
+    if(typeof code === 'number')
+        code = [code];
+
     const json = await response.json();
-    if(response.status !== code)
+    if(!code.includes(response.status))
         throw new Error(`${response.statusText} (${response.status}): ${json.message}`);
     return json;
 }
@@ -231,7 +236,7 @@ function pushFile(event, context, callback) {
             sha: d.sha
         })
     })
-        .then(r => checkResponseCode(r, 200))
+        .then(r => checkResponseCode(r, [200, 201]))
         .then(json => fetch(json.content.url, {
             method: "GET", headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
@@ -248,6 +253,28 @@ function pushFile(event, context, callback) {
             console.error(e);
             callback(e);
         });
+}
+
+/**
+ * Pull an item from GitHub by its URL
+ * @param event
+ * @param context
+ * @param callback
+ */
+function pullItem(event, context, callback) {
+    const d = JSON.parse(event.body);
+    fetch(d.url, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200))
+        .then(json => callback(null, {
+            statusCode: 200, statusText: "OK", body: JSON.stringify(json)
+        }))
+        .catch(e => {console.error(e); callback(e)})
 }
 
 /**

@@ -1,5 +1,6 @@
 const Base64 = require('js-base64');
 const YAML = require('yaml');
+const queryString = require('query-string');
 export default {
     namespaced: true,
     // State should only be manipulated internally
@@ -16,6 +17,8 @@ export default {
     // Mutations should only be called internally
     mutations: {
         setItem(store, {array, item}) {
+            // Strip the branch identifier if it exists
+            item.url = queryString.parseUrl(item.url).url;
             const existing = store[array].filter(i => i.url === item.url);
             if(existing.length)
                 store[array] = store[array].map(
@@ -23,6 +26,9 @@ export default {
                 );
             else
                 store[array].push(item);
+        },
+        removeItem(store, {array, item}) {
+            store[array] = store[array].filter(i => i.url !== item.url)
         },
         setBusyFlag(store, {flag, value}) {
             if(value && !store.busyFlags.includes(flag))
@@ -104,7 +110,7 @@ export default {
                 throw new Error(`Store has no repository with URL: ${url}`);
             const repository = match[0];
             // Collect repository files
-            const files = getters.FilesByFilter(f => f.url.indexOf(url) !== -1);
+            const files = getters.FilesByFilter(f => fileInRepository(f.url, url));
             // Check for a config file
             const configFiles = files.filter(f => f.path === '_config.yml');
             const episodes = files.filter(f => /^_episodes/.test(f.path));
@@ -181,6 +187,7 @@ export default {
                 array: 'repositories',
                 item: {url, ownerLogin, name, topics, isMain}
             });
+            nsContext.commit('setBusyFlag', {flag: url, value: false});
         },
         /**
          * Add a file to the store
@@ -232,6 +239,36 @@ export default {
         setFileContentFromYAML(nsContext, {url, yaml, body = null}) {
             let content = `---\n${YAML.stringify(yaml)}\n---\n${body}`;
             return nsContext.dispatch('setFileContent', {url, content, encode: true});
+        },
+        /**
+         * Duplicate a file
+         * @param nsContext
+         * @param url {string} URL of the file to copy
+         * @return {File}
+         */
+        duplicateFile(nsContext, {url}) {
+            const fileMatches = nsContext.state.files.filter(i => i.url === url);
+            if(!fileMatches.length)
+                throw new Error(`Cannot duplicate unknown file: ${url}`);
+            const file = fileMatches[0];
+            // Find a free path
+            const match = /^(?<name>.+)\.(?<ext>[^.]+)$/.exec(file.path);
+            let newPath;
+            let newURL;
+            let i = 0;
+            do {
+                newPath = `${match.groups.name}_${(++i).toString()}.${match.groups.ext}`;
+                newURL = file.url.replace(file.path, newPath);
+            } while(nsContext.state.files.filter(f => f.url === newURL).length);
+            // Add the new copy
+            const item = {
+                ...file,
+                url: newURL,
+                path: newPath,
+                remoteContent: Base64.encode("")
+            };
+            nsContext.commit('setItem', {array: 'files', item});
+            return nsContext.getters.File(newURL);
         },
         /**
          * Push a file to its remote repository and replace the current file with the remote version on success (keeps files sync'd with remote). Returns the newly sync'd file.
@@ -447,6 +484,12 @@ export default {
                         return null;
                     return r.json();
                 })
+                // Update topics on the local Repository
+                .then(json => nsContext.commit('setItem', {
+                    array: 'repositories', item: {
+                        ...nsContext.state.repositories.filter(r => r.isMain)[0],
+                        topics: json
+                    }}))
                 .then(() => nsContext.commit('setBusyFlag', {flag: main.url, value: false}))
                 .then(() => nsContext.dispatch('findRepositories', {topics}))
                 .catch(e => {
@@ -456,10 +499,18 @@ export default {
                     return null;
                 })
         },
+        /**
+         * Save all changed files in the main Repository
+         * @param nsContext
+         * @return {Promise<{failures: number, successes: number}>}
+         */
         saveRepositoryChanges(nsContext) {
             return Promise.allSettled(nsContext.getters.Repository().files
                 .filter(F => F.hasChanged())
-                .map(F => nsContext.dispatch('pushFile', F.url))
+                .map(F => {
+                    console.log(`Updating ${F.path}`)
+                    nsContext.dispatch('pushFile', F)
+                })
             )
                 .then(results => {
                     const failures = results.filter(r => r === null).length;
@@ -468,6 +519,109 @@ export default {
                         failures: failures
                     };
                 })
+        },
+        /**
+         * Load a repository from GitHub
+         * @param nsContext
+         * @param url
+         * @return {Promise<Repository>}
+         */
+        loadRepository(nsContext, {url}) {
+            nsContext.commit('setBusyFlag', {flag: url, value: true});
+            return fetch("/.netlify/functions/githubAPI", {
+                method: "POST", headers: {task: 'pullItem'},
+                body: JSON.stringify({
+                    url: url, token: nsContext.rootGetters['github/token']
+                })
+            })
+                .then(r => {
+                    if(r.status !== 200)
+                        return null;
+                    return r.json();
+                })
+                .then(r => nsContext.dispatch('addRepository', r))
+                .then(() => nsContext.commit('setMainRepository', {url}))
+                .then(() => nsContext.commit('setBusyFlag', {flag: url, value: false}))
+                .then(() => nsContext.getters.Repository(url))
+                .catch(e => {
+                    nsContext.commit('addError', e);
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    console.error(e);
+                    return null;
+                })
+        },
+        /**
+         * Install a copy of a remote file
+         * @param nsContext
+         * @param url {string}
+         * @return {null|Promise<File|null>}
+         */
+        installFile(nsContext, {url}) {
+            // Check file is okay to install
+            const Repo = nsContext.getters.Repository();
+            const File = nsContext.getters.File(url);
+            if(!File) {
+                nsContext.commit('addError', `No such file to install: ${url}`);
+                return null;
+            }
+            if(fileInRepository(File.url, Repo.url)) {
+                nsContext.commit('addError', 'Cannot install File into its own Repository');
+                return null;
+            }
+            nsContext.commit('setBusyFlag', {flag: url, value: true});
+
+            // Check dependencies and copy to repository, renaming if conflicts
+            let dependencies = File.yaml.dependencies;
+            if(!dependencies)
+                dependencies = findFileDependencies(File.content);
+
+            // Update file to copy target content + use safe dependency links
+            const newURL = `${Repo.url}/contents/${File.path}`;
+            return nsContext.dispatch('addFile', {
+                url: newURL,
+                content: Base64.encode(File.content),
+                sha: null,
+                path: File.path
+            })
+                // Upload file
+                .then(() => nsContext.dispatch('pushFile', {url: newURL}))
+                // Drop original
+                .then(F => {
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    // Remove original by reference to its URL
+                    nsContext.commit('removeItem', {array: 'files', item: {url}});
+                    return F;
+                })
+                .catch(e => {
+                    nsContext.commit('addError', e);
+                    console.error(e);
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    return null;
+                })
+
         }
     }
 };
+
+function fileInRepository(fileURL, repositoryURL){
+    return fileURL.indexOf(repositoryURL) !== -1;
+}
+
+async function findFileDependencies(content) {
+    // Check for Markdown image links
+    const out = [];
+    // https://stackoverflow.com/a/58345920
+    const parseImageLinks = /\[?(!)(?<alt>\[[^\][]*\[?[^\][]*\]?[^\][]*)\]\((?<url>[^\s]+?)(?:\s+(["'])(?<title>.*?)\4)?\)/gm;
+    let match;
+
+    while((match = parseImageLinks.exec(content)) !== null) {
+        if(match.groups && !/https?:\/\//.test(match.groups.url))
+            out.push(match.groups)
+    }
+
+    // Fetch referenced files
+    // Check for conflicts with existing files
+    console.log(out);
+
+
+}

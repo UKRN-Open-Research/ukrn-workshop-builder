@@ -3,7 +3,6 @@
         <b-dropdown aria-role="list"
                     class="repository-view"
                     @active-change="doLookup"
-                    expanded
         >
             <template #trigger="{ active }" >
                 <b-button type="is-primary"
@@ -21,15 +20,18 @@
                           @click="$emit('selectRepo', repo.episodes)"
                 />
             </b-dropdown-item>
+            <b-dropdown-item v-else-if="!repo.busyFlag()">
+                <em>No episodes found for this repository.</em>
+            </b-dropdown-item>
             <b-dropdown-item aria-role="listitem"
                              v-for="episode in repo.episodes"
                              :key="episode.url"
                              :focusable="false"
                              disabled
             >
-                {{ episode.name }}
+                <EpisodeName :episode="episode"/>
             </b-dropdown-item>
-            <b-dropdown-item v-if="repo.busyFlag" :focusable="false" custom>
+            <b-dropdown-item v-if="repo.busyFlag()" :focusable="false" custom>
                 <b-skeleton v-for="i in 3" :key="i" size="is-small" animated :active="repo.busyFlag()"/>
             </b-dropdown-item>
         </b-dropdown>
@@ -37,9 +39,10 @@
 </template>
 
 <script>
+    import EpisodeName from "./EpisodeName";
     export default {
         name: 'RemoteRepositoryView',
-        components: {},
+        components: {EpisodeName},
         props: {
             repo: {type: Object, required: true}
         },
@@ -64,5 +67,6 @@
 <style lang="scss" scoped>
     .repository-view {
         padding: .5em;
+        text-align: left;
     }
 </style>

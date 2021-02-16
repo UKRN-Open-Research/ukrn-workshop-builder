@@ -23,10 +23,15 @@ export default {
     actions: {
         logout() {
             const URL = queryString.parseUrl(window.location.href);
-            const redirect = queryString.stringifyUrl({
-                url: URL.url, query: {...URL.query, code: null, token: null, logout: true}
+            window.location = queryString.stringifyUrl({
+                url: URL.url,
+                query: {
+                    ...URL.query,
+                    code: null,
+                    token: null,
+                    logout: true
+                }
             }, {skipNull: true});
-            window.location = redirect;
         },
         redeemCode (nsContext) {
             if(nsContext.state.loginInProgress)

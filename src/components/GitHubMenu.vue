@@ -1,14 +1,12 @@
 <template>
-  <div class="github-menu">
+  <div class="github-menu" v-if="mainRepo">
     <div class="github-menu-wrapper"
          @mouseenter="expanded = true"
          @focus="expanded = true"
          @mouseleave="expanded = false"
          @blur="expanded = false"
     >
-      <div v-if="mainRepo"
-           class="github-menu-buttons"
-      >
+      <div class="github-menu-buttons">
         <header>
           <b-icon icon="github" size="is-large"/>
           <span v-if="expanded">GitHub integration</span>
@@ -47,22 +45,15 @@ export default {
   },
   methods: {
     reload() {
-      this.$store.dispatch('loadRemoteWorkshop', {
-        user: this.$store.getters['github/login'],
-        repository: this.$store.state.workshop.remoteRepository,
-        callback: (e) => {
-          if(e !== null)
-            this.$buefy.toast.open({
-              message: `Error loading remote repository!`,
-              type: "is-danger"
-            });
-          else
-            this.$buefy.toast.open({
-              message: "Loaded remote repository content",
-              type: "is-success"
-            });
-        }
-      })
+      const self = this;
+      this.$store.dispatch('workshop/loadRepository', {url: self.mainRepo.url})
+              .then(R => self.$store.dispatch('workshop/findRepositoryFiles', {url: R.url}))
+              .then(() => self.$buefy.toast.open({
+                message: "Repository reloaded", type: "is-success"
+              }))
+              .catch(e => {console.error(e); self.$buefy.toast.open({
+                message: "Failed to reload repository", type: "is-danger"
+              })})
     },
     save() {
       const self = this;
@@ -81,7 +72,7 @@ export default {
                 else if(successes)
                   self.$buefy.toast.open({
                     message: `Successfully pushed ${successes} file${successes === 1? '' : 's'} to GitHub`,
-                    type: 'is-danger'
+                    type: 'is-success'
                   });
               })
     }
