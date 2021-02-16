@@ -46,7 +46,7 @@ export default {
                 .then(r => {
                     if(r.status !== 200)
                         throw new Error(`GitHub login received ${r.statusText} (${r.statusCode})`);
-                    return r.json();
+                    return r.text();
                 })
                 .then(r => {
                     console.log(r)

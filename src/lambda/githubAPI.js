@@ -70,12 +70,16 @@ function redeemCode(event, context, callback) {
     )
         .then(r => checkResponseCode(r, 200))
         .then(json => {
+            console.log({json})
+            const access_token = json.access_token;
+            console.log({access_token})
+            const encrypted_token = cryptr.encrypt(access_token);
+            console.log({encrypted_token})
             const reply = {
-                statusCode: 200, statusText: "OK", body: JSON.stringify({
-                    access_token: cryptr.encrypt(json.access_token)
-                })
+                statusCode: 200, statusText: "OK",
+                body: JSON.stringify({access_token: encrypted_token})
             };
-            console.log(reply.body);
+            console.log(reply)
             callback(null, reply)
         })
         .catch(e => {
