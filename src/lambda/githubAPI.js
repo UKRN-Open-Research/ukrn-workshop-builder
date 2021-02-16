@@ -12,31 +12,50 @@ const cryptr = new Cryptr(GITHUB_TOKEN_ENCRYPTION_KEY);
  * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
  */
 async function main(event, context, callback) {
-    console.log(`New request: task=${event.headers.task}`)
-    switch (event.headers.task) {
-        case "redeemCode":
-            return redeemCode(event, context);
-        case "getUserDetails":
-            return getUserDetails(event, context, callback);
-        case "findRepositories":
-            return findRepositories(event, context, callback);
-        case "findRepositoryFiles":
-            return findRepositoryFiles(event, context, callback);
-        case "createRepository":
-            return createRepository(event, context, callback);
-        case "pushFile":
-            return pushFile(event, context, callback);
-        case "pullItem":
-            return pullItem(event, context, callback);
-        case "setTopics":
-            return setTopics(event, context, callback);
-        default:
-            if(event.headers.task)
-                callback(`Unrecognised githubAPI task requested: ${event.headers.task}`);
-            else
-                callback("No githubAPI task specified");
+    try {
+        console.log(`New request: task=${event.headers.task}`)
+        switch (event.headers.task) {
+            case "redeemCode":
+                return callback(null, await redeemCode(event));
+            case "getUserDetails":
+                return await getUserDetails(event);
+            case "findRepositories":
+                return await findRepositories(event);
+            case "findRepositoryFiles":
+                return await findRepositoryFiles(event);
+            case "createRepository":
+                return await createRepository(event);
+            case "pushFile":
+                return await pushFile(event);
+            case "pullItem":
+                return await pullItem(event);
+            case "setTopics":
+                return await setTopics(event);
+            default:
+                if(event.headers.task)
+                    throw new Error(`Unrecognised githubAPI task requested: ${event.headers.task}`);
+                else
+                    throw new Error("No githubAPI task specified");
+        }
+    } catch(e) {
+        console.error({statusCode: 500, body: e.toString()});
+        callback(e)
+        // return {statusCode: 500, body: e.toString()};
     }
 }
+
+/**
+ * Send an OK response
+ * @param obj {object} Body content to be JSON.stringified()
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+function OK(obj) {
+    return {
+        statusCode: 200, statusText: "OK",
+        body: JSON.stringify(obj)
+    };
+}
+
 
 /**
  *
@@ -59,61 +78,47 @@ async function checkResponseCode(response, code) {
 /**
  * Send a code to GitHub and request a token in exchange
  * @param event {object} request details
+ * @return {statusText: string, body: string, statusCode: number}
  */
 async function redeemCode(event) {
     console.log(`Exchanging code ${event.headers['github-code']} for token`)
     const url = `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GITHUB_APP_SECRET}&code=${event.headers["github-code"]}`;
-    console.log(`fetch(${url})`)
-    try {
-        const access_token = await fetch(
-            url,
-            {headers: {"accept": "application/vnd.github.v3+json"}}
-        )
-            .then(r => {console.log(`GitHub responded`); return r})
-            .then(r => {console.log(`Received response ${r.status} - ${r.statusText}`); return r})
-            .then(r => {console.log(r); return r})
-            .then(r => checkResponseCode(r, 200))
-            .then(json => json.access_token);
-        console.log({access_token})
-        const encrypted_token = cryptr.encrypt(access_token);
-        console.log({encrypted_token})
-        return {
-            statusCode: 200, statusText: "OK",
-            body: JSON.stringify({access_token: encrypted_token})
-        };
-    } catch(e) {
-        console.error(e);
-        return({statusCode: 500, body: e.toString()});
-    }
+    const access_token = await fetch(
+        url,
+        {headers: {"accept": "application/vnd.github.v3+json"}}
+    )
+        .then(r => checkResponseCode(r, 200))
+        .then(json => json.access_token)
+        .catch(e => {
+            console.error(e)
+            throw new Error(e)
+        });
+
+    return OK({access_token: cryptr.encrypt(access_token)});
 }
 
 /**
  * Get the GitHub user details
  * @param event {object} request details
- * @param context {object} environment details
- * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+ * @return {statusText: string, body: string, statusCode: number}
  */
-function getUserDetails(event, context, callback) {
+async function getUserDetails(event) {
     const d = JSON.parse(event.body);
 
-    fetch('https://api.github.com/user', {headers: {
+    const details = await fetch('https://api.github.com/user', {headers: {
             "accept": "application/vnd.github.v3+json",
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }})
-        .then(r => checkResponseCode(r, 200))
-        .then(json => callback(null, {statusCode: 200, statusText: "OK",
-            body: JSON.stringify(json)}))
-        .catch(e => callback(e))
+        .then(r => checkResponseCode(r, 200));
+    return OK(details);
 }
 
 /**
  * Look up the repositories
  * @param event
- * @param context
- * @param callback
- * @return {Promise<{r: Response, json: any}>}
+ * @return {statusText: string, body: string, statusCode: number}
  */
-async function findRepositories(event, context, callback) {
+async function findRepositories(event) {
     const d = JSON.parse(event.body);
     let topics = "";
     let user = "";
@@ -123,24 +128,23 @@ async function findRepositories(event, context, callback) {
         user = `+user:${user}`;
     const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-open-research${user}${topics}`;
     console.log(`findRepositories(${url})`)
-    return fetch(url, {
+    const items = await fetch(url, {
         method: "GET", headers: {
             "accept": "application/vnd.github.mercy-preview+json",
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
         .then(r => checkResponseCode(r, 200))
-        .then(json => callback(null, {
-            statusCode: 200, statusText: "OK",
-            body: JSON.stringify(json.items)
-        }))
-        .catch(e => {
-            console.error(e);
-            callback(e);
-        })
+        .then(json => json.items);
+    return OK(items);
 }
 
-async function findRepositoryFiles(event, context, callback) {
+/**
+ * Find all the files in a given repository
+ * @param event
+ * @return {statusText: string, body: string, statusCode: number}
+ */
+async function findRepositoryFiles(event) {
     const d = JSON.parse(event.body);
     const files = [
         d.includeConfig? `${d.url}/contents/_config.yml` : null
@@ -152,7 +156,7 @@ async function findRepositoryFiles(event, context, callback) {
         .filter(p => p !== null);
 
     // Fill in the file paths from the directory crawl
-    Promise.all(dirs.map(dir => fetch(`${d.url}/contents/${dir}`, {
+    const fileList = await Promise.all(dirs.map(dir => fetch(`${d.url}/contents/${dir}`, {
             method: "GET", headers: {
                 "accept": "application/vnd.github.v3+json",
                 "authorization": `token ${cryptr.decrypt(d.token)}`
@@ -170,8 +174,8 @@ async function findRepositoryFiles(event, context, callback) {
             const fList = files;
             r.forEach(L => fList.push(...L));
             return fList.filter(f => f !== null);
-        })
-        .then(fList => Promise.all(fList.map(f => fetch(f, {
+        });
+    const response = await Promise.all(fileList.map(f => fetch(f, {
                     method: "GET",
                     headers: {
                         "accept": "application/vnd.github.v3+json",
@@ -179,23 +183,19 @@ async function findRepositoryFiles(event, context, callback) {
                     }
                 })
                     .then(r => checkResponseCode(r, 200))
-            )))
-        .then(r => callback(null, {
-            statusCode: 200, statusText: "OK", body: JSON.stringify(r)
-        }))
-        .catch(e => {console.error(e); callback(e)})
+            ));
+    return OK(response);
 }
 
 /**
 * Create a repository on GitHub for the currently authorised user
 * @param event {object} request details
-* @param context {object} environment details
-* @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+* @return {statusText: string, body: string, statusCode: number}
 */
-function createRepository(event, context, callback) {
+async function createRepository(event) {
     const d = JSON.parse(event.body);
     let output = null;
-    fetch(`https://api.github.com/repos/${d.template}/generate`, {
+    const newRepo = await fetch(`https://api.github.com/repos/${d.template}/generate`, {
         method: "POST",
         headers: {
             "accept": "application/vnd.github.baptiste-preview+json",
@@ -206,9 +206,8 @@ function createRepository(event, context, callback) {
             private: false
         })
     })
-        .then(r => checkResponseCode(r, 201))
-        .then(json => output = json)
-        .then(() => fetch(`${output.url}/topics`, {
+        .then(r => checkResponseCode(r, 201));
+    await fetch(`${output.url}/topics`, {
             method: "PUT",
             headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
@@ -217,26 +216,20 @@ function createRepository(event, context, callback) {
             body: JSON.stringify({
                 names: ['ukrn-open-research', 'ukrn-workshop']
             })
-        }))
-        .then(r => checkResponseCode(r, 200))
-        .then(() => callback(null, {
-            statusCode: 200, statusText: "OK", body: JSON.stringify(output)
-        }))
-        .catch(e => {
-            console.error(e);
-            callback(e);
         })
+        .then(r => checkResponseCode(r, 200));
+    // Fetch a fresh copy with the updated topics
+    return pullItem(newRepo);
 }
 
 /**
 * Replace a file with a new version via github commit
 * @param event {object} request details
-* @param context {object} environment details
-* @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+* @return {statusText: string, body: string, statusCode: number}
 */
-function pushFile(event, context, callback) {
+async function pushFile(event) {
     const d = JSON.parse(event.body);
-    fetch(d.url, {
+    const upload = await fetch(d.url, {
         method: "PUT",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
@@ -248,85 +241,66 @@ function pushFile(event, context, callback) {
             sha: d.sha
         })
     })
-        .then(r => checkResponseCode(r, [200, 201]))
-        .then(json => fetch(json.content.url, {
+        .then(r => checkResponseCode(r, [200, 201]));
+    // retrieve updated version
+    const file = await fetch(upload.content.url, {
             method: "GET", headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
                 "authorization": `token ${cryptr.decrypt(d.token)}`
             }
-        }))
-        .then(r => checkResponseCode(r, 200))
-        .then(json => callback(null, {
-            statusCode: 200,
-            statusText: "OK",
-            body: JSON.stringify(json)
-        }))
-        .catch(e => {
-            console.error(e);
-            callback(e);
-        });
+        })
+        .then(r => checkResponseCode(r, 200));
+    return OK(file);
 }
 
 /**
  * Pull an item from GitHub by its URL
  * @param event
  * @param context
- * @param callback
+ * @return {statusText: string, body: string, statusCode: number}
  */
-function pullItem(event, context, callback) {
+async function pullItem(event) {
     const d = JSON.parse(event.body);
-    fetch(d.url, {
+    const item = await fetch(d.url, {
         method: "GET",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200))
-        .then(json => callback(null, {
-            statusCode: 200, statusText: "OK", body: JSON.stringify(json)
-        }))
-        .catch(e => {console.error(e); callback(e)})
+        .then(r => checkResponseCode(r, 200));
+    return OK(item);
 }
 
 /**
 * Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily
 * @param event {object} request details
-* @param context {object} environment details
-* @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+* @return {statusText: string, body: string, statusCode: number}
 */
-function setTopics(event, context, callback) {
+async function setTopics(event) {
     const d = JSON.parse(event.body);
     // Find current topics
-    getTopics(event)
-        .then(topics => {
-            const setTopics = d.topics;
-            // To protect against removal of customised topics we use this approach
-            topics.forEach(t => {
-                if(!Object.keys(setTopics).includes(t))
-                    setTopics[t] = true;
-            });
-            return Object.keys(setTopics).filter(k => setTopics[k]);
-        })
-        // Set topics
-        .then(topics => fetch(`${d.url}/topics`, {
-            method: "PUT",
-            headers: {
-                "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${cryptr.decrypt(d.token)}`
-            },
-            body: JSON.stringify({names: topics})
-        }))
-        .then(r => checkResponseCode(r, 200))
-        // Fetch final topic list for sanity
-        .then(() => getTopics(event))
-        .then(topics => callback(null, {
-            statusCode: 200, statusText: "OK", body: JSON.stringify(topics)
-        }))
-        .catch(e => {
-            console.error(e);
-            callback(e);
-        })
+    const topics = await getTopics(event);
+    const setTopics = d.topics;
+    // To protect against removal of customised topics we use this approach
+    topics.forEach(t => {
+        if(!Object.keys(setTopics).includes(t))
+            setTopics[t] = true;
+    });
+    const newTopicList = Object.keys(setTopics).filter(k => setTopics[k]);
+
+    // Send the topic list
+    await fetch(`${d.url}/topics`, {
+        method: "PUT",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        },
+        body: JSON.stringify({names: newTopicList})
+    })
+        .then(r => checkResponseCode(r, 200));
+    // Fetch final topic list for sanity
+    return OK(await getTopics(event));
 }
 
 /**
@@ -334,16 +308,16 @@ function setTopics(event, context, callback) {
  * @param event {{body: string, ...:*}}
  * @return {Promise<Object>}
  */
-function getTopics(event) {
+async function getTopics(event) {
     const d = JSON.parse(event.body);
-    return fetch(`${d.url}/topics`, {
+    const topics = fetch(`${d.url}/topics`, {
         method: "GET",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200))
-        .then(json => json.names)
+        .then(r => checkResponseCode(r, 200));
+    return topics.names;
 }
 
