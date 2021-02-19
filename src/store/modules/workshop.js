@@ -149,21 +149,17 @@ export default {
             const existing = state.files.filter(f => f.url === config.url);
             if(!existing.length)
                 throw new Error(`Cannot determine validity of unknown config: ${config.url}`);
-            const errors = [];
+            const errors = {};
             if(!config.yaml)
-                return ['no-yaml'];
+                return {yaml: "The config must have YAML content signified by ---"};
             if(!config.yaml.title)
-                errors.push('no-title');
-            else if(config.yaml.title === "My workshop")
-                errors.push('default-title');
-            if(!config.yaml['workshop-topic'])
-                errors.push('no-topic');
-            else if(config.yaml['workshop-topic'] === "TOPIC NOT SET")
-                errors.push('default-topic');
+                errors.title = "The title cannot be blank";
+            if(!config.yaml.topic)
+                errors.topic = "The topic cannot be empty.";
             return errors;
         },
         isConfigValid: (state, getters) => config => {
-            return !getters.listConfigErrors(config).length;
+            return !Object.keys(getters.listConfigErrors(config)).length;
         }
     },
     // Actions are used to manipulate the state from the front end

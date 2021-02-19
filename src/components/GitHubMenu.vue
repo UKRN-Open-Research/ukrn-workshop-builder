@@ -13,19 +13,26 @@
         </header>
         <b-button icon-left="delete"
                   :label="expanded? 'Discard local changes' : ''"
-                  :disabled="$store.getters['workshop/Repository']().files.filter(f => f.hasChanged()).length === 0"
+                  :disabled="mainRepo.files.filter(f => f.hasChanged()).length === 0"
                   type="is-danger"
                   @click="reload"
         />
         <b-button icon-left="content-save"
                   :label="expanded? 'Save changes to GitHub' : ''"
-                  :disabled="$store.getters['workshop/Repository']().files.filter(f => f.hasChanged()).length === 0"
+                  :disabled="mainRepo.files.filter(f => f.hasChanged()).length === 0"
                   type="is-success"
                   @click="save"
         />
       </div>
+      <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
+      <a v-if="pagesURL !== ''" :href="pagesURL">
+        <b-button icon-left="link"
+                  :label="expanded? 'View workshop website' : ''"
+                  :disabled="!mainRepo"
+                  type="is-info"
+        />
+      </a>
     </div>
-    <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
   </div>
 </template>
 
@@ -40,7 +47,12 @@ export default {
     }
   },
   computed: {
-    mainRepo() {return this.$store.getters['workshop/Repository']()}
+    mainRepo() {return this.$store.getters['workshop/Repository']()},
+    pagesURL() {
+      try {
+        return `https://${this.mainRepo.ownerLogin}.github.io/${this.mainRepo.name}`;
+      } catch(e) {return ""}
+    }
   },
   methods: {
     reload() {

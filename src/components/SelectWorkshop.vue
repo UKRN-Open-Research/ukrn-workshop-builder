@@ -104,7 +104,7 @@ export default {
       .then(R => {
         if(R.config)
           return this.$store.dispatch('workshop/findRepositories', {
-          topics: [R.config.yaml['workshop-topic']]
+          topics: [R.config.yaml.topic]
         });
       })
     },

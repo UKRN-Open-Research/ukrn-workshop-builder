@@ -193,7 +193,6 @@ async function findRepositoryFiles(event) {
 */
 async function createRepository(event) {
     const d = JSON.parse(event.body);
-    let output = null;
     const newRepo = await fetch(`https://api.github.com/repos/${d.template}/generate`, {
         method: "POST",
         headers: {
@@ -206,7 +205,7 @@ async function createRepository(event) {
         })
     })
         .then(r => checkResponseCode(r, 201));
-    await fetch(`${output.url}/topics`, {
+    await fetch(`${newRepo.url}/topics`, {
             method: "PUT",
             headers: {
                 "accept": "application/vnd.github.mercy-preview+json",
@@ -218,7 +217,9 @@ async function createRepository(event) {
         })
         .then(r => checkResponseCode(r, 200));
     // Fetch a fresh copy with the updated topics
-    return pullItem(newRepo);
+    return pullItem({body: JSON.stringify({
+            url: newRepo.url, token: d.token
+    })});
 }
 
 /**
@@ -309,7 +310,7 @@ async function setTopics(event) {
  */
 async function getTopics(event) {
     const d = JSON.parse(event.body);
-    const topics = fetch(`${d.url}/topics`, {
+    const topics = await fetch(`${d.url}/topics`, {
         method: "GET",
         headers: {
             "accept": "application/vnd.github.mercy-preview+json",
