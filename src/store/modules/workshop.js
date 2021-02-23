@@ -113,8 +113,12 @@ export default {
             const files = getters.FilesByFilter(f => fileInRepository(f.url, url));
             // Check for a config file
             const configFiles = files.filter(f => f.path === '_config.yml');
-            const episodes = files.filter(f => /^_episodes/.test(f.path));
+            const episodes = files
+                .filter(f => /^_episodes/.test(f.path))
+                .filter(i => !i.yaml['ukrn_wb_rules'] || !i.yaml['ukrn_wb_rules'].includes('hidden'));
+            const episode_template = files.filter(i => i.yaml['ukrn_wb_rules'] && i.yaml['ukrn_wb_rules'].includes('template'));
             return {...repository, files, episodes,
+                episode_template: episode_template.length? episode_template[0] : null,
                 busyFlag: () => getters.isBusy(url),
                 config: configFiles.length? configFiles[0] : null};
         },
@@ -314,6 +318,32 @@ export default {
                 })
         },
         /**
+         * Pull a URL from GitHub and return the result directly
+         * @param nsContext
+         * @param url {string} URL to pull
+         * @return {null|Promise<object>}
+         */
+        pullURL(nsContext, {url}) {
+            if(nsContext.getters.isBusy(url))
+                return null;
+            return fetch("/.netlify/functions/githubAPI", {
+                method: "POST", headers: {task: "pullItem"},
+                body: JSON.stringify({url, token: nsContext.rootGetters['github/token']})
+            })
+                .then(r => {
+                    if(r.status !== 200)
+                        throw new Error(`pullItem received ${r.statusText} (${r.status})`)
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    return r.json();
+                })
+                .catch(e => {
+                    nsContext.commit('addError', e);
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    console.error(e);
+                    return null;
+                })
+        },
+        /**
          * Create a repository (as the main repository)
          * @param nsContext
          * @param name {string}
@@ -337,7 +367,7 @@ export default {
             })
                 .then(r => {
                     if(r.status !== 200)
-                        return null;
+                        throw new Error(`createRepository received ${r.statusText} (${r.status})`)
                     return r.json();
                 })
                 .then(json => nsContext.dispatch('addRepository', {
@@ -380,7 +410,7 @@ export default {
             })
                 .then(r => {
                     if(r.status !== 200)
-                        return null;
+                        throw new Error(`findRepositories received ${r.statusText} (${r.status})`)
                     return r.json();
                 })
                 .then(async json => {
@@ -430,7 +460,7 @@ export default {
             })
                 .then(r => {
                     if(r.status !== 200)
-                        return null;
+                        throw new Error(`findRepositoryFiles received ${r.statusText} (${r.status})`)
                     return r.json();
                 })
                 .then(async json => {

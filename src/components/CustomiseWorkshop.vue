@@ -33,15 +33,10 @@
           </p>
           <p class="">When you have made your changes, use the 'Save changes' button below to push them to your GitHub repository.</p>
         </div>
-        <div v-for="field in currentTemplate.yaml['ukrn_wb'].filter(f => f.fields)[0].fields.map(f => Object.keys(f)[0])"
-             :key="field"
-        >
-          <WorkshopProperty :field="field"
-                            :template="currentTemplate"
-                            @refresh="refresh"
-                            class="card-content"
+          <WorkshopProperties :template="currentTemplate"
+                              @refresh="refresh"
+                              class="card-content"
           />
-        </div>
 
         <nav class="card-content"
              v-if="!$store.getters['workshop/hasChanged'](template.url)"
@@ -86,10 +81,10 @@
 </template>
 
 <script>
-import WorkshopProperty from "./WorkshopProperty";
+import WorkshopProperties from "./WorkshopProperties";
 export default {
   name: 'CustomiseWorkshop',
-  components: {WorkshopProperty},
+  components: {WorkshopProperties},
   props: {},
   data: function() {
     return {

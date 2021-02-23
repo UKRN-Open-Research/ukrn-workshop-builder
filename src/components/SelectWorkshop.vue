@@ -35,7 +35,6 @@
       </div>
       <div class="content">
         <b-field label="Create new repository..."
-                 label-position="on-border"
                  :message="newRepositoryName === newRepositoryNameSafe? '' : `Repository will be created as ${newRepositoryNameSafe}`"
         >
           <b-input placeholder="New repository name"

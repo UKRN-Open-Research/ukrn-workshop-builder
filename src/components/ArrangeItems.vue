@@ -9,7 +9,7 @@
   >
     <b-collapse v-for="item in items.sort((a, b) => a.yaml.order > b.yaml.order? 1 : -1)"
                 :key="item.url"
-                :class="`episode card ${item.remote? 'remote' : ''} ${item.yaml['ukrn-wb-rules'] && item.yaml['ukrn-wb-rules'].includes('allow-multiple')? 'is-break' : ''}`"
+                :class="`episode card ${item.remote? 'remote' : ''} ${item.yaml['ukrn_wb_rules'] && item.yaml['ukrn_wb_rules'].includes('allow-multiple')? 'is-break' : ''}`"
                 :title="item.description"
                 animation="slide"
                 :aria-id="`item-details-${item.url}`"
@@ -53,30 +53,21 @@
         </div>
       </template>
 
-      <div class="card-content">
-        <div class="content">
-          This is where we'll put the cog stuff.
-        </div>
+      <div class="card-content item-body">
+        <CustomiseItem :item="item"/>
       </div>
-      <footer class="card-footer">
-        <a class="card-footer-item">Save</a>
-        <a class="card-footer-item">Edit</a>
-        <a class="card-footer-item">Delete</a>
-      </footer>
     </b-collapse>
-
-    <span slot="header" v-if="!items.length && dayId === 1">
-      There are currently no episodes in the workshop. To add episodes, drag them from the stash into a day. You can search for episodes that have already been created and add them to your stash.
-    </span>
   </draggable>
 </template>
 
 <script>
 import draggable from "vuedraggable"
 import EpisodeName from "./EpisodeName";
+import CustomiseItem from "./CustomiseItem";
 export default {
   name: 'ArrangeItems',
   components: {
+    CustomiseItem,
     EpisodeName,
     draggable},
   props: {
@@ -140,6 +131,7 @@ export default {
     background-color: lightblue;
     &.remote {background-color: orange;}
     &.is-break.is-break {background-color: lightgrey;}
+    .item-body {background-color: white;}
   }
   .action-icons {
     display: flex;

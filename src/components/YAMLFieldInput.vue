@@ -1,0 +1,88 @@
+<template>
+    <b-autocomplete v-if="field.format === 'topic'"
+                    v-model="currentValue"
+                    :data="$store.state.topicList"
+                    placeholder="Start typing to get suggestions"
+                    icon="magnify"
+                    clearable
+                    :open-on-focus="true"
+    >
+        <template #empty>No matching topics found</template>
+    </b-autocomplete>
+    <b-autocomplete v-else-if="field.type === 'filename'"
+                    v-model="currentValue"
+                    :data="data"
+                    placeholder="Start typing to get suggestions"
+                    icon="magnify"
+                    :open-on-focus="true"
+    >
+        <template #empty>No match found</template>
+    </b-autocomplete>
+    <b-select v-else-if="field.format === 'iso-3166-1-alpha-2'"
+              v-model="currentValue"
+    >
+        <option v-for="C in countries"
+                :key="C.code"
+                :value="C.code"
+        >{{ C.name }}</option>
+    </b-select>
+    <b-select v-else-if="field.format === 'iso-639-1'"
+              v-model="currentValue"
+    >
+        <option v-for="L in languages"
+                :key="L.code"
+                :value="L.code"
+        >{{ L.name }}</option>
+    </b-select>
+    <b-input v-else-if="field.type === 'string' && field.format === 'long'"
+             v-model="currentValue"
+             type="textarea"
+    />
+    <b-input v-else-if="field.type === 'string'"
+             v-model="currentValue"
+    />
+    <b-numberinput v-else-if="field.type === 'number'"
+                   v-model="currentValue"
+    />
+    <b-input v-else-if="field.type === 'time'"
+             v-model="currentValue"
+    />
+    <b-datepicker v-else-if="field.type === 'date'"
+                  v-model="currentValue"
+    />
+    <b-switch v-else-if="field.type === 'boolean'"
+              v-model="currentValue"
+    >{{ value }}</b-switch>
+    <b-input v-else style="background-color: darkred; height: 1em; min-width: 10em;">
+        Unhandled input type: {{ field.type }}
+    </b-input>
+</template>
+
+<script>
+export default {
+    name: "YAMLFieldInput",
+    props: {
+        field: {type: Object, required: true},
+        value: {required: true},
+        data: {type: Array, required: false}
+    },
+    data: function() {
+        return {
+            countries: this.field.format === 'iso-3166-1-alpha-2'?
+                require('../lib/country-codes') : null,
+            languages: this.field.format === 'iso-639-1'?
+                require('../lib/language-codes') : null
+        }
+    },
+    computed: {
+        currentValue: {
+            get() {return this.value},
+            set(v) {this.$emit('input', v)}
+        }
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

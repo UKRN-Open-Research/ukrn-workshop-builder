@@ -25,7 +25,7 @@
         />
       </div>
       <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
-      <a v-if="pagesURL !== ''" :href="pagesURL">
+      <a v-if="pagesURL !== ''" :href="pagesURL" target="_blank">
         <b-button icon-left="link"
                   :label="expanded? 'View workshop website' : ''"
                   :disabled="!mainRepo"

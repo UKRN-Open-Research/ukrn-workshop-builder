@@ -11,6 +11,11 @@
       </div>
     </section>
     <section class="card" v-else>
+      <div class="content"
+           v-if="schedule.days.length === 1 && schedule.days[0].items.length === 0"
+      >
+        <p>There are currently no episodes in the workshop. To add episodes, drag them from the stash into a day. You can search for episodes that have already been created and add them to your stash.</p>
+      </div>
       <div class="columns">
         <div class="column">
           <div class="card-content card"
@@ -100,7 +105,7 @@
       RemoteRepositoryView,
       ArrangeItems
     },
-    props: {},
+    props: {recalculateItems: {type: Boolean, required: false, default: true}},
     data: function() {
       return {
         addRemoteItems: false,
@@ -114,7 +119,7 @@
        * Return all the episodes in a Repository which has a matching topic.
        */
       allItems() {
-        if(!this.mainRepo.topics || !this.mainRepo.topics.length)
+        if(!this.recalculateItems || !this.mainRepo.topics || !this.mainRepo.topics.length)
           return [];
         const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
         const topics = this.mainRepo.topics
@@ -194,8 +199,8 @@
       async updateItemDay({item, dayId, prevOrder, nextOrder}) {
         console.log(`${item.path} DAY => ${dayId} [${prevOrder}, ${nextOrder}]`)
         // Duplicate allow-multiple items
-        if(item.yaml['ukrn-wb-rules']
-                && item.yaml['ukrn-wb-rules'].includes('allow-multiple')
+        if(item.yaml['ukrn_wb_rules']
+                && item.yaml['ukrn_wb_rules'].includes('allow-multiple')
                 && dayId !== ""
                 && !item.yaml.day)
           item = await this.$store.dispatch('workshop/duplicateFile', {url: item.url});
@@ -221,10 +226,7 @@
         episodes.forEach(E => this.setEpisodeAvailable(E, true));
       }
     },
-    mounted() {
-      // TODO: search for and list repositories which have episodes for this topic
-      // Might be best to do this in the store on topic selection/workshop load
-    }
+    mounted() {}
   }
 </script>
 
