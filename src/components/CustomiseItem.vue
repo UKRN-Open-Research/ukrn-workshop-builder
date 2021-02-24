@@ -107,8 +107,9 @@ export default {
       this.isEditingContent = true;
     },
     save({key, value}) {
-      this.item.yaml[key] = value;
-      this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.item.url, yaml: this.item.yaml, body: this.item.body})
+      const newYAML = {...this.item.yaml};
+      newYAML[key] = value;
+      this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.item.url, yaml: newYAML, body: this.item.body})
               .then(() => this.$emit('refresh'))
     }
   },

@@ -6,6 +6,7 @@
                         :data="data"
                         :value="currentValue[i - 1]"
                         @input="v => updateValue(i - 1, v)"
+                        @blur="evt => $emit('blur', evt)"
         />
     </b-field>
 </template>

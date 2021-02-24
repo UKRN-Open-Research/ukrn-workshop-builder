@@ -1,7 +1,7 @@
 <template>
     <div class="content yaml-item">
         <b-field :label="field.name"
-                 :type="field.is_required && !value? 'is-danger' : ''"
+                 :type="status"
         >
             <template #message>
                 <div>{{ field.help }}.</div>
@@ -11,13 +11,13 @@
                                  :field="field"
                                  :data="field.type === 'filename'? fileList : []"
                                  v-model="value"
-                                 @input="save"
+                                 @blur="save"
             />
             <YAMLFieldInput v-else
                             :field="field"
                             :data="field.type === 'filename'? fileList : []"
                             v-model="value"
-                            @input="save"
+                            @blur="save"
             />
         </b-field>
         <b-loading :active="loadingFileList" :is-full-page="false"/>
@@ -31,14 +31,17 @@ export default {
     name: "YAMLField",
     components: {YAMLFieldInput, YAMLFieldInputArray},
     props: {
-        field: {type: Object, required: true}
+        field: {type: Object, required: true},
+        saveStatusLinger: {type: Number, required: false, default: 1000}
     },
     data: function() {
         return {
             currentValue: null, // dictionary of values indexed by YAML keys
             valueChanged: false, // dictionary of change flags indexed by YAML keys
             loadingFileList: true,
-            fileList: []
+            fileList: [],
+            saveStatus: '',
+            saveStatusTimeout: null
         }
     },
     computed: {
@@ -53,19 +56,36 @@ export default {
                 } catch (e) {return null}
             },
             // Set by key, value
-            set(v) {this.valueChanged = true; this.currentValue = v;}
+            set(v) {
+                this.valueChanged = true;
+                this.setSaveStatus('dirty');
+                this.currentValue = v;
+            }
+        },
+        status() {
+            if(this.field.is_required && this.value === '')
+                return 'is-danger';
+            switch(this.saveStatus) {
+                case "saved": return 'is-success';
+                case "dirty": return 'is-light';
+            }
+            return '';
         }
     },
     methods: {
+        toBackendValue(v) {
+            if(this.field.type === 'time')
+                v = v.map(x => `${x.substr(0, 2)}_${x.substr(2,2)}`);
+            if(this.field.is_array)
+                v = v.filter(x => x !== '');
+            return v;
+        },
         save() {
             console.log(`Save: ${this.field.value} -> ${this.value}`)
-            let input = this.value;
-            if(this.field.type === 'time')
-                input = input.map(x => `${x.substr(0, 2)}_${x.substr(2,2)}`);
-            if(this.field.is_array)
-                input = input.filter(x => x !== '');
+            let input = this.toBackendValue(this.value);
             if(input === this.field.value)
                 return;
+            this.setSaveStatus('saved');
             this.$emit('save', {key: this.field.key, value: input});
         },
         validTime(tag) {
@@ -98,6 +118,16 @@ export default {
                     })
                     .catch(() => null)
             })
+        },
+        setSaveStatus(status) {
+            if(this.saveStatusTimeout)
+                clearTimeout(this.saveStatusTimeout);
+            this.saveStatus = status;
+            if(status === 'saved')
+                this.saveStatusTimeout = setTimeout(
+                    () => this.setSaveStatus('clean'),
+                    this.saveStatusLinger
+                )
         }
     },
     mounted() {this.getFieldList()}

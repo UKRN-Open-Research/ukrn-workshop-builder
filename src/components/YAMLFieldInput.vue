@@ -1,6 +1,7 @@
 <template>
     <b-autocomplete v-if="field.format === 'topic'"
                     v-model="currentValue"
+                    @blur="evt => $emit('blur', evt)"
                     :data="$store.state.topicList"
                     placeholder="Start typing to get suggestions"
                     icon="magnify"
@@ -11,6 +12,7 @@
     </b-autocomplete>
     <b-autocomplete v-else-if="field.type === 'filename'"
                     v-model="currentValue"
+                    @blur="evt => $emit('blur', evt)"
                     :data="data"
                     placeholder="Start typing to get suggestions"
                     icon="magnify"
@@ -20,6 +22,7 @@
     </b-autocomplete>
     <b-select v-else-if="field.format === 'iso-3166-1-alpha-2'"
               v-model="currentValue"
+              @blur="evt => $emit('blur', evt)"
     >
         <option v-for="C in countries"
                 :key="C.code"
@@ -28,6 +31,7 @@
     </b-select>
     <b-select v-else-if="field.format === 'iso-639-1'"
               v-model="currentValue"
+              @blur="evt => $emit('blur', evt)"
     >
         <option v-for="L in languages"
                 :key="L.code"
@@ -36,22 +40,28 @@
     </b-select>
     <b-input v-else-if="field.type === 'string' && field.format === 'long'"
              v-model="currentValue"
+             @blur="evt => $emit('blur', evt)"
              type="textarea"
     />
     <b-input v-else-if="field.type === 'string'"
              v-model="currentValue"
+             @blur="evt => $emit('blur', evt)"
     />
     <b-numberinput v-else-if="field.type === 'number'"
                    v-model="currentValue"
+                   @blur="evt => $emit('blur', evt)"
     />
     <b-input v-else-if="field.type === 'time'"
              v-model="currentValue"
+             @blur="evt => $emit('blur', evt)"
     />
     <b-datepicker v-else-if="field.type === 'date'"
                   v-model="currentValue"
+                  @blur="evt => $emit('blur', evt)"
     />
     <b-switch v-else-if="field.type === 'boolean'"
               v-model="currentValue"
+              @blur="evt => $emit('blur', evt)"
     >{{ value }}</b-switch>
     <b-input v-else style="background-color: darkred; height: 1em; min-width: 10em;">
         Unhandled input type: {{ field.type }}

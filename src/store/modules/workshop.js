@@ -59,25 +59,8 @@ export default {
             if(!match.length)
                 throw new Error(`Store has no file with URL: ${url}`);
             const file = match[0];
-            // Process file content
-            const textContent = Base64.decode(file.content);
-            let yaml = null;
-            let yamlParseError = null;
-            let body = null;
-            try{
-                const parsed = YAML.parseAllDocuments(textContent);
-                const yamlText = textContent.substring(...parsed[0].range);
-                body = parsed.length > 1?
-                    textContent.substring(...parsed[1].range) : null;
-                yaml = YAML.parse(yamlText);
-            } catch(e) {
-                body = textContent;
-                yaml = {};
-                yamlParseError = e;
-            }
             return {
                 ...file,
-                content: textContent, yaml, yamlParseError, body,
                 busyFlag: () => getters.isBusy(url),
                 hasChanged: () => getters.hasChanged(url)
             }
@@ -204,9 +187,17 @@ export default {
                 throw new Error('Attempt to overwrite existing file.\nTo overwrite files specify overwrite=true in the payload.');
             if(!Base64.isValid(content))
                 throw new Error('payload.content must be a valid Base64-encoded string');
+            content = Base64.decode(content);
+            if(remoteContent !== null && !Base64.isValid(remoteContent))
+                throw new Error('payload.remoteContent must be a valid Base64-encoded string');
+            else if(remoteContent !== null)
+                remoteContent = Base64.decode(remoteContent);
             nsContext.commit('setItem', {
                 array: 'files',
-                item: {url, content, sha, path, remoteContent: remoteContent || content}
+                item: {
+                    url, content, sha, path, remoteContent: remoteContent || content,
+                    ...parseYAML(content)
+                }
             });
         },
         /**
@@ -216,17 +207,13 @@ export default {
          * @param content {string} content to set
          * @param encode {boolean} whether to have the back end encode the file in Base64
          */
-        setFileContent(nsContext, {url, content, encode = true}) {
-            if(encode)
-                content = Base64.encode(content);
-            if(!Base64.isValid(content))
-                throw new Error('payload.content must be a valid Base64-encoded string');
+        setFileContent(nsContext, {url, content}) {
             const files = nsContext.state.files.filter(f => f.url === url);
             if(!files.length)
                 throw new Error(`Attempt to update content of unknown file: ${url}`)
             nsContext.commit('setItem', {
                 array: 'files',
-                item: {...files[0], content: content}
+                item: {...files[0], content: content, ...parseYAML(content)}
             });
         },
         /**
@@ -238,7 +225,7 @@ export default {
          */
         setFileContentFromYAML(nsContext, {url, yaml, body = null}) {
             let content = `---\n${YAML.stringify(yaml)}\n---\n${body}`;
-            return nsContext.dispatch('setFileContent', {url, content, encode: true});
+            return nsContext.dispatch('setFileContent', {url, content});
         },
         /**
          * Duplicate a file
@@ -289,7 +276,7 @@ export default {
                 body: JSON.stringify({
                     url: file.url,
                     path: file.path,
-                    content: file.content,
+                    content: Base64.encode(file.content),
                     sha: file.sha,
                     token: nsContext.rootGetters['github/token']
                 })
@@ -628,6 +615,30 @@ export default {
         }
     }
 };
+
+/**
+ * Parse a YAML-headed file into YAML key-value and body
+ * @param content {string}
+ * @return {{yamlParseError: null|string, body: string|null, yaml: null|{}}}
+ */
+function parseYAML(content) {
+    // Process file content
+    let yaml = null;
+    let yamlParseError = null;
+    let body = null;
+    try{
+        const parsed = YAML.parseAllDocuments(content);
+        const yamlText = content.substring(...parsed[0].range);
+        body = parsed.length > 1?
+            content.substring(...parsed[1].range) : null;
+        yaml = YAML.parse(yamlText);
+    } catch(e) {
+        body = content;
+        yaml = {};
+        yamlParseError = e;
+    }
+    return {yaml, body, yamlParseError};
+}
 
 function fileInRepository(fileURL, repositoryURL){
     return fileURL.indexOf(repositoryURL) !== -1;

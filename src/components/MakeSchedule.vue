@@ -19,7 +19,7 @@
       <div class="columns">
         <div class="column">
           <div class="card-content card"
-               v-for="day in schedule.days.sort((a,b) => a.number < b.number? -1 : 1)"
+               v-for="day in schedule.days"
                :key="day.number"
           >
             <header class="card-header" v-if="!mainRepo.busyFlag()">
@@ -44,7 +44,7 @@
             <div class="card-content" v-if="!mainRepo.busyFlag()">
               <ArrangeItems :items="schedule.unassignedItems"
                             :is-unscheduled="true"
-                            @chage="updateItemDay"
+                            @change="updateItemDay"
                             @drop="item => updateItemDay({item, dayId: ''})"
               />
             </div>
@@ -59,7 +59,6 @@
               </b-button>
             </div>
           </div>
-          <!-- TODO: ADD BREAKS AND ALLOW ORDERING -->
         </div>
       </div>
 
@@ -119,6 +118,7 @@
        * Return all the episodes in a Repository which has a matching topic.
        */
       allItems() {
+        const T = performance.now()
         if(!this.recalculateItems || !this.mainRepo.topics || !this.mainRepo.topics.length)
           return [];
         const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
@@ -132,11 +132,12 @@
         const episodes = [];
         topicRepos.forEach(R => episodes.push(...R.episodes));
         // Add remote flag
-        console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories`)
+        console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories in ${Math.round(performance.now() - T)}ms`)
         return episodes.map(e => {return {...e, remote: !mainEpisodes.includes(e.url)}});
       },
       // The schedule is a representation of the episodes in a workshop arranged by day and time
       schedule: function() {
+        const T = performance.now()
         const schedule = {days: [], unassignedItems: []};
         this.allItems.forEach(item => {
           // Items without valid day/start_time inputs are unassigned
@@ -156,6 +157,10 @@
         for(let d = 1; d <= lastDay + 1; d++)
           if(!schedule.days.filter(day => day.number === d).length)
             schedule.days.push({number: d, items: []});
+        // Arrange days and items
+        schedule.days.sort((a,b) => a.number < b.number? -1 : 1);
+        schedule.days.forEach(d => d.items.sort((a, b) => a.yaml.order > b.yaml.order? 1 : -1));
+        console.log(`Generated schedule in ${Math.round(performance.now() - T)}ms`)
         return schedule;
       },
       filteredTopicRepositories() {

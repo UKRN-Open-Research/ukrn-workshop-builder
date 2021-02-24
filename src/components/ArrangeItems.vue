@@ -7,7 +7,7 @@
           group="items"
           class="episodeList"
   >
-    <b-collapse v-for="item in items.sort((a, b) => a.yaml.order > b.yaml.order? 1 : -1)"
+    <b-collapse v-for="item in items"
                 :key="item.url"
                 :class="`episode card ${item.remote? 'remote' : ''} ${item.yaml['ukrn_wb_rules'] && item.yaml['ukrn_wb_rules'].includes('allow-multiple')? 'is-break' : ''}`"
                 :title="item.description"

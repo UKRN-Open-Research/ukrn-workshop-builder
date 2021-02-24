@@ -38,7 +38,7 @@
 
       <b-step-item step="4" label="Schedule" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep >= 3">
         <h1 class="title has-text-centered">Construct schedule</h1>
-        <MakeSchedule :recalculateItems="activeStep === 3"/>
+        <MakeSchedule/>
       </b-step-item>
     </b-steps>
   </div>
