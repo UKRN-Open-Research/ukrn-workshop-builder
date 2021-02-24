@@ -250,9 +250,10 @@ export default {
             // Add the new copy
             const item = {
                 ...file,
+                ...parseYAML(file.content),
                 url: newURL,
                 path: newPath,
-                remoteContent: Base64.encode("")
+                remoteContent: ""
             };
             nsContext.commit('setItem', {array: 'files', item});
             return nsContext.getters.File(newURL);

@@ -12,7 +12,7 @@
     </div>
     <div v-else class="content yaml-panel">
       <div v-for="f in Fields.filter(f => f.value !== undefined)"
-           :key="f"
+           :key="f.key"
       >
         <span class="title">{{f}}</span> {{ item.yaml[f] }}
       </div>
