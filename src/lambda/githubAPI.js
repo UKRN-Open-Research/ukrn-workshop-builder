@@ -31,6 +31,8 @@ async function main(event, context, callback) {
                 return callback(null, await pullItem(event));
             case "setTopics":
                 return callback(null, await setTopics(event));
+            case "copyFile":
+                return callback(null, await copyFile(event));
             default:
                 if(event.headers.task)
                     throw new Error(`Unrecognised githubAPI task requested: ${event.headers.task}`);
@@ -319,5 +321,32 @@ async function getTopics(event) {
     })
         .then(r => checkResponseCode(r, 200));
     return topics.names;
+}
+
+/**
+ * Copy a file from one repository to another, and return the copy
+ * @param event {{body: string, ...:*}}
+ * @return {Promise<Object>}
+ */
+async function copyFile(event) {
+    const d = JSON.parse(event.body);
+    let file = null;
+    return await fetch(d.url, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200))
+        .then(json => file = json)
+        .then(() => pushFile({body: JSON.stringify({
+                ...d, content: file.content, path: file.path, url: d.newURL
+            })}))
+        .catch(e => {
+            if(/\(409\)/.test(e) && d.ignoreExisting)
+                return OK(file);
+            throw new Error(e);
+        });
 }
 

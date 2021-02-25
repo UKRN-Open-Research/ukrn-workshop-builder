@@ -7,31 +7,41 @@
          @blur="expanded = false"
     >
       <div class="github-menu-buttons">
-        <header>
-          <b-icon icon="github" size="is-large"/>
-          <span v-if="expanded">GitHub integration</span>
-        </header>
-        <b-button icon-left="delete"
-                  :label="expanded? 'Discard local changes' : ''"
-                  :disabled="mainRepo.files.filter(f => f.hasChanged()).length === 0"
-                  type="is-danger"
-                  @click="reload"
-        />
-        <b-button icon-left="content-save"
-                  :label="expanded? 'Save changes to GitHub' : ''"
-                  :disabled="mainRepo.files.filter(f => f.hasChanged()).length === 0"
-                  type="is-success"
-                  @click="save"
-        />
-      </div>
-      <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
-      <a v-if="pagesURL !== ''" :href="pagesURL" target="_blank">
-        <b-button icon-left="link"
+        <div class="github-components">
+          <header>
+            <b-icon icon="github" size="is-large"/>
+            <span v-if="expanded">GitHub Integration</span>
+          </header>
+          <b-button icon-left="delete"
+                    :label="expanded? 'Discard local changes' : ''"
+                    :disabled="mainRepo.files.filter(f => f.hasChanged()).length === 0"
+                    type="is-danger"
+                    @click="reload"
+                    size="is-medium"
+                    expanded
+          />
+          <b-button icon-left="content-save"
+                    :label="expanded? 'Save changes to GitHub' : ''"
+                    :disabled="mainRepo.files.filter(f => f.hasChanged()).length === 0"
+                    type="is-success"
+                    @click="save"
+                    size="is-medium"
+                    expanded
+          />
+        </div>
+        <b-loading :active="$store.state.workshop.busyFlags.length !== 0" :is-full-page="false"/>
+        <b-button v-if="pagesURL !== ''"
+                  tag="a"
+                  :href="pagesURL"
+                  target="_blank"
+                  icon-left="link"
                   :label="expanded? 'View workshop website' : ''"
                   :disabled="!mainRepo"
                   type="is-info"
+                  size="is-medium"
+                  expanded
         />
-      </a>
+      </div>
     </div>
   </div>
 </template>
@@ -107,7 +117,7 @@ export default {
 
   .github-menu-wrapper {
     background-color: rebeccapurple;
-    padding: .5em .25em .5em 1em;
+    padding: .5em 0 .5em 1em;
     border-top-left-radius: 1em;
     border-bottom-left-radius: 1em;
     opacity: 0.5;
@@ -115,12 +125,30 @@ export default {
   .github-menu-wrapper:hover {opacity: 1;}
 
   .github-menu-buttons {
-    display: flex;
-    flex-direction: column;
-
     background-color: white;
     border-top-left-radius: 1em;
     border-bottom-left-radius: 1em;
-    padding-bottom: .5em;
+    padding: .5em 0 .5em .5em;
+    .github-components {
+      display: flex;
+      flex-direction: column;
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        font-size: 1.3em;
+        margin-bottom: .25em;
+        user-select: none;
+      }
+      button:first-of-type {border-bottom-left-radius: 0}
+      button:last-of-type {border-top-left-radius: 0}
+    }
+    a, button {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    a {
+      margin-top: .5em;
+    }
   }
 </style>

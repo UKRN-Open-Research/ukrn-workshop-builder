@@ -9,15 +9,22 @@
                        :field="field"
                        @save="save"
       />
+      <b-button @click="editContent" label="Edit content"/>
     </div>
     <div v-else class="content yaml-panel">
       <div v-for="f in Fields.filter(f => f.value !== undefined)"
            :key="f.key"
+           class="yaml-read-only"
       >
-        <span class="title">{{f}}</span> {{ item.yaml[f] }}
+        <header class="title">{{f.name}}</header>
+        <ul v-if="f.is_array">
+          <li v-for="i in item.yaml[f.key].length" :key="i">
+            {{ item.yaml[f.key][i - 1] }}
+          </li>
+        </ul>
+        <p v-else>{{ item.yaml[f.key] }}</p>
       </div>
     </div>
-    <b-button @click="editContent" label="Edit content"/>
 
     <b-modal v-model="isEditingContent"
              scroll="keep"
@@ -29,6 +36,7 @@
                       v-model="currentContent"
                       language="en"
                       defaultOpen="edit"
+                      :toolbars="toolbars"
         />
       </div>
       <div v-else>
@@ -49,7 +57,21 @@ export default {
   data: function() {
     return {
       isEditingContent: false,
-      currentContent: ""
+      currentContent: "",
+      toolbars: {
+        bold: true, italic: true, header: true, underline: true,
+        strikethrough: true, mark: true, superscript: true, subscript: true,
+        quote: true, ol: true, ul: true, link: true, imagelink: true, code: true,
+        table: true, fullscreen: true, readmodel: true, htmlcode: true, help: true,
+        /* 1.3.5 */
+        undo: true, redo: true, trash: false, save: false,
+        /* 1.4.2 */
+        navigation: true,
+        /* 2.1.8 */
+        alignleft: true, aligncenter: true, alignright: true,
+        /* 2.2.1 */
+        subfield: true, preview: true
+      }
     }
   },
   computed: {
@@ -127,5 +149,13 @@ export default {
   .yaml-item-wrapper {
     display: grid;
     min-width: 45%;
+  }
+  .yaml-read-only {
+    header {
+      font-size: 1em;
+      margin-bottom: .25em;
+    }
+    p, ul {margin: 0}
+    ul {text-align: left}
   }
 </style>

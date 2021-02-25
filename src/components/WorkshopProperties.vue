@@ -30,7 +30,8 @@ export default {
             saveTimeout: null,
             minSaveDelay: 500,
             lastSaveTime: 0,
-            saveOperations: {}
+            saveOperations: {},
+            checkboxGroup: []
         }
     },
     computed: {
@@ -65,7 +66,6 @@ export default {
     methods: {
         registerSave({key, value}) {
             this.saveOperations[key] = value;
-            console.log({timeout: this.saveTimeout})
             if(this.saveTimeout)
                 clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => this.save(), this.minSaveDelay);
@@ -75,21 +75,14 @@ export default {
             const me = this;
             this.saveTimeout = null;
             this.lastSaveTime = performance.now();
-            let newTopic = false;
             const newYAML = {...this.template.yaml};
             for(let k of Object.keys(this.saveOperations)) {
                 console.log(`Saving ${k} => ${this.saveOperations[k]}`)
-                if(k === 'topic')
-                    newTopic = this.saveOperations[k];
                 newYAML[k] = this.saveOperations[k];
                 delete this.saveOperations[k];
             }
+
             this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.template.url, yaml: newYAML, body: this.template.body})
-                .then(() => {
-                    if(newTopic !== false)
-                    this.$store.dispatch('workshop/setTopics', {
-                        topics: [newTopic]})
-                })
                 .then(() => me.$emit('refresh'))
                 .then(() => me.saving = false);
         }

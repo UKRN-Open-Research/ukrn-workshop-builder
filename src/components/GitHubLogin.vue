@@ -1,8 +1,8 @@
 <template>
-    <b-button @click="$store.getters['github/user']? $store.dispatch('github/logout') : loginRequest()"
+    <b-button @click="$store.getters['github/login']? $store.dispatch('github/logout') : loginRequest()"
               icon-left="github"
               size="is-medium"
-              :inverted="$store.getters['github/login']? true : false"
+              :type="!$store.getters['github/login']? '' : 'is-dark'"
               :loading="$store.state.github.loginInProgress"
     >
       <span v-if="$store.getters['github/login']">{{ $store.getters['github/login'] }} (logout)</span>

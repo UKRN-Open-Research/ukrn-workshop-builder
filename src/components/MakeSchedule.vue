@@ -211,20 +211,20 @@
           item = await this.$store.dispatch('workshop/duplicateFile', {url: item.url});
         // TODO: Delete allow-multiple items when de-scheduled
 
-        const newItem = {...item};
-        newItem.yaml.day = dayId;
+        const newYAML = {...item.yaml};
+        newYAML.day = dayId;
         // Place in the correct order
         if(prevOrder && nextOrder && prevOrder === nextOrder) {
           // TODO: implement recalculating item order values
         } else if(!prevOrder && nextOrder)
-          newItem.yaml.order = Math.round(nextOrder / 2);
+          newYAML.order = Math.round(nextOrder / 2);
         else if(prevOrder && !nextOrder)
-          newItem.yaml.order = Math.round(prevOrder + 100000);
+          newYAML.order = Math.round(prevOrder + 100000);
         else if(prevOrder && nextOrder)
-          newItem.yaml.order = Math.round(prevOrder + (nextOrder - prevOrder) / 2);
+          newYAML.order = Math.round(prevOrder + (nextOrder - prevOrder) / 2);
         else
-          newItem.yaml.order = 100000;
-        this.updateEpisode(newItem);
+          newYAML.order = 100000;
+        this.updateEpisode({...item, yaml: newYAML});
       },
       addRepositoryEpisodes(episodes) {
         // Close modal

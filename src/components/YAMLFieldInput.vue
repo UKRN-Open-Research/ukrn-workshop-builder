@@ -1,28 +1,16 @@
 <template>
-    <b-autocomplete v-if="field.format === 'topic'"
-                    v-model="currentValue"
-                    @blur="evt => $emit('blur', evt)"
-                    :data="$store.state.topicList"
-                    placeholder="Start typing to get suggestions"
-                    icon="magnify"
-                    clearable
-                    :open-on-focus="true"
-    >
-        <template #empty>No matching topics found</template>
-    </b-autocomplete>
-    <b-autocomplete v-else-if="field.type === 'filename'"
-                    v-model="currentValue"
-                    @blur="evt => $emit('blur', evt)"
-                    :data="data"
-                    placeholder="Start typing to get suggestions"
-                    icon="magnify"
-                    :open-on-focus="true"
-    >
-        <template #empty>No match found</template>
-    </b-autocomplete>
+    <div v-if="field.format === 'topic'">
+        <b-radio v-for="t in $store.state.topicList"
+                 v-model="currentValue"
+                 :name="field.key"
+                 :key="t"
+                 :native-value="t"
+                 @input="evt => $emit('blur', evt)"
+        >{{ `${t[0].toUpperCase()}${t.substring(1).replaceAll(/-/g, ' ')}` }}</b-radio>
+    </div>
     <b-select v-else-if="field.format === 'iso-3166-1-alpha-2'"
               v-model="currentValue"
-              @blur="evt => $emit('blur', evt)"
+              @input="evt => $emit('blur', evt)"
     >
         <option v-for="C in countries"
                 :key="C.code"
@@ -31,7 +19,7 @@
     </b-select>
     <b-select v-else-if="field.format === 'iso-639-1'"
               v-model="currentValue"
-              @blur="evt => $emit('blur', evt)"
+              @input="evt => $emit('blur', evt)"
     >
         <option v-for="L in languages"
                 :key="L.code"
@@ -42,6 +30,7 @@
              v-model="currentValue"
              @blur="evt => $emit('blur', evt)"
              type="textarea"
+             class="full-wide"
     />
     <b-input v-else-if="field.type === 'string'"
              v-model="currentValue"
@@ -49,7 +38,7 @@
     />
     <b-numberinput v-else-if="field.type === 'number'"
                    v-model="currentValue"
-                   @blur="evt => $emit('blur', evt)"
+                   @input="evt => $emit('blur', evt)"
     />
     <b-input v-else-if="field.type === 'time'"
              v-model="currentValue"
@@ -94,5 +83,5 @@ export default {
 </script>
 
 <style scoped>
-
+    .full-wide {width: 100%;}
 </style>

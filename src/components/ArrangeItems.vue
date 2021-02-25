@@ -23,7 +23,7 @@
             <span class="card-header-title">
               <EpisodeName :episode="item"/>
             </span>
-          <b-icon :icon="props.open ? 'menu-up' : 'menu-down'" class="card-content caret" size="is-medium"/>
+          <b-icon :icon="props.open? 'menu-up' : item.remote? 'dots-vertical' : 'wrench'" class="card-content caret" :size="props.open? 'is-medium' : 'is-small'"/>
           <div class="action-icons" @click="evt=>evt.stopPropagation()">
             <b-button v-if="item.remote && dayId"
                       icon-right="plus-circle"
@@ -31,14 +31,13 @@
                       title="Install remote episode"
                       @click="install(item)"
             />
-            <b-button v-else-if="!item.remote"
-                      icon-right="cog"
+            <b-button tag="a"
+                      :href="getPagesLink(item)"
+                      target="_blank"
+                      title="Open episode website in a new tab"
+                      icon-right="link"
                       size="is-medium"
-                      title="Edit episode"
             />
-            <a :href="getPagesLink(item)" target="_blank" title="Open episode website in a new tab">
-              <b-button icon-right="link" size="is-medium"/>
-            </a>
             <b-button v-if="dayId"
                       icon-right="minus-circle"
                       size="is-medium"
@@ -135,6 +134,8 @@ export default {
   }
   .action-icons {
     display: flex;
+    align-items: center;
+    justify-content: space-evenly;
     margin-right: 0;
     padding: .25em 0;
     button {

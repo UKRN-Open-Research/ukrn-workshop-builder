@@ -5,11 +5,20 @@
         >
             <template #message>
                 <div>{{ field.help }}.</div>
-                <div v-if="field.is_required && !value">This field is required!</div>
+                <div v-if="status === 'is-danger'">This field is required!</div>
             </template>
-            <YAMLFieldInputArray v-if="field.is_array"
+            <div v-if="field.type === 'filename'">
+                <b-checkbox v-for="f in fileList"
+                            :key="f"
+                            v-model="value"
+                            :native-value="f"
+                            :name="field.key"
+                            @input="save"
+                >{{ f }}</b-checkbox>
+            </div>
+            <YAMLFieldInputArray v-else-if="field.is_array"
                                  :field="field"
-                                 :data="field.type === 'filename'? fileList : []"
+                                 :data="fileList"
                                  v-model="value"
                                  @blur="save"
             />
@@ -53,7 +62,7 @@ export default {
                     if(this.field.type !== 'time')
                         return this.field.value;
                     return this.field.value.map(x => x.replace(/_/, ''));
-                } catch (e) {return null}
+                } catch (e) {return this.field.is_array? [] : ''}
             },
             // Set by key, value
             set(v) {
@@ -63,20 +72,23 @@ export default {
             }
         },
         status() {
-            if(this.field.is_required && this.value === '')
+            if(this.field.is_required &&
+                (this.value === '' || this.value === null))
                 return 'is-danger';
             switch(this.saveStatus) {
                 case "saved": return 'is-success';
-                case "dirty": return 'is-light';
+                case "dirty": return 'is-info is-light';
             }
             return '';
         }
     },
     methods: {
         toBackendValue(v) {
+            if(v === null)
+                return v;
             if(this.field.type === 'time')
                 v = v.map(x => `${x.substr(0, 2)}_${x.substr(2,2)}`);
-            if(this.field.is_array)
+            if(this.field.is_array && v.length)
                 v = v.filter(x => x !== '');
             return v;
         },
@@ -94,11 +106,12 @@ export default {
             if(match.groups.h >= 24) return false;
             return match.groups.m < 60;
         },
-        getFieldList() {
+        getFileList() {
             if(!this.field.special || this.field.type !== 'filename') {
                 this.loadingFileList = false;
                 return;
             }
+            this.fileList = [];
             const self = this;
             this.field.special.forEach(path => {
                 this.$store.dispatch('workshop/pullURL', {
@@ -107,7 +120,7 @@ export default {
                     .then(r => {
                         r.forEach(f => {
                             const match = /^(.+)\.[^.]+$/.exec(f.name);
-                            if(!match)
+                            if(!match || match[1][0] === '_')
                                 return;
                             const entry = match[1];
                             if(self.fileList.includes(entry))
@@ -130,7 +143,7 @@ export default {
                 )
         }
     },
-    mounted() {this.getFieldList()}
+    mounted() {this.getFileList()}
 }
 </script>
 

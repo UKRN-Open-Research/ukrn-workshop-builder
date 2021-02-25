@@ -1,5 +1,15 @@
 <template>
-    <b-field grouped group-multiline>
+    <b-field v-if="field.type === 'filename'" grouped group-multiline>
+        <YAMLFieldInput v-for="i in data.length"
+                        :key="data[i - 1]"
+                        :field="field"
+                        :data="data[i - 1]"
+                        :value="currentValue[i - 1]"
+                        @input="v => updateValue(i - 1, v)"
+                        @blur="evt => $emit('blur', evt)"
+        />
+    </b-field>
+    <b-field v-else grouped group-multiline>
         <YAMLFieldInput v-for="i in currentValue.length"
                         :key="i - 1"
                         :field="field"

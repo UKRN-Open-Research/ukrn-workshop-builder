@@ -298,6 +298,15 @@ export default {
                     nsContext.commit('setBusyFlag', {flag: url, value: false});
                     return nsContext.getters.File(url);
                 })
+                // Update topics if we updated the topic in the config file
+                .then(async F => {
+                    if(F.path === '_config.yml') {
+                        const repo = nsContext.getters.Repository();
+                        if(repo && !repo.topics.includes(F.yaml.topic))
+                            await nsContext.dispatch('setTopics', {topics: [F.yaml.topic]});
+                    }
+                    return F;
+                })
                 .catch(e => {
                     nsContext.commit('addError', e);
                     nsContext.commit('setBusyFlag', {flag: url, value: false});
@@ -473,10 +482,13 @@ export default {
          * @return {null|Promise<any>}
          */
         setTopics(nsContext, {topics}) {
+            console.log(`setTopics(${topics})`)
             const main = nsContext.getters.Repository();
             if(!main)
                 throw new Error(`Cannot set topics without a main repository.`);
-            const unknownTopics = topics.filter(t => !nsContext.rootState.topicList.includes(t));
+            const unknownTopics = topics
+                .filter(t => !nsContext.rootState.topicList.includes(t))
+                .filter(t => t !== "");
             if(unknownTopics.length)
                 throw new Error(`Cannot set unknown topics: ${unknownTopics.join(', ')}`);
             if(nsContext.getters.isBusy(main.url))
@@ -570,7 +582,7 @@ export default {
          * @param url {string}
          * @return {null|Promise<File|null>}
          */
-        installFile(nsContext, {url}) {
+        async installFile(nsContext, {url}) {
             // Check file is okay to install
             const Repo = nsContext.getters.Repository();
             const File = nsContext.getters.File(url);
@@ -584,10 +596,42 @@ export default {
             }
             nsContext.commit('setBusyFlag', {flag: url, value: true});
 
-            // Check dependencies and copy to repository, renaming if conflicts
-            let dependencies = File.yaml.dependencies;
-            if(!dependencies)
-                dependencies = findFileDependencies(File.content);
+            if(!File.yaml.dependencies)
+                File.yaml.dependencies = findFileDependencies(File);
+
+            console.log(File.yaml.dependencies);
+
+            // Find the file's name/repository route
+            const re = new RegExp(`^https://api.github.com/repos/([^/]+/[^/]+)/contents/${File.path}$`);
+            const match = re.exec(File.url);
+            if(!match)
+                throw new Error(`${File.url} does not appear to be a valid GitHub URL`);
+            File.yaml.originalRepository = match[1];
+
+            const newPaths = File.yaml.dependencies
+                .map(ref => ref.replace(/^\.\.\//, '/'));
+
+            console.log({dependencies: File.yaml.dependencies, newPaths})
+
+            await Promise.allSettled(File.yaml.dependencies.map(async (f, i) => {
+                const oldPath = f.replace(/^\.\.\//, '');
+                const newPath = newPaths[i];
+                const fullURL = File.url.replace(File.path, oldPath);
+                const newURL = `${Repo.url}/contents/installed/${File.yaml.originalRepository}${newPath}`;
+                await fetch('/.netlify/functions/githubAPI', {
+                    method: "POST", headers: {task: 'copyFile'},
+                    body: JSON.stringify({
+                        url: fullURL, newURL, ignoreExisting: true,
+                        token: nsContext.rootGetters['github/token'],
+                    })
+                });
+
+                File.yaml.dependencies = File.yaml.dependencies
+                    .map(x => x === f? newPath : x);
+                File.body = File.body.replaceAll(f, `{% include installedFile.lqd path='${oldPath}' %}`);
+            }));
+
+            File.content = `---\n${YAML.stringify(File.yaml)}\n---\n${File.body}`;
 
             // Update file to copy target content + use safe dependency links
             const newURL = `${Repo.url}/contents/${File.path}`;
@@ -612,7 +656,6 @@ export default {
                     nsContext.commit('setBusyFlag', {flag: url, value: false});
                     return null;
                 })
-
         }
     }
 };
@@ -645,21 +688,21 @@ function fileInRepository(fileURL, repositoryURL){
     return fileURL.indexOf(repositoryURL) !== -1;
 }
 
-async function findFileDependencies(content) {
+function findFileDependencies(File) {
     // Check for Markdown image links
-    const out = [];
+    const references = [];
     // https://stackoverflow.com/a/58345920
     const parseImageLinks = /\[?(!)(?<alt>\[[^\][]*\[?[^\][]*\]?[^\][]*)\]\((?<url>[^\s]+?)(?:\s+(["'])(?<title>.*?)\4)?\)/gm;
     let match;
 
-    while((match = parseImageLinks.exec(content)) !== null) {
+    while((match = parseImageLinks.exec(File.content)) !== null) {
         if(match.groups && !/https?:\/\//.test(match.groups.url))
-            out.push(match.groups)
+            references.push(match.groups.url)
     }
 
-    // Fetch referenced files
-    // Check for conflicts with existing files
-    console.log(out);
-
-
+    // Update links using original repository link style to use root reference link style
+    return references.map(r => r.replace(
+        /^\{% include installedFile\.lqd path='\{\{ (.)+ }}' %}/,
+        `/installed/${File.yaml.originalRepository}/\\1`
+    ));
 }
