@@ -61,7 +61,7 @@ export default {
                         return this.currentValue;
                     if(this.field.type !== 'time')
                         return this.field.value;
-                    return this.field.value.map(x => x.replace(/_/, ''));
+                    return this.field.value.map(x => x.replace(/\|/, ''));
                 } catch (e) {return this.field.is_array? [] : ''}
             },
             // Set by key, value
@@ -86,10 +86,10 @@ export default {
         toBackendValue(v) {
             if(v === null)
                 return v;
-            if(this.field.type === 'time')
-                v = v.map(x => `${x.substr(0, 2)}_${x.substr(2,2)}`);
             if(this.field.is_array && v.length)
                 v = v.filter(x => x !== '');
+            if(this.field.type === 'time')
+                v = v.map(x => `${x.substr(0, 2)}|${x.substr(2,2)}`);
             return v;
         },
         save() {

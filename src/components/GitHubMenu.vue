@@ -112,7 +112,7 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    z-index: 100;
+    z-index: 30;
   }
 
   .github-menu-wrapper {

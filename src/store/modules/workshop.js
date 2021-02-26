@@ -586,6 +586,7 @@ export default {
             // Check file is okay to install
             const Repo = nsContext.getters.Repository();
             const File = nsContext.getters.File(url);
+            const newURL = `${Repo.url}/contents/${File.path}`;
             if(!File) {
                 nsContext.commit('addError', `No such file to install: ${url}`);
                 return null;
@@ -594,58 +595,43 @@ export default {
                 nsContext.commit('addError', 'Cannot install File into its own Repository');
                 return null;
             }
-            nsContext.commit('setBusyFlag', {flag: url, value: true});
-
-            if(!File.yaml.dependencies)
-                File.yaml.dependencies = findFileDependencies(File);
-
-            console.log(File.yaml.dependencies);
 
             // Find the file's name/repository route
             const re = new RegExp(`^https://api.github.com/repos/([^/]+/[^/]+)/contents/${File.path}$`);
-            const match = re.exec(File.url);
-            if(!match)
+            const name_repo = re.exec(File.url);
+            if(!name_repo)
                 throw new Error(`${File.url} does not appear to be a valid GitHub URL`);
-            File.yaml.originalRepository = match[1];
 
-            const newPaths = File.yaml.dependencies
-                .map(ref => ref.replace(/^\.\.\//, '/'));
+            nsContext.commit('setBusyFlag', {flag: url, value: true});
 
-            console.log({dependencies: File.yaml.dependencies, newPaths})
-
-            await Promise.allSettled(File.yaml.dependencies.map(async (f, i) => {
-                const oldPath = f.replace(/^\.\.\//, '');
-                const newPath = newPaths[i];
-                const fullURL = File.url.replace(File.path, oldPath);
-                const newURL = `${Repo.url}/contents/installed/${File.yaml.originalRepository}${newPath}`;
-                await fetch('/.netlify/functions/githubAPI', {
-                    method: "POST", headers: {task: 'copyFile'},
-                    body: JSON.stringify({
-                        url: fullURL, newURL, ignoreExisting: true,
-                        token: nsContext.rootGetters['github/token'],
-                    })
-                });
-
-                File.yaml.dependencies = File.yaml.dependencies
-                    .map(x => x === f? newPath : x);
-                File.body = File.body.replaceAll(f, `{% include installedFile.lqd path='${oldPath}' %}`);
-            }));
-
-            File.content = `---\n${YAML.stringify(File.yaml)}\n---\n${File.body}`;
-
-            // Update file to copy target content + use safe dependency links
-            const newURL = `${Repo.url}/contents/${File.path}`;
-            return nsContext.dispatch('addFile', {
+            // Create new file
+            await nsContext.dispatch('addFile', {
                 url: newURL,
                 content: Base64.encode(File.content),
                 sha: null,
                 path: File.path
-            })
-                // Upload file
-                .then(() => nsContext.dispatch('pushFile', {url: newURL}))
+            });
+
+            let newFile = nsContext.getters.File(newURL);
+
+            nsContext.commit('setBusyFlag', {flag: newURL, value: true});
+
+            // Register dependencies
+            newFile.yaml.missingDependencies = findFileDependencies(File).map(ref => ref.replace(/^\.\.\//, '/'));
+            newFile.yaml.dependencies = [];
+            newFile.yaml.originalRepository = name_repo[1];
+            await nsContext.dispatch('setFileContentFromYAML', {...newFile});
+
+            newFile = await nsContext.dispatch('installDependencies', {url: newURL});
+
+            // Unset busy flag so pushFile doesn't complain
+            nsContext.commit('setBusyFlag', {flag: newURL, value: false});
+            // Update file to copy target content + use safe dependency links
+            return nsContext.dispatch('pushFile', {url: newURL})
                 // Drop original
                 .then(F => {
                     nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    nsContext.commit('setBusyFlag', {flag: newURL, value: false});
                     // Remove original by reference to its URL
                     nsContext.commit('removeItem', {array: 'files', item: {url}});
                     return F;
@@ -654,8 +640,142 @@ export default {
                     nsContext.commit('addError', e);
                     console.error(e);
                     nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    nsContext.commit('setBusyFlag', {flag: newURL, value: false});
                     return null;
                 })
+        },
+        /**
+         * Install the dependencies for a file.
+         * @param nsContext
+         * @param url {string}
+         * @return {Promise<function(*=): {busyFlag: *, content: string, yaml: {"...": *}, body: (string|null)}>}
+         */
+        async installDependencies(nsContext, {url}) {
+            const File = nsContext.getters.File(url);
+            const setBusyFlag = !File.busyFlag();
+            if(setBusyFlag)
+                nsContext.commit('setBusyFlag', {flag: url, value: true});
+            const Repo = nsContext.getters.Repository();
+            const remoteRepoURL = `https://api.github.com/repos/${File.yaml.originalRepository}`;
+            const newYAML = {...File.yaml};
+            let newBody = File.body;
+
+            console.log({dependencies: File.yaml.dependencies, missingDependencies: File.yaml.missingDependencies})
+
+            await Promise.allSettled(File.yaml.missingDependencies.map(async (f) => {
+                const fullURL = `${remoteRepoURL}/contents${f}`;
+                const newURL = `${Repo.url}/contents/installed/${File.yaml.originalRepository}${f}`;
+                await fetch('/.netlify/functions/githubAPI', {
+                    method: "POST", headers: {task: 'copyFile'},
+                    body: JSON.stringify({
+                        url: fullURL, newURL, returnExisting: true,
+                        token: nsContext.rootGetters['github/token'],
+                    })
+                })
+                    .then(r => {
+                        if(r.status !== 200)
+                            throw new Error(`installFile(${f}) received ${r.statusText} (${r.status})`);
+                        newYAML.missingDependencies = newYAML.missingDependencies
+                            .filter(x => x !== f);
+                        newYAML.dependencies = [...newYAML.dependencies, f];
+                    })
+                    .catch(() => {});
+
+                const re = new RegExp(`.?.?${f}`);
+                newBody = newBody.replaceAll(re, `{% include installedFile.lqd path='${f}' %}`);
+            }));
+
+            // Save YAML changes to store
+            await nsContext.dispatch('setFileContentFromYAML', {...File, yaml: newYAML, body: newBody});
+            if(setBusyFlag)
+                nsContext.commit('setBusyFlag', {flag: url, value: false});
+            return nsContext.getters.File(url);
+        },
+        /**
+         *
+         * @param nsContext
+         * @param url {string}
+         * @param deleteDependencies {boolean} whether to remove orphan dependencies
+         * @return {Promise<{deleted: {fileName: string, deleted: boolean, skipped: (boolean|*[])}[], failed: *[], skipped: {fileName: string, deleted, skipped: boolean}[]}>}
+         */
+        async deleteFile(nsContext, {url, deleteDependencies = true}) {
+            const main = nsContext.getters.Repository();
+            if(!main || !fileInRepository(url, main.url))
+                throw new Error('Only files in the main repository can be removed');
+            nsContext.commit('setBusyFlag', {flag: url, value: true});
+            const file = nsContext.getters.File(url);
+            let dependencies = [];
+            if(deleteDependencies) {
+                // Check and remove dependencies which will be orphaned
+                dependencies = await Promise.allSettled(file.yaml.dependencies.map(f => {
+                    // Don't delete if other episodes depend on this file
+                    if(nsContext.getters.FilesByFilter(F => {
+                        return F.url !== url
+                            && fileInRepository(F.url, main.url)
+                            && F.yaml.originalRepository === file.yaml.originalRepository
+                            && F.yaml.dependencies.includes(f);
+                    }).length) {
+                        dependencies.push({fileName: f, skipped: true});
+                        return;
+                    }
+                    fetch('/.netlify/functions/githubAPI', {
+                        method: "POST", headers: {task: 'deleteFile'},
+                        body: JSON.stringify({
+                            url: `${main.url}/contents/installed/${file.yaml.originalRepository}${f}`,
+                            token: nsContext.rootGetters['github/token']
+                        })
+                    })
+                        .then(r => {
+                            if(r.status !== 200)
+                                throw new Error(`deleteFile(${f}) received ${r.statusText} (${r.status})`);
+                            dependencies.push({fileName: f, deleted: true});
+                        })
+                        .catch(() => {dependencies.push({fileName: f})})
+                }));
+            }
+
+            const remove = await fetch('/.netlify/functions/githubAPI', {
+                method: "POST", headers: {task: 'deleteFile'},
+                body: JSON.stringify({
+                    url, token: nsContext.rootGetters['github/token']
+                })
+            })
+                .then(r => {
+                    if(r.status !== 200)
+                        throw new Error(`deleteFile received ${r.statusText} (${r.status})`);
+                    nsContext.commit('removeItem', {array: 'files', item: file});
+                    return null;
+                })
+                .catch(async e => {
+                    nsContext.commit('addError', e);
+                    console.error(e);
+                    // Mark deleted dependencies as missing
+                    if(dependencies.length) {
+                        file.yaml.dependencies = dependencies.filter(x => !x.deleted);
+                        file.yaml.missingDependencies = dependencies.filter(x => x.deleted);
+                    }
+                    await nsContext.dispatch('setFileContentFromYAML', {...file});
+                    nsContext.commit('setBusyFlag', {flag: url, value: false});
+                    return nsContext.getters.File(url);
+                });
+
+            dependencies = dependencies.map(d => {
+                return {
+                    fileName: `${file.yaml.originalRepository}${d.fileName}`,
+                    skipped: d.skipped,
+                    deleted: d.deleted
+                }
+            });
+            const out = {
+                deleted: [...dependencies.filter(x => x.deleted)],
+                skipped: [...dependencies.filter(x => x.skipped)],
+                failed: [...dependencies.filter(x => !x.deleted && !x.skipped)]
+            };
+            if(remove === null)
+                out.deleted.push({fileName: url, deleted: true});
+            else
+                out.failed.push({fileName: url});
+            return out;
         }
     }
 };
@@ -697,7 +817,8 @@ function findFileDependencies(File) {
 
     while((match = parseImageLinks.exec(File.content)) !== null) {
         if(match.groups && !/https?:\/\//.test(match.groups.url))
-            references.push(match.groups.url)
+            if(!references.includes(match.groups.url))
+                references.push(match.groups.url)
     }
 
     // Update links using original repository link style to use root reference link style

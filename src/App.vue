@@ -1,11 +1,6 @@
 <template>
   <div id="app" class="">
     <GitHubMenu/>
-    <img alt="Vue logo"
-         src="./assets/logo.png"
-         class="vue-logo"
-         @click="testSomething"
-    />
     <b-steps
             v-model="activeStep"
             :has-navigation="false"
@@ -33,7 +28,7 @@
 
       <b-step-item step="3" label="Customize workshop" icon="check-box-multiple-outline" :type="stepType(3)" :clickable="latestStep >= 2">
         <h1 class="title has-text-centered">Customize workshop</h1>
-        <CustomiseWorkshop @pickLesson="activeStep = 4" @goToCreateWorkshop="activeStep = 2"/>
+        <CustomiseWorkshop @pickLesson="activeStep = 4" @goToCreateWorkshop="activeStep = 1"/>
       </b-step-item>
 
       <b-step-item step="4" label="Schedule" icon="check-box-multiple-outline" :type="stepType(4)" :clickable="latestStep >= 3">
@@ -113,13 +108,6 @@ export default {
       // if(this.latestStep === n)
       //   return 'is-info';
       return '';
-    },
-
-    testSomething() {
-      fetch('/.netlify/functions/githubAPI')
-              .then(r => {console.log(r); return r.text()})
-              .then(t => console.log(t))
-              .catch(e => console.log(e))
     }
   },
   mounted() {this.activeStep = this.latestStep},

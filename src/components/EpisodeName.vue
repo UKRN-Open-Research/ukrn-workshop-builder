@@ -21,7 +21,14 @@
         >
             {{ episode.path }}
         </b-tooltip>
-        <span v-else>{{episode.yaml.title}}</span>
+        <span v-else>
+            <b-icon v-if="episode.yaml.missingDependencies && episode.yaml.missingDependencies.length"
+                    icon="alert"
+                    type="is-warning"
+                    title="This episode has missing dependencies."
+            />
+            {{episode.yaml.title}}
+        </span>
     </span>
 </template>
 
@@ -37,5 +44,5 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-    .load-icon {padding-left: 1em;}
+    span {user-select: inherit;}
 </style>

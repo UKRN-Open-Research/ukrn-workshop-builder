@@ -45,7 +45,6 @@
               <ArrangeItems :items="schedule.unassignedItems"
                             :is-unscheduled="true"
                             @change="updateItemDay"
-                            @drop="item => updateItemDay({item, dayId: ''})"
               />
             </div>
             <b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>

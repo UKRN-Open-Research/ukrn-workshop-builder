@@ -331,6 +331,22 @@ async function getTopics(event) {
 async function copyFile(event) {
     const d = JSON.parse(event.body);
     let file = null;
+    // Check if the target url already exists
+    if(d.returnExisting) {
+        const existing = await fetch(d.newURL, {
+            method: "GET",
+            headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            }
+        })
+            .then(r => checkResponseCode(r, 200))
+            .then(json => json.content)
+            .catch(() => null);
+        if(existing)
+            return OK(existing);
+    }
+
     return await fetch(d.url, {
         method: "GET",
         headers: {
@@ -342,11 +358,6 @@ async function copyFile(event) {
         .then(json => file = json)
         .then(() => pushFile({body: JSON.stringify({
                 ...d, content: file.content, path: file.path, url: d.newURL
-            })}))
-        .catch(e => {
-            if(/\(409\)/.test(e) && d.ignoreExisting)
-                return OK(file);
-            throw new Error(e);
-        });
+            })}));
 }
 

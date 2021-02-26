@@ -38,31 +38,30 @@
                               class="card-content"
           />
 
-        <nav class="card-content"
-             v-if="!$store.getters['workshop/hasChanged'](template.url)"
-        >
-          <b-button icon-right="chevron-right"
+        <nav class="card-content">
+          <b-button v-if="!$store.getters['workshop/hasChanged'](template.url)"
+                    icon-right="chevron-right"
                     type="is-primary"
                     @click="$emit('pickLesson')"
           >
             Pick lessons
           </b-button>
-        </nav>
-        <b-button v-else
-                  @click="pushConfig"
-                  :disabled="!$store.getters['workshop/isConfigValid'](template)"
-                  :type="$store.getters['workshop/isConfigValid'](template)? 'is-primary' : 'is-warning'"
-        >
-          <b-tooltip v-if="!$store.getters['workshop/isConfigValid'](template)"
-                     label="The current config file is invalid."
-                     dashed
+          <b-button v-else
+                    @click="pushConfig"
+                    :disabled="!$store.getters['workshop/isConfigValid'](template)"
+                    :type="$store.getters['workshop/isConfigValid'](template)? 'is-primary' : 'is-warning'"
           >
-            Save changes to GitHub
-          </b-tooltip>
-          <span v-else>
+            <b-tooltip v-if="!$store.getters['workshop/isConfigValid'](template)"
+                       label="The current config file is invalid."
+                       dashed
+            >
+              Save changes to GitHub
+            </b-tooltip>
+            <span v-else>
           Save changes to GitHub
         </span>
-        </b-button>
+          </b-button>
+        </nav>
       </section>
 
       <b-modal v-model="isEditingTemplate"
