@@ -1,12 +1,12 @@
 <template>
   <div class="item-wrapper">
-    <div :class="`card-header episode ${item.remote? 'remote' : 'local'} ${item.yaml['is-break']? 'is-break' : ''}`">
+    <div class="card-header episode" :class="item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
     <span class="card-header-title">
-        <EpisodeName :episode="item"/>
+        <EpisodeName :episode="item" :include-repo="item.remote"/>
     </span>
-      <div class="action-icons">
+      <div class="action-icons has-background-white-ter">
         <b-button v-if="item.remote && item.yaml.day"
-                  icon-right="plus-circle"
+                  icon-right="plus"
                   :size="iconSize"
                   type="is-success"
                   outlined
@@ -14,12 +14,20 @@
                   @click="install(item)"
         />
         <b-button v-else-if="item.hasChanged() && item.yaml.day"
-                  icon-right="github"
+                  icon-right="content-save"
                   :size="iconSize"
                   type="is-success"
                   outlined
                   title="Save changes to GitHub"
                   @click="$store.dispatch('workshop/pushFile', {url: item.url})"
+        />
+        <b-button v-if="item.remote || !item.yaml.day"
+                  icon-right="text-search"
+                  :size="iconSize"
+                  type="is-info"
+                  outlined
+                  title="View properties"
+                  @click="isViewing = true"
         />
         <b-button v-if="!item.remote && item.yaml.day"
                   icon-right="playlist-edit"
@@ -58,7 +66,7 @@
                   icon-right="minus"
                   :size="iconSize"
                   title="Remove this episode"
-                  @click="$store.commit('removeItem', {array: 'files', item})"
+                  @click="$store.commit('workshop/removeItem', {array: 'files', item})"
                   type="is-danger"
                   outlined
         />
@@ -66,7 +74,7 @@
                   icon-right="minus"
                   :size="iconSize"
                   title="Delete"
-                  @click="$store.commit('deleteFile', {url: item.url})"
+                  @click="$store.dispatch('workshop/deleteFile', {url: item.url})"
                   type="is-danger"
                   outlined
         />
@@ -89,18 +97,37 @@
                   @save="save"
           />
         </div>
-        <div v-else class="content yaml-panel">
-          <div v-for="f in Fields.filter(f => f.value !== undefined)"
-               :key="f.key"
-               class="yaml-read-only"
-          >
-            <header class="title">{{f.name}}</header>
-            <ul v-if="f.is_array">
-              <li v-for="i in item.yaml[f.key].length" :key="i">
-                {{ item.yaml[f.key][i - 1] }}
-              </li>
-            </ul>
-            <p v-else>{{ item.yaml[f.key] }}</p>
+      </b-modal>
+
+      <b-modal v-model="isViewing" class="yaml-modal yaml-read-only" full-screen>
+        <div class="yaml-item-wrapper">
+          <header>Viewing <EpisodeName :episode="item"/></header>
+          <div class="columns">
+            <div class="column yaml-panel">
+              <div v-for="f in Fields.filter(x => x.value !== undefined)"
+                   :key="f.key"
+                   class="yaml-read-only"
+              >
+                <header class="title">{{ f.name }}</header>
+                <ul v-if="f.is_array && item.yaml[f.key] !== null">
+                  <li v-for="i in item.yaml[f.key].length" :key="i">
+                    {{ item.yaml[f.key][i - 1] }}
+                  </li>
+                </ul>
+                <p v-else-if="!f.is_array">{{ item.yaml[f.key] }}</p>
+              </div>
+            </div>
+            <div class="column">
+              <header class="title">Content</header>
+              <mavon-editor class="card-content"
+                            :value="item.body"
+                            language="en"
+                            defaultOpen="preview"
+                            :subfield="false"
+                            :toolbars="{}"
+                            :editable="false"
+              />
+            </div>
           </div>
         </div>
       </b-modal>
@@ -139,6 +166,7 @@ export default {
   },
   data: function() {
     return {
+      isViewing: false,
       isEditing: false,
       isEditingContent: false,
       currentContent: "",
@@ -249,9 +277,6 @@ export default {
     justify-content: space-evenly;
     margin: .25em 0;
     width: 100%;
-    background-color: lightblue;
-    &.remote {background-color: orange;}
-    &.is-break.is-break {background-color: lightgrey;}
   }
   .action-icons {
     display: flex;
@@ -262,7 +287,6 @@ export default {
     margin-right: .1em;
     margin-top: .1em;
     padding: .25em;
-    background-color: #C7F1FF;
     height: min-content;
     border-radius: .1em;
     button {
@@ -275,6 +299,7 @@ export default {
     display: grid;
     grid-auto-flow: row;
     grid-row-gap: 1em;
+    height: min-content;
   }
   .yaml-item-wrapper {
     padding: 1em;

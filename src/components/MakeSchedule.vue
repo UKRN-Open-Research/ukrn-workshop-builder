@@ -45,6 +45,7 @@
               <ArrangeItems :items="schedule.unassignedItems"
                             :is-unscheduled="true"
                             @change="updateItemDay"
+                            class="unassigned-items"
               />
             </div>
             <b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
@@ -62,7 +63,7 @@
       </div>
 
       <b-modal v-model="addRemoteItems" full-screen>
-        <div class="content">
+        <div class="content fullscreen-modal">
           <header class="title">
             <h1 class="">Add items from a remote repository</h1>
           </header>
@@ -120,6 +121,7 @@
         const T = performance.now()
         if(!this.recalculateItems || !this.mainRepo.topics || !this.mainRepo.topics.length)
           return [];
+        const episodes = [...this.mainRepo.episodes];
         const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
         const topics = this.mainRepo.topics
                 .filter(t => this.$store.state.topicList.includes(t));
@@ -128,8 +130,7 @@
             if(r.topics.includes(t))
               return true;
         });
-        const episodes = [];
-        topicRepos.forEach(R => episodes.push(...R.episodes));
+        topicRepos.forEach(R => episodes.push(...R.episodes.filter(E => this.availableEpisodes.includes(E.url))));
         // Add remote flag
         console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories in ${Math.round(performance.now() - T)}ms`)
         return episodes.map(e => {return {...e, remote: !mainEpisodes.includes(e.url)}});
@@ -242,5 +243,8 @@
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
+  }
+  .fullscreen-modal > * {padding: 1em;}
+  .unassigned-items {
   }
 </style>

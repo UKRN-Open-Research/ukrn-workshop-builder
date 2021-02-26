@@ -29,7 +29,7 @@
                              :focusable="false"
                              disabled
             >
-                <EpisodeName :episode="episode"/>
+                <EpisodeName :episode="episode" :include-repo="false"/>
             </b-dropdown-item>
             <b-dropdown-item v-if="repo.busyFlag()" :focusable="false" custom>
                 <b-skeleton v-for="i in 3" :key="i" size="is-small" animated :active="repo.busyFlag()"/>
@@ -57,6 +57,12 @@
                         'workshop/findRepositoryFiles',
                         {url: this.repo.url}
                     )
+                        // Remove day and order properties
+                        .then(R => R.episodes.forEach(E => {
+                            this.$store.dispatch('workshop/setFileContentFromYAML', {
+                                ...E, yaml: {...E.yaml, day: '', order: ''}
+                            })
+                        }))
             }
         }
     }

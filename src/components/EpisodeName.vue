@@ -1,6 +1,9 @@
 <template>
-    <span>
-        <span v-if="typeof episode.yaml !== 'object'" class="is-danger">
+    <span class="episode-name">
+        <span v-if="includeRepo" class="repository has-background-white-ter">
+            {{ owner_repo.owner }} / {{ owner_repo.repo }}
+        </span>
+        <span v-if="typeof episode.yaml !== 'object'" class="has-text-danger">
             INVALID OBJECT
         </span>
         <b-tooltip v-else-if="!Object.keys(episode.yaml).length"
@@ -37,12 +40,38 @@
         name: 'EpisodeName',
         components: {},
         props: {
-            episode: {type: Object, required: true}
+            episode: {type: Object, required: true},
+            includeRepo: {type: Boolean, required: false, default: true}
+        },
+        computed: {
+            owner_repo() {
+                try {
+                    const match = /^https:\/\/api\.github\.com\/repos\/([^/]+)\/([^/]+)/
+                        .exec(this.episode.url);
+                    return {owner: match[1], repo: match[2]}
+                } catch(e) {return ""}
+            }
         }
     }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-    span {user-select: inherit;}
+    .episode-name {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: start;
+        width: 100%;
+    }
+    span {
+        text-align: left;
+        user-select: inherit;
+    }
+    .repository {
+        display: inline-block;
+        font-size: .75em;
+        vertical-align: top;
+        margin-bottom: .75em;
+        padding: .1em .25em;
+    }
 </style>

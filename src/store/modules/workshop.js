@@ -705,7 +705,7 @@ export default {
             nsContext.commit('setBusyFlag', {flag: url, value: true});
             const file = nsContext.getters.File(url);
             let dependencies = [];
-            if(deleteDependencies) {
+            if(deleteDependencies && file.yaml.dependencies && file.yaml.dependencies.length) {
                 // Check and remove dependencies which will be orphaned
                 dependencies = await Promise.allSettled(file.yaml.dependencies.map(f => {
                     // Don't delete if other episodes depend on this file
