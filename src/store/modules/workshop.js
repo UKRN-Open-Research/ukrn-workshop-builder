@@ -752,14 +752,16 @@ export default {
                     nsContext.commit('addError', e);
                     console.error(e);
                     // Mark deleted dependencies as missing
+                    const newYAML = file.yaml;
                     if(dependencies.length) {
-                        file.yaml.dependencies = dependencies.filter(x => !x.deleted);
-                        file.yaml.missingDependencies = dependencies.filter(x => x.deleted);
+                        newYAML.dependencies = dependencies.filter(x => !x.deleted);
+                        newYAML.missingDependencies = dependencies.filter(x => x.deleted);
                     }
-                    await nsContext.dispatch('setFileContentFromYAML', {...file});
+                    await nsContext.dispatch('setFileContentFromYAML', {...file, yaml: newYAML});
                     nsContext.commit('setBusyFlag', {flag: url, value: false});
                     return nsContext.getters.File(url);
                 });
+
 
             dependencies = dependencies.map(d => {
                 return {
@@ -777,6 +779,8 @@ export default {
                 out.deleted.push({fileName: url, deleted: true});
             else
                 out.failed.push({fileName: url});
+
+            nsContext.commit('setBusyFlag', {flag: url, value: false});
             return out;
         }
     }

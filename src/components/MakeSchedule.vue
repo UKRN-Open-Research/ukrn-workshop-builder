@@ -38,7 +38,7 @@
         <div class="column">
           <div class="card-content card">
             <header class="card-header" v-if="!mainRepo.busyFlag()">
-              <h1 class="card-header-title">Unassigned items</h1>
+              <h1 class="card-header-title">Stash</h1>
             </header>
             <b-skeleton size="is-large" animated :active="mainRepo.busyFlag()"/>
             <div class="card-content" v-if="!mainRepo.busyFlag()">

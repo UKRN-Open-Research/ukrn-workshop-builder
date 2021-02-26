@@ -33,6 +33,8 @@ async function main(event, context, callback) {
                 return callback(null, await setTopics(event));
             case "copyFile":
                 return callback(null, await copyFile(event));
+            case "deleteFile":
+                return callback(null, await deleteFile(event));
             default:
                 if(event.headers.task)
                     throw new Error(`Unrecognised githubAPI task requested: ${event.headers.task}`);
@@ -65,7 +67,7 @@ function OK(obj) {
  * @return {Promise<object>}
  */
 async function checkResponseCode(response, code) {
-    console.log(`FETCH ${response.url.replace("https://api.github.com", "")}: ${response.status} - ${response.statusText}`);
+    console.log(`${response.status} - ${response.statusText}: FETCH ${response.url.replace("https://api.github.com", "")}`);
 
     if(typeof code === 'number')
         code = [code];
@@ -359,5 +361,37 @@ async function copyFile(event) {
         .then(() => pushFile({body: JSON.stringify({
                 ...d, content: file.content, path: file.path, url: d.newURL
             })}));
+}
+
+/**
+ * Delete a file via github commit
+ * @param event {object} request details
+ * @return {statusText: string, body: string, statusCode: number}
+ */
+async function deleteFile(event) {
+    const d = JSON.parse(event.body);
+    const file = await fetch(d.url, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.v3+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200));
+    console.log({...file, content: '...'})
+    return OK(
+        await fetch(file.url, {
+            method: "DELETE",
+            headers: {
+                "accept": "application/vnd.github.v3+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            },
+            body: JSON.stringify({
+                message: `${file.path} deleted by UKRN Workshop Builder`,
+                sha: file.sha
+            })
+        })
+            .then(r => checkResponseCode(r, 200))
+    );
 }
 

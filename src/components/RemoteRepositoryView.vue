@@ -14,7 +14,7 @@
 
             <b-dropdown-item v-if="repo.episodes.length" custom>
                 <b-button icon-right="plus"
-                          label="Add repository items"
+                          label="Add items to stash"
                           type="is-success"
                           expanded
                           @click="$emit('selectRepo', repo.episodes)"
