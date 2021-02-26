@@ -681,8 +681,10 @@ export default {
                     })
                     .catch(() => {});
 
-                const re = new RegExp(`.?.?${f}`);
-                newBody = newBody.replaceAll(re, `{% include installedFile.lqd path='${f}' %}`);
+                // Replace ../fig/path/img.png to root link: /fig/path/img.png
+                newBody = newBody.replaceAll(`..${f}`, f);
+                // And replace root links with complex links
+                newBody = newBody.replaceAll(f, `{% include installedFile.lqd path='${f}' %}`);
             }));
 
             // Save YAML changes to store
