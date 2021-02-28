@@ -305,6 +305,7 @@ export default {
                         if(repo && !repo.topics.includes(F.yaml.topic))
                             await nsContext.dispatch('setTopics', {topics: [F.yaml.topic]});
                     }
+                    nsContext.dispatch('github/registerBuildCheck', {}, {root: true});
                     return F;
                 })
                 .catch(e => {
@@ -378,6 +379,7 @@ export default {
                 .then(R => nsContext.dispatch('findRepositoryFiles', {url: R.url}))
                 .then(() => {
                     nsContext.commit('setBusyFlag', {flag, value: false});
+                    nsContext.dispatch('github/registerBuildCheck', {}, {root: true});
                     return nsContext.getters.Repository();
                 })
                 .catch(e => {
@@ -800,7 +802,7 @@ function parseYAML(content) {
         const parsed = YAML.parseAllDocuments(content);
         const yamlText = content.substring(...parsed[0].range);
         body = parsed.length > 1?
-            content.substring(...parsed[1].range) : null;
+            content.substring(parsed[1].range[0]) : null;
         yaml = YAML.parse(yamlText);
     } catch(e) {
         body = content;

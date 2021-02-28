@@ -41,6 +41,14 @@
                   size="is-medium"
                   expanded
         />
+        <b-button v-if="pagesURL !== '' && $store.state.github.buildStatus"
+                  :type="`is-light ${buildType}`"
+                  :icon-left="buildIcon"
+                  :loading="buildType === 'is-info'"
+                  :label="expanded? buildMessage : ''"
+                  expanded
+                  aria-roledescription="div"
+        />
       </div>
     </div>
   </div>
@@ -62,6 +70,34 @@ export default {
       try {
         return `https://${this.mainRepo.ownerLogin}.github.io/${this.mainRepo.name}`;
       } catch(e) {return ""}
+    },
+    buildType() {
+      try {
+        switch(this.$store.state.github.buildStatus.status) {
+          case "built": return 'is-success';
+          case "errored": return 'is-danger';
+          default: return 'is-info';
+        }
+      } catch(e) {return ''}
+    },
+    buildIcon() {
+      try {
+        switch(this.$store.state.github.buildStatus.status) {
+          case "built": return 'check';
+          case "errored": return 'exclamation';
+          default: return 'dots-horizontal';
+        }
+      } catch(e) {return ''}
+    },
+    buildMessage() {
+      try {
+        const build = this.$store.state.github.buildStatus;
+        switch(build.status) {
+          case "built": return `Website built successfully in ${Math.round(build.duration / 10) / 100}s`;
+          case "errored": return `Website build failure: ${build.error.message}`;
+          default: return 'Website building in progress...';
+        }
+      } catch(e) {return ''}
     }
   },
   methods: {

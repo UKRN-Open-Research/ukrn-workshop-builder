@@ -123,12 +123,9 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
-.vue-logo {
-  height: 50px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 1000;
+.modal-close {
+  background-color: darkgrey !important;
+  z-index: 100000;
 }
 
 // Import Bulma's core

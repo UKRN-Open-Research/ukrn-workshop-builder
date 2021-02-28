@@ -99,13 +99,15 @@ export default {
       // Load repositories with the same topic
       this.$store.dispatch('workshop/findRepositoryFiles',
               {url: this.remoteRepositoryURL})
-      // Look up workshops with the same topic
-      .then(R => {
-        if(R.config)
-          return this.$store.dispatch('workshop/findRepositories', {
-          topics: [R.config.yaml.topic]
-        });
-      })
+              // Look up workshops with the same topic
+              .then(R => {
+                if(R.config)
+                  return this.$store.dispatch('workshop/findRepositories', {
+                    topics: [R.config.yaml.topic]
+                  });
+              });
+      // Fetch build info for selected repository
+      this.$store.dispatch('github/registerBuildCheck', {delay: 100});
     },
     createRepository() {
       this.$store.dispatch('workshop/createRepository', {

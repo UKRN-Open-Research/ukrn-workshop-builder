@@ -29,7 +29,8 @@
                   title="View properties"
                   @click="isViewing = true"
         />
-        <b-button v-if="!item.remote && item.yaml.day"
+        <!-- We use the title yaml field to determine if the yaml is valid -->
+        <b-button v-if="!item.remote && item.yaml.day && item.yaml.title"
                   icon-right="playlist-edit"
                   :size="iconSize"
                   type="is-info"
@@ -37,13 +38,21 @@
                   title="Edit properties"
                   @click="isEditing = true"
         />
-        <b-button v-if="!item.remote && item.yaml.day"
+        <b-button v-if="!item.remote && item.yaml.day && item.yaml.title"
                   icon-right="file-document-edit-outline"
                   :size="iconSize"
                   type="is-info"
                   outlined
                   title="Edit content"
                   @click="editContent"
+        />
+        <b-button v-if="!item.remote && item.yaml.day && !item.yaml.title"
+                  icon-right="wrench"
+                  :size="iconSize"
+                  type="is-info"
+                  outlined
+                  title="Repair raw content"
+                  @click="editRawContent"
         />
         <b-button tag="a"
                   :href="getPagesLink(item)"
@@ -150,6 +159,25 @@
           <b-message type="is-warning">Unable to load episode body.</b-message>
         </div>
       </b-modal>
+
+      <b-modal v-model="isEditingRawContent"
+               scroll="keep"
+               @close="rawContent = currentRawContent"
+               full-screen
+      >
+        <div class="card" v-if="currentRawContent">
+          <header class="card-header-title">Edit content (saved automatically)</header>
+          <mavon-editor class="card-content"
+                        v-model="currentRawContent"
+                        language="en"
+                        defaultOpen="edit"
+                        :toolbars="toolbars"
+          />
+        </div>
+        <div v-else>
+          <b-message type="is-warning">Unable to load episode body.</b-message>
+        </div>
+      </b-modal>
     </div>
     <b-loading :active="item.busyFlag()" :is-full-page="false"/>
   </div>
@@ -169,7 +197,9 @@ export default {
       isViewing: false,
       isEditing: false,
       isEditingContent: false,
+      isEditingRawContent: false,
       currentContent: "",
+      currentRawContent: "",
       iconSize: 'is-small',
       toolbars: {
         bold: true, italic: true, header: true, underline: true,
@@ -199,13 +229,23 @@ export default {
     content: {
       get() {return this.item.body},
       set(v) {
-        this.item.body = v;
         this.$store.dispatch('workshop/setFileContentFromYAML', {
-          url: this.item.url, yaml: this.item.yaml, body: this.item.body
+          url: this.item.url, yaml: this.item.yaml, body: v
         })
       }
     },
-    /**
+    rawContent: {
+      get() {
+        return this.item.content
+      },
+      set(v) {
+        this.$store.dispatch('workshop/setFileContent', {
+          url: this.item.url,
+          content: v
+        })
+      }
+    },
+      /**
      * Rip properties and keys from their respective YAML lists and combine
      * @return {{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}[]}
      * @constructor
@@ -240,6 +280,10 @@ export default {
     editContent() {
       this.currentContent = this.content;
       this.isEditingContent = true;
+    },
+    editRawContent() {
+      this.currentRawContent = this.rawContent;
+      this.isEditingRawContent = true;
     },
     save({key, value}) {
       const newYAML = {...this.item.yaml};

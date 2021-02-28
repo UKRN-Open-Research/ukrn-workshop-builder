@@ -35,6 +35,8 @@ async function main(event, context, callback) {
                 return callback(null, await copyFile(event));
             case "deleteFile":
                 return callback(null, await deleteFile(event));
+            case "getLastBuild":
+                return callback(null, await getLastBuild(event));
             default:
                 if(event.headers.task)
                     throw new Error(`Unrecognised githubAPI task requested: ${event.headers.task}`);
@@ -395,3 +397,18 @@ async function deleteFile(event) {
     );
 }
 
+/**
+ *
+ * @param event {object} Should have body JSON string with repository URL and GitHub access token
+ * @return {Promise<{statusText: string, body: string, statusCode: number}>}
+ */
+async function getLastBuild(event) {
+    const d = JSON.parse(event.body);
+    const status = await fetch(`${d.url}/pages/builds/latest`, {
+        headers: {
+            "accept": "application/vnd.github.v3+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }})
+        .then(r => checkResponseCode(r, 200))
+    return OK(status);
+}

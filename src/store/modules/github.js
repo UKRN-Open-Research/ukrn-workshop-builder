@@ -4,7 +4,9 @@ export default {
     state: {
         user: {},
         errors: [],
-        loginInProgress: false
+        loginInProgress: false,
+        buildStatusChecks: [],
+        buildStatus: null
     },
     getters: {
         lastError(state) {
@@ -18,6 +20,9 @@ export default {
     mutations: {
         setUser (state, name) {state.user = name},
         setLoginFlag (state, f) {state.loginInProgress = f},
+        addBuildStatusCheck(state, check) {state.buildStatusChecks.push(check)},
+        removeBuildStatusCheck(state) {state.buildStatusChecks.shift()},
+        updateBuildStatus(state, status) {state.buildStatus = status},
         addError (state, e) {state.errors.push(e)}
     },
     actions: {
@@ -33,24 +38,29 @@ export default {
                 }
             }, {skipNull: true});
         },
-        redeemCode (nsContext) {
-            if(nsContext.state.loginInProgress)
+        redeemCode(nsContext) {
+            if (nsContext.state.loginInProgress)
                 return;
-            if(nsContext.state.code === "")
+            if (nsContext.state.code === "")
                 return nsContext.commit('addError', "Cannot login with empty code");
             nsContext.commit('setLoginFlag', true);
             fetch(
                 '/.netlify/functions/githubAPI',
-                {method: "POST", headers: {"task": "redeemCode", "github-code": nsContext.getters.code}}
+                {method: "POST",
+                    headers: {
+                        "task": "redeemCode",
+                        "github-code": nsContext.getters.code
+                    }
+                }
             )
                 .then(r => {
-                    if(r.status !== 200)
+                    if (r.status !== 200)
                         throw new Error(`GitHub login received ${r.statusText} (${r.statusCode})`);
                     return r.json();
                 })
                 .then(r => {
                     console.log(r)
-                    if(!r.access_token)
+                    if (!r.access_token)
                         throw new Error(`Response had no token ${r}`);
                     nsContext.dispatch('processToken', r.access_token);
                     nsContext.commit('setLoginFlag', false);
@@ -62,21 +72,28 @@ export default {
                     nsContext.dispatch('logout');
                 })
         },
-        processToken (nsContext, token) {
+        processToken(nsContext, token) {
             const URL = queryString.parseUrl(window.location.href);
             const redirect = queryString.stringifyUrl({
-                url: URL.url, query: {...URL.query, code: null, token: token, logout: false}
+                url: URL.url,
+                query: {
+                    ...URL.query,
+                    code: null,
+                    token: token,
+                    logout: false
+                }
             }, {skipNull: true});
             window.location = redirect;
         },
         getUserDetails(nsContext) {
             nsContext.commit('setLoginFlag', true);
             return fetch('/.netlify/functions/githubAPI', {
-                method: "POST", headers: {task: "getUserDetails"},
+                method: "POST",
+                headers: {task: "getUserDetails"},
                 body: JSON.stringify({token: nsContext.getters.token})
             })
                 .then(r => {
-                    if(r.status !== 200) {
+                    if (r.status !== 200) {
                         nsContext.dispatch('logout');
                         throw new Error(`Could not retrieve user details, logging out.`);
                     }
@@ -86,12 +103,54 @@ export default {
                 .then(() => nsContext.commit('setLoginFlag', false))
                 .then(() => nsContext.dispatch('workshop/findRepositories',
                     {owner: nsContext.getters.login}, {root: true}))
-            .catch(e => {
-                console.error(e);
-                nsContext.commit('addError', e);
-                nsContext.commit('setLoginFlag', false);
-                nsContext.dispatch('logout');
+                .catch(e => {
+                    console.error(e);
+                    nsContext.commit('addError', e);
+                    nsContext.commit('setLoginFlag', false);
+                    nsContext.dispatch('logout');
+                })
+        },
+        /**
+         * Add a new build status check to the end of
+         * @param nsContext
+         * @param [delay=180000] {number} milliseconds to delay request. Default 3 minutes
+         */
+        registerBuildCheck(nsContext, {delay=180000}) {
+            console.log(`registerBuildCheck(delay=${delay})`)
+            let lastCheck = null;
+            if(nsContext.state.buildStatusChecks.length)
+                lastCheck = nsContext.state.buildStatusChecks[nsContext.state.buildStatusChecks.length - 1];
+            // If there's already a check scheduled for beyond the target time, don't add another
+            if(lastCheck && lastCheck > performance.now() + delay)
+                return;
+
+            // Set the check time to five minutes after the latest check
+            const time = (lastCheck? lastCheck : performance.now()) + delay;
+            nsContext.commit('addBuildStatusCheck', time);
+            // Set the timeout
+            setTimeout(() => nsContext.dispatch('getBuildStatus'), time - performance.now());
+        },
+        /**
+         * Fetch the latest build status for the workshop website
+         * @param nsContext
+         */
+        getBuildStatus(nsContext) {
+            nsContext.commit('removeBuildStatusCheck');
+            fetch('/.netlify/functions/githubAPI', {
+                method: "POST",
+                headers: {task: "getLastBuild"},
+                body: JSON.stringify({
+                    url: nsContext.rootGetters['workshop/Repository']().url,
+                    token: nsContext.getters.token
+                })
             })
+                .then(r => {
+                    if(r.status !== 200)
+                        throw new Error(`getBuildStatus received ${r.statusText} (${r.status})`)
+                    return r.json();
+                })
+                .then(status => nsContext.commit('updateBuildStatus', status))
+                .catch(e => this.addError(e))
         }
     }
 };

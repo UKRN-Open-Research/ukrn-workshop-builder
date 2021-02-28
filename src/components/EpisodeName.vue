@@ -11,7 +11,6 @@
                    type="is-warning"
                    label="This episode has invalid an invalid YAML header, so its details cannot be read."
                    position="is-bottom"
-                   multilined
         >
             {{ episode.path }}
         </b-tooltip>
@@ -20,7 +19,6 @@
                    type="is-info"
                    label="This episode has no 'title' set in its YAML header."
                    position="is-bottom"
-                   multilined
         >
             {{ episode.path }}
         </b-tooltip>

@@ -87,6 +87,8 @@
                                   :key="repo.url"
                                   :repo="repo"
                                   @selectRepo="addRepositoryEpisodes"
+                                  :is-open="expandedRepo === repo.url"
+                                  @open="url => expandedRepo = url"
             />
           </div>
         </div>
@@ -109,7 +111,8 @@
       return {
         addRemoteItems: false,
         remoteRepositoryName: "",
-        availableEpisodes: []
+        availableEpisodes: [],
+        expandedRepo: ""
       }
     },
     computed: {
@@ -239,10 +242,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
   .cards {
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 100%;
+    width: 100%;
   }
   .fullscreen-modal > * {padding: 1em;}
   .unassigned-items {
