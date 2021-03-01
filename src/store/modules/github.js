@@ -6,6 +6,7 @@ export default {
         errors: [],
         loginInProgress: false,
         buildStatusChecks: [],
+        lastBuildStatusCheck: null,
         buildStatus: null
     },
     getters: {
@@ -21,7 +22,9 @@ export default {
         setUser (state, name) {state.user = name},
         setLoginFlag (state, f) {state.loginInProgress = f},
         addBuildStatusCheck(state, check) {state.buildStatusChecks.push(check)},
-        removeBuildStatusCheck(state) {state.buildStatusChecks.shift()},
+        removeBuildStatusCheck(state) {
+            state.lastBuildStatusCheck = state.buildStatusChecks.shift()
+        },
         updateBuildStatus(state, status) {state.buildStatus = status},
         addError (state, e) {state.errors.push(e)}
     },

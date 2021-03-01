@@ -153,6 +153,8 @@
                         language="en"
                         defaultOpen="edit"
                         :toolbars="toolbars"
+                        @imgAdd="imgAdd"
+                        ref="editor"
           />
         </div>
         <div v-else>
@@ -172,7 +174,7 @@
                         language="en"
                         defaultOpen="edit"
                         :tabSize="2"
-                        :toolbars="toolbars"
+                        :toolbars="{...toolbars, imagelink: false}"
           />
         </div>
         <div v-else>
@@ -206,7 +208,7 @@ export default {
         bold: true, italic: true, header: true, underline: true,
         strikethrough: true, mark: true, superscript: true, subscript: true,
         quote: true, ol: true, ul: true, link: true, imagelink: true, code: true,
-        table: true, fullscreen: true, readmodel: true, htmlcode: true, help: true,
+        table: true, fullscreen: true, readmodel: true, htmlcode: false, help: true,
         /* 1.3.5 */
         undo: true, redo: true, trash: false, save: false,
         /* 1.4.2 */
@@ -306,6 +308,50 @@ export default {
       const name = /\/([^/]+)$/.exec(item.path);
       const webDir = name[1].replace(/\.[^.]*$/, "");
       return `https://${match[1]}.github.io/${match[2]}/${webDir}/`;
+    },
+    imgAdd(pos, img) {
+      console.log({pos, img})
+      this.$buefy.dialog.prompt({
+        message: `${img.size > 75000? '<p class="has-background-warning-light has-text-warning-dark size-note">Note: <strong>image files over 75kb in size may need to be uploaded to GitHub manually.</strong></p><br/>' : ''}Upload image as /fig/`,
+        inputAttrs: {
+          type: 'text',
+          placeholder: 'filename.png',
+          value: img.name
+        },
+        confirmText: 'Confirm upload',
+        trapFocus: true,
+        closeOnConfirm: false,
+        /**
+         * Try to upload the image
+         * @param value {string} dialogue user input
+         * @param close {function} callback to close
+         */
+        onConfirm: (value, {close}) => {
+          const path = `/fig/${value.replaceAll('../', '/')}`;
+          this.$buefy.toast.open({
+            message: `Uploading as /fig/${value}...`,
+            type: 'is-success is-light'
+          });
+          this.$store.dispatch('workshop/uploadImage', {path, file: img})
+                  .then(r => {
+                    if(r) {
+                      this.$buefy.toast.open({
+                        message: r === true? `Upload successful` : `Upload replaced existing file`,
+                        type: r === true? 'is-success' : 'is-warning'
+                      });
+                      close();
+                      this.$refs.editor.$img2Url(pos, `..${path}`);
+                    } else {
+                      this.$buefy.toast.open({
+                        message: `Failed to upload as /fig/${value}`,
+                        type: 'is-danger',
+                        duration: 10000
+                      });
+                    }
+                  });
+        },
+        onCancel: () => {this.$refs.editor.$refs.toolbar_left.$imgDelByFilename(img.name)}
+      });
     }
   },
   watch: {
@@ -364,4 +410,5 @@ export default {
     p, ul {margin: 0}
     ul {text-align: left}
   }
+
 </style>

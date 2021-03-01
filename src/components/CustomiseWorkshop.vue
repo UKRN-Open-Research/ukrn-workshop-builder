@@ -33,10 +33,10 @@
           </p>
           <p class="">When you have made your changes, use the 'Save changes' button below to push them to your GitHub repository.</p>
         </div>
-          <WorkshopProperties :template="currentTemplate"
-                              @refresh="refresh"
-                              class="card-content"
-          />
+        <WorkshopProperties :template="currentTemplate"
+                            @refresh="refresh"
+                            class="card-content"
+        />
 
         <nav class="card-content">
           <b-button v-if="!$store.getters['workshop/hasChanged'](template.url)"
@@ -89,6 +89,7 @@ export default {
     return {
       currentTemplate: null,
       isEditingTemplate: false,
+      bannerImg: null
     }
   },
   computed: {

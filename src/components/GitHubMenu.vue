@@ -105,8 +105,10 @@ export default {
     },
     lastCheck() {
       try {
-        const t = new Date(this.$store.state.github.buildStatus.updated_at);
-        return `${t.getDate()}/${t.getMonth() + 1}/${t.getFullYear()} - ${t.getHours()}:${t.getMinutes()}${t.getHours() < 12? 'am' : 'pm'}`
+        if(!this.$store.state.github.lastBuildStatusCheck)
+          return null;
+        const t = new Date(this.$store.state.github.lastBuildStatusCheck + performance.timeOrigin);
+        return `${t.getDate()}/${t.getMonth() + 1}/${t.getFullYear()} - ${t.getHours()}:${Math.floor(t.getMinutes()/10)}${t.getMinutes()%10}${t.getHours() < 12? 'am' : 'pm'}`
       } catch(e) {return null}
     }
   },

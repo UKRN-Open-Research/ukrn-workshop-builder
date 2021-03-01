@@ -131,6 +131,7 @@ export default {
   width: 100%;
   textarea.match-height {min-height: unset; height: auto;}
 }
+.size-note {padding: .5em;}
 
 // Import Bulma's core
 @import "~bulma/sass/utilities/_all";

@@ -224,7 +224,7 @@ export default {
          * @param [body=null] {string|null} body content
          */
         setFileContentFromYAML(nsContext, {url, yaml, body = null}) {
-            let content = `---\n${YAML.stringify(yaml)}\n---\n${body}`;
+            let content = `---\n${YAML.stringify(yaml)}\n---\n${body.replace(/^\n+/, '')}`;
             return nsContext.dispatch('setFileContent', {url, content});
         },
         /**
@@ -314,6 +314,44 @@ export default {
                     console.error(e);
                     return null;
                 })
+        },
+        async uploadImage(nsContext, {path, file}) {
+            try {
+                console.log({path, file})
+                const repo = nsContext.getters.Repository();
+                if(!repo)
+                    throw new Error('Cannot upload image without a main repository');
+                const url = `${repo.url}/contents${path}`;
+                const sha = await fetch('/.netlify/functions/githubAPI', {
+                    method: "POST", headers: {task: 'pullItem'},
+                    body: JSON.stringify({
+                        url, token: nsContext.rootGetters['github/token']
+                    })
+                })
+                    .then(r => r.json())
+                    .then(r => r.sha)
+                    .catch(() => {});
+
+                await fetch('/.netlify/functions/githubAPI', {
+                    method: "POST", headers: {task: 'pushFile'},
+                    body: JSON.stringify({
+                        url, sha,
+                        path: path.substring(1), // strip leading /
+                        content: /data:\w+\/\w+;base64,([\w\W]+)$/.exec(file.miniurl)[1],
+                        token: nsContext.rootGetters['github/token']
+                    })
+                })
+                    .then(r => {
+                        if(r.status !== 200)
+                            throw new Error(`uploadImage(${path}) received ${r.statusText} (${r.status})`);
+                    });
+                return sha || true;
+            }
+            catch(e) {
+                nsContext.commit('addError', e);
+                console.error(e);
+                return false;
+            }
         },
         /**
          * Pull a URL from GitHub and return the result directly
