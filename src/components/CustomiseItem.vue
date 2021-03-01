@@ -171,6 +171,7 @@
                         v-model="currentRawContent"
                         language="en"
                         defaultOpen="edit"
+                        :tabSize="2"
                         :toolbars="toolbars"
           />
         </div>
@@ -307,7 +308,12 @@ export default {
       return `https://${match[1]}.github.io/${match[2]}/${webDir}/`;
     }
   },
-  watch: {}
+  watch: {
+    isViewing(newVal) {this.$store.commit('setEditItem', newVal)},
+    isEditing(newVal) {this.$store.commit('setEditItem', newVal)},
+    isEditingContent(newVal) {this.$store.commit('setEditItem', newVal)},
+    isEditingRawContent(newVal) {this.$store.commit('setEditItem', newVal)},
+  }
 }
 </script>
 

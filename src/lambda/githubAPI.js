@@ -66,10 +66,11 @@ function OK(obj) {
  *
  * @param response {object} GitHub API response
  * @param code {number|number[]} status code to check for
+ * @param method {string} request method
  * @return {Promise<object>}
  */
-async function checkResponseCode(response, code) {
-    console.log(`${response.status} - ${response.statusText}: FETCH ${response.url.replace("https://api.github.com", "")}`);
+async function checkResponseCode(response, code, method = 'GET') {
+    console.log(`${response.status} - ${response.statusText}: ${method} ${response.url.replace("https://api.github.com", "")}`);
 
     if(typeof code === 'number')
         code = [code];
@@ -92,7 +93,7 @@ async function redeemCode(event) {
         url,
         {headers: {"accept": "application/vnd.github.v3+json"}}
     )
-        .then(r => checkResponseCode(r, 200))
+        .then(r => checkResponseCode(r, 200, 'GET'))
         .then(json => json.access_token)
         .catch(e => {
             console.error(e)
@@ -114,7 +115,7 @@ async function getUserDetails(event) {
             "accept": "application/vnd.github.v3+json",
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }})
-        .then(r => checkResponseCode(r, 200));
+        .then(r => checkResponseCode(r, 200, 'GET'));
     return OK(details);
 }
 
@@ -139,7 +140,7 @@ async function findRepositories(event) {
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200))
+        .then(r => checkResponseCode(r, 200, 'GET'))
         .then(json => json.items);
     return OK(items);
 }
@@ -168,7 +169,7 @@ async function findRepositoryFiles(event) {
             }
         })
             // Protect against 404 errors because some repos don't have some directories
-            .then(r => r.status === 404? [{}] : checkResponseCode(r, 200))
+            .then(r => r.status === 404? [{}] : checkResponseCode(r, 200, 'GET'))
             .then(json => json.map(i => {
                 if(i.type === "file" && !/^[._]/.test(i.name))
                     return i.url;
@@ -187,7 +188,7 @@ async function findRepositoryFiles(event) {
                         "authorization": `token ${cryptr.decrypt(d.token)}`
                     }
                 })
-                    .then(r => checkResponseCode(r, 200))
+                    .then(r => checkResponseCode(r, 200, 'GET'))
             ));
     return OK(response);
 }
@@ -210,7 +211,7 @@ async function createRepository(event) {
             private: false
         })
     })
-        .then(r => checkResponseCode(r, 201));
+        .then(r => checkResponseCode(r, 201, 'POST'));
     await fetch(`${newRepo.url}/topics`, {
             method: "PUT",
             headers: {
@@ -221,7 +222,7 @@ async function createRepository(event) {
                 names: ['ukrn-open-research', 'ukrn-workshop']
             })
         })
-        .then(r => checkResponseCode(r, 200));
+        .then(r => checkResponseCode(r, 200, 'PUT'));
     // Fetch a fresh copy with the updated topics
     return pullItem({body: JSON.stringify({
             url: newRepo.url, token: d.token
@@ -247,7 +248,7 @@ async function pushFile(event) {
             sha: d.sha
         })
     })
-        .then(r => checkResponseCode(r, [200, 201]));
+        .then(r => checkResponseCode(r, [200, 201], 'PUT'));
     // retrieve updated version
     const file = await fetch(upload.content.url, {
             method: "GET", headers: {
@@ -255,7 +256,7 @@ async function pushFile(event) {
                 "authorization": `token ${cryptr.decrypt(d.token)}`
             }
         })
-        .then(r => checkResponseCode(r, 200));
+        .then(r => checkResponseCode(r, 200, 'GET'));
     return OK(file);
 }
 
@@ -274,7 +275,7 @@ async function pullItem(event) {
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200));
+        .then(r => checkResponseCode(r, 200, 'GET'));
     return OK(item);
 }
 
@@ -304,7 +305,7 @@ async function setTopics(event) {
         },
         body: JSON.stringify({names: newTopicList})
     })
-        .then(r => checkResponseCode(r, 200));
+        .then(r => checkResponseCode(r, 200, 'PUT'));
     // Fetch final topic list for sanity
     return OK(await getTopics(event));
 }
@@ -323,7 +324,7 @@ async function getTopics(event) {
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200));
+        .then(r => checkResponseCode(r, 200, 'GET'));
     return topics.names;
 }
 
@@ -344,7 +345,7 @@ async function copyFile(event) {
                 "authorization": `token ${cryptr.decrypt(d.token)}`
             }
         })
-            .then(r => checkResponseCode(r, 200))
+            .then(r => checkResponseCode(r, 200, 'GET'))
             .then(json => json.content)
             .catch(() => null);
         if(existing)
@@ -358,7 +359,7 @@ async function copyFile(event) {
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200))
+        .then(r => checkResponseCode(r, 200, 'GET'))
         .then(json => file = json)
         .then(() => pushFile({body: JSON.stringify({
                 ...d, content: file.content, path: file.path, url: d.newURL
@@ -379,8 +380,8 @@ async function deleteFile(event) {
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }
     })
-        .then(r => checkResponseCode(r, 200));
-    console.log({...file, content: '...'})
+        .then(r => checkResponseCode(r, 200, 'GET'));
+
     return OK(
         await fetch(file.url, {
             method: "DELETE",
@@ -393,7 +394,7 @@ async function deleteFile(event) {
                 sha: file.sha
             })
         })
-            .then(r => checkResponseCode(r, 200))
+            .then(r => checkResponseCode(r, 200, 'DELETE'))
     );
 }
 
@@ -409,6 +410,6 @@ async function getLastBuild(event) {
             "accept": "application/vnd.github.v3+json",
             "authorization": `token ${cryptr.decrypt(d.token)}`
         }})
-        .then(r => checkResponseCode(r, 200))
+        .then(r => checkResponseCode(r, 200, 'GET'))
     return OK(status);
 }

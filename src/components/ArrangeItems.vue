@@ -6,6 +6,7 @@
           @change="change"
           group="items"
           class="episodeList"
+          :disabled="$store.state.editingItem"
   >
     <CustomiseItem v-for="item in items"
                    :key="item.url"

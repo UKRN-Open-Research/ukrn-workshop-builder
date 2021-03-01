@@ -116,7 +116,6 @@ export default {
          * @param [delay=180000] {number} milliseconds to delay request. Default 3 minutes
          */
         registerBuildCheck(nsContext, {delay=180000}) {
-            console.log(`registerBuildCheck(delay=${delay})`)
             let lastCheck = null;
             if(nsContext.state.buildStatusChecks.length)
                 lastCheck = nsContext.state.buildStatusChecks[nsContext.state.buildStatusChecks.length - 1];

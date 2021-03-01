@@ -46,9 +46,13 @@
                   :icon-left="buildIcon"
                   :loading="buildType === 'is-info'"
                   :label="expanded? buildMessage : ''"
+                  :title="$store.state.github.buildStatus.error.message"
                   expanded
                   aria-roledescription="div"
         />
+        <div v-if="lastCheck && expanded" class="has-text-grey-light last-check-time">
+          Last build status check: {{ lastCheck }}
+        </div>
       </div>
     </div>
   </div>
@@ -94,10 +98,16 @@ export default {
         const build = this.$store.state.github.buildStatus;
         switch(build.status) {
           case "built": return `Website built successfully in ${Math.round(build.duration / 10) / 100}s`;
-          case "errored": return `Website build failure: ${build.error.message}`;
+          case "errored": return `Website build failure.`;
           default: return 'Website building in progress...';
         }
       } catch(e) {return ''}
+    },
+    lastCheck() {
+      try {
+        const t = new Date(this.$store.state.github.buildStatus.updated_at);
+        return `${t.getDate()}/${t.getMonth() + 1}/${t.getFullYear()} - ${t.getHours()}:${t.getMinutes()}${t.getHours() < 12? 'am' : 'pm'}`
+      } catch(e) {return null}
     }
   },
   methods: {
@@ -187,4 +197,6 @@ export default {
       margin-top: .5em;
     }
   }
+
+  .last-check-time {font-size: .8em;}
 </style>

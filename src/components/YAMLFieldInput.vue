@@ -31,6 +31,7 @@
              @blur="evt => $emit('blur', evt)"
              type="textarea"
              class="full-wide"
+             custom-class="match-height"
     />
     <b-input v-else-if="field.type === 'string'"
              v-model="currentValue"
@@ -82,6 +83,5 @@ export default {
 }
 </script>
 
-<style scoped>
-    .full-wide {width: 100%;}
+<style lang="scss">
 </style>

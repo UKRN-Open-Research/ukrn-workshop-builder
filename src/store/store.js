@@ -16,7 +16,11 @@ const store = new Vuex.Store({
     state: {
         topicList: [
             'open-data', 'open-access', 'open-code', 'preprints', 'preregistration'
-        ]
+        ],
+        editingItem: false,
+    },
+    mutations: {
+        setEditItem(state, value) {state.editingItem = value},
     }
 });
 

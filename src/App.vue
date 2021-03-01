@@ -127,6 +127,10 @@ export default {
   background-color: darkgrey !important;
   z-index: 100000;
 }
+.full-wide {
+  width: 100%;
+  textarea.match-height {min-height: unset; height: auto;}
+}
 
 // Import Bulma's core
 @import "~bulma/sass/utilities/_all";

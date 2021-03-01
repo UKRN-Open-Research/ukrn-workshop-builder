@@ -685,6 +685,8 @@ export default {
 
                 // Replace ../fig/path/img.png to root link: /fig/path/img.png
                 newBody = newBody.replaceAll(`..${f}`, f);
+                // Replace installedFile wrapper so that we don't wrap wrappers
+                newBody = newBody.replaceAll(`{% include installedFile.lqd path='${f}' %}`, f);
                 // And replace root links with complex links
                 newBody = newBody.replaceAll(f, `{% include installedFile.lqd path='${f}' %}`);
             }));
