@@ -224,7 +224,7 @@ export default {
          * @param [body=null] {string|null} body content
          */
         setFileContentFromYAML(nsContext, {url, yaml, body = null}) {
-            if(body) 
+            if(body)
                 body = body.replace(/^\n+/, '');
             let content = `---\n${YAML.stringify(yaml)}\n---\n${body}`;
             return nsContext.dispatch('setFileContent', {url, content});

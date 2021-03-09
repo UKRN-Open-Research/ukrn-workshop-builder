@@ -74,8 +74,8 @@
           </div>
           <b-autocomplete
                   v-model="remoteRepositoryName"
-                  :data="filteredTopicRepositories.map(r => `${r.owner}/${r.name}`)"
-                  placeholder="https://github.com/owner/repository"
+                  :data="filteredTopicRepositories.map(r => `${r.ownerLogin}/${r.name}`)"
+                  placeholder="Start typing an owner, repository, or tag to filter"
                   icon="magnify"
                   clearable
                   expanded
@@ -169,7 +169,7 @@
       filteredTopicRepositories() {
         return this.$store.getters['workshop/RepositoriesByFilter'](
                 r => !r.isMain &&
-                        `${r.owner}/${r.name}`
+                        `${r.owner}|${r.name}|${r.topics.join('|')}`
                         .toLowerCase()
                         .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0
         )
