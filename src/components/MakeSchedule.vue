@@ -210,11 +210,17 @@
         if(item.yaml['ukrn_wb_rules']
                 && item.yaml['ukrn_wb_rules'].includes('allow-multiple')
                 && dayId !== ""
-                && !item.yaml.day)
+                && !item.yaml.day) {
+          const remote = item.remote;
           item = await this.$store.dispatch('workshop/duplicateFile', {url: item.url});
+          if(remote && !this.availableEpisodes.includes(item.url))
+            this.availableEpisodes.push(item.url);
+        }
         // TODO: Delete allow-multiple items when de-scheduled
 
         const newYAML = {...item.yaml};
+        // Strip the wb rules from the new child
+        newYAML.ukrn_wb_rules = [];
         newYAML.day = dayId;
         // Place in the correct order
         if(prevOrder && nextOrder && prevOrder === nextOrder) {

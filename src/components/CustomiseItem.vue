@@ -146,7 +146,7 @@
                @close="content = currentContent"
                full-screen
       >
-        <div class="card" v-if="currentContent">
+        <div class="card" v-if="currentContent !== null">
           <header class="card-header-title">Edit content (saved automatically)</header>
           <mavon-editor class="card-content"
                         v-model="currentContent"
@@ -154,6 +154,7 @@
                         defaultOpen="edit"
                         :toolbars="toolbars"
                         @imgAdd="imgAdd"
+                        @save="content = currentContent"
                         ref="editor"
           />
         </div>
@@ -167,7 +168,7 @@
                @close="rawContent = currentRawContent"
                full-screen
       >
-        <div class="card" v-if="currentRawContent">
+        <div class="card" v-if="currentRawContent !== null">
           <header class="card-header-title">Edit content (saved automatically)</header>
           <mavon-editor class="card-content"
                         v-model="currentRawContent"
@@ -175,6 +176,7 @@
                         defaultOpen="edit"
                         :tabSize="2"
                         :toolbars="{...toolbars, imagelink: false}"
+                        @save="rawContent = currentRawContent"
           />
         </div>
         <div v-else>
@@ -210,7 +212,7 @@ export default {
         quote: true, ol: true, ul: true, link: true, imagelink: true, code: true,
         table: true, fullscreen: true, readmodel: true, htmlcode: false, help: true,
         /* 1.3.5 */
-        undo: true, redo: true, trash: false, save: false,
+        undo: true, redo: true, trash: false, save: true,
         /* 1.4.2 */
         navigation: true,
         /* 2.1.8 */

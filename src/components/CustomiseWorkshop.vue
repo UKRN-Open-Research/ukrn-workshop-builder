@@ -71,7 +71,11 @@
       >
         <div class="card" v-if="currentTemplate">
           <header class="card-header-title">Edit template (saved automatically)</header>
-          <mavon-editor class="card-content" v-model="currentTemplate.content" language="en" defaultOpen="edit"/>
+          <mavon-editor class="card-content"
+                        v-model="currentTemplate.content"
+                        language="en"
+                        defaultOpen="edit"
+          />
         </div>
       </b-modal>
     </div>
