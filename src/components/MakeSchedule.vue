@@ -74,7 +74,7 @@
           </div>
           <b-autocomplete
                   v-model="remoteRepositoryName"
-                  :data="filteredTopicRepositories.map(r => `${r.ownerLogin}/${r.name}`)"
+                  :data="autoCompleteOptions"
                   placeholder="Start typing an owner, repository, or tag to filter"
                   icon="magnify"
                   clearable
@@ -173,6 +173,17 @@
                         .toLowerCase()
                         .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0
         )
+      },
+      autoCompleteOptions() {
+        const options = [];
+        this.filteredTopicRepositories.forEach(r => {
+          const entries = [r.name, r.ownerLogin, ...r.topics];
+          entries.forEach(e => {
+            if(!options.includes(e))
+              options.push(e);
+          })
+        });
+        return options;
       },
       remoteRepositoryEpisodes() {
         if(!this.remoteRepositoryName)

@@ -628,7 +628,20 @@ export default {
             // Check file is okay to install
             const Repo = nsContext.getters.Repository();
             const File = nsContext.getters.File(url);
-            const newURL = `${Repo.url}/contents/${File.path}`;
+            const fList = Repo.files.map(f => f.url);
+            let newURL = `${Repo.url}/contents/${File.path}`;
+            // Adjust newURL if it's in Repo already
+            while(fList.includes(newURL)) {
+                const x = /^([\w\W]+?)(\.[^.]*)?$/.exec(newURL);
+                const name = x[1];
+                const ext = x.length > 2? x[2] : "";
+                const m = /_([0-9]+)$/.exec(name);
+                if (m)
+                    newURL = `${name.replace(/_[0-9]+$/, `_${parseInt(m[1]) + 1}`)}${ext}`;
+                else
+                    newURL = `${name}_1${ext}`;
+            }
+
             if(!File) {
                 nsContext.commit('addError', `No such file to install: ${url}`);
                 return null;
@@ -651,7 +664,7 @@ export default {
                 url: newURL,
                 content: Base64.encode(File.content),
                 sha: null,
-                path: File.path
+                path: newURL.replace(Repo.url, "")
             });
 
             let newFile = nsContext.getters.File(newURL);

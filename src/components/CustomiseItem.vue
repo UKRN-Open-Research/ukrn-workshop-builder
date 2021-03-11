@@ -301,7 +301,7 @@ export default {
       const self = this;
       this.$store.dispatch('workshop/installFile', {url: episode.url})
               .then(F => self.$buefy.toast.open({
-                message: F? `Episode installed to ${episode.path}.` : `Error installing ${episode.path}`,
+                message: F? `Episode installed as ${F.path}.` : `Error installing ${episode.path}`,
                 type: F? `is-success` : `is-danger`
               }))
     },
