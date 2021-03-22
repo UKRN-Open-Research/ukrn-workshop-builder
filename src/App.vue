@@ -122,6 +122,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  margin: 1em;
 }
 .modal-close {
   background-color: darkgrey !important;
