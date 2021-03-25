@@ -169,7 +169,7 @@
       filteredTopicRepositories() {
         return this.$store.getters['workshop/RepositoriesByFilter'](
                 r => !r.isMain &&
-                        `${r.owner}|${r.name}|${r.topics.join('|')}`
+                        `${r.ownerLogin}|${r.name}|${r.topics.join('|')}`
                         .toLowerCase()
                         .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0
         )
