@@ -11,7 +11,7 @@
         <div class="column">
           <p>You already have a repository which is tagged with the topic "ukrn-workshop". You can select it here:</p>
         </div>
-        <div class="column">
+        <div class="column select-repo">
           https://github.com/{{ $store.getters['github/login'] }}/
           <b-select v-model="remoteRepositoryURL" :loading="$store.getters['workshop/isBusy']('findRepositories')">
             <option v-for="repo in userRepositories" :key="repo.url" :value="repo.url">
@@ -19,7 +19,8 @@
             </option>
           </b-select>
           <b-button label="Load workshop"
-                    icon-left="arrow-right"
+                    icon-right="arrow-right"
+                    type="is-primary"
                     @click="chooseWorkshop"
                     :disabled="!remoteRepositoryURL"
           />
@@ -124,8 +125,11 @@ export default {
   $colour-workshop-main: #c4ffe1;
   $colour-workshop-dark: darkgreen;
 
-  .workshop {
-    /*background-color: $colour-workshop-main;*/
+  .select-repo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
   }
 
 </style>

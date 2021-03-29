@@ -44,7 +44,7 @@ export default {
         redeemCode(nsContext) {
             if (nsContext.state.loginInProgress)
                 return;
-            if (nsContext.state.code === "")
+            if (nsContext.getters.code === "")
                 return nsContext.commit('addError', "Cannot login with empty code");
             nsContext.commit('setLoginFlag', true);
             fetch(

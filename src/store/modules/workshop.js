@@ -890,3 +890,13 @@ function findFileDependencies(File) {
         `/installed/${File.yaml.originalRepository}/\\1`
     ));
 }
+
+function getRepoIntroFile(r, f) {
+    const topics = [...r.topics, 'unknown-topic'];
+    const intros = topics.map(t => {
+        const file = f.filter(F => F.path === `_includes/intro/topic-intros/${t}.md`);
+        return file? file[0] : null
+    })
+        .filter(x => x !== null);
+    return intros.length? intros[0] : null
+}
