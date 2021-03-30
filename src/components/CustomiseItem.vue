@@ -1,9 +1,13 @@
 <template>
   <div class="item-wrapper">
     <div class="card-header episode" :class="item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
-    <span class="card-header-title">
-        <EpisodeName :episode="item" :include-repo="item.remote"/>
-    </span>
+      <span class="time" v-if="start && end">
+        {{ pad(start[0]) }}:{{ pad(start[1]) }}<br/>{{ pad(end[0]) }}:{{ pad(end[1]) }}
+      </span>
+      <span class="card-header-title">
+        <span v-if="overrideName">{{ overrideName }}</span>
+        <EpisodeName v-else :episode="item" :include-repo="item.remote"/>
+      </span>
       <div class="action-icons has-background-white-ter">
         <b-button v-if="item.remote && item.yaml.day"
                   icon-right="plus"
@@ -13,7 +17,7 @@
                   title="Install remote episode"
                   @click="install(item)"
         />
-        <b-button v-else-if="item.hasChanged() && item.yaml.day"
+        <b-button v-else-if="item.hasChanged() && (item.yaml.day || addButtons.includes('save'))"
                   icon-right="content-save"
                   :size="iconSize"
                   type="is-success"
@@ -21,7 +25,7 @@
                   title="Save changes to GitHub"
                   @click="$store.dispatch('workshop/pushFile', {url: item.url})"
         />
-        <b-button v-if="item.remote || !item.yaml.day"
+        <b-button v-if="item.remote || !item.yaml.day && !removeButtons.includes('properties')"
                   icon-right="text-search"
                   :size="iconSize"
                   type="is-info"
@@ -30,7 +34,7 @@
                   @click="isViewing = true"
         />
         <!-- We use the title yaml field to determine if the yaml is valid -->
-        <b-button v-if="!item.remote && item.yaml.day && item.yaml.title"
+        <b-button v-if="(!item.remote && item.yaml.day && item.yaml.title && !removeButtons.includes('properties')) || addButtons.includes('properties')"
                   icon-right="playlist-edit"
                   :size="iconSize"
                   type="is-info"
@@ -38,7 +42,7 @@
                   title="Edit properties"
                   @click="isEditing = true"
         />
-        <b-button v-if="!item.remote && item.yaml.day && item.yaml.title"
+        <b-button v-if="(!item.remote && item.yaml.day && item.yaml.title && !removeButtons.includes('edit')) || addButtons.includes('edit')"
                   icon-right="file-document-edit-outline"
                   :size="iconSize"
                   type="is-info"
@@ -46,7 +50,7 @@
                   title="Edit content"
                   @click="editContent"
         />
-        <b-button v-if="!item.remote && item.yaml.day && !item.yaml.title"
+        <b-button v-if="(!item.remote && item.yaml.day && !item.yaml.title && !removeButtons.includes('repair')) || addButtons.includes('repair')"
                   icon-right="wrench"
                   :size="iconSize"
                   type="is-info"
@@ -54,8 +58,17 @@
                   title="Repair raw content"
                   @click="editRawContent"
         />
-        <b-button tag="a"
-                  :href="getPagesLink(item)"
+        <b-button v-else-if="noYAML"
+                  icon-right="file-document-edit-outline"
+                  :size="iconSize"
+                  type="is-info"
+                  outlined
+                  title="Edit content"
+                  @click="editRawContent"
+        />
+        <b-button v-if="!removeButtons.includes('link')"
+                  tag="a"
+                  :href="overrideLink? getRelativeLink(item, overrideLink) : getPagesLink(item)"
                   target="_blank"
                   type="is-dark"
                   outlined
@@ -63,7 +76,7 @@
                   icon-right="link"
                   :size="iconSize"
         />
-        <b-button v-if="item.yaml.day"
+        <b-button v-if="item.yaml.day && !removeButtons.includes('drop')"
                   icon-right="arrow-right"
                   :size="iconSize"
                   title="Move to stash"
@@ -71,7 +84,7 @@
                   type="is-warning"
                   outlined
         />
-        <b-button v-if="!item.yaml.day && item.remote"
+        <b-button v-if="!item.yaml.day && item.remote && !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Remove this episode"
@@ -79,7 +92,7 @@
                   type="is-danger"
                   outlined
         />
-        <b-button v-if="!item.yaml.day && !item.remote && !(item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('undeletable'))"
+        <b-button v-if="!item.yaml.day && !item.remote && !(item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('undeletable')) && !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Delete"
@@ -195,7 +208,14 @@ export default {
   name: 'CustomiseItem',
   components: {YAMLField, EpisodeName},
   props: {
-    item: {type: Object, required: true} // list of episodes selected
+    item: {type: Object, required: true}, // list of episodes selected
+    overrideName: {type: String, required: false},
+    overrideLink: {type: String, required: false},
+    noYAML: {type: Boolean, required: false, default: false},
+    addButtons: {type: Array, required: false, default: ()=>[]},
+    removeButtons: {type: Array, required: false, default: ()=>[]},
+    start: {type: Array, required: false},
+    end: {type: Array, required: false}
   },
   data: function() {
     return {
@@ -311,6 +331,10 @@ export default {
       const webDir = name[1].replace(/\.[^.]*$/, "");
       return `https://${match[1]}.github.io/${match[2]}/${webDir}/`;
     },
+    getRelativeLink(item, link) {
+      const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);
+      return `https://${match[1]}.github.io/${match[2]}${link}`;
+    },
     imgAdd(pos, img) {
       console.log({pos, img})
       this.$buefy.dialog.prompt({
@@ -354,6 +378,16 @@ export default {
         },
         onCancel: () => {this.$refs.editor.$refs.toolbar_left.$imgDelByFilename(img.name)}
       });
+    },
+    /**
+     * Pad a number to two digits with leading zero
+     * @param x {Number}
+     * @return {string}
+     */
+    pad(x) {
+      if(x < 10)
+        return `0${Math.floor(x).toString()}`;
+      return Math.floor(x).toString();
     }
   },
   watch: {
@@ -367,6 +401,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+  .time {
+    margin-left: .5rem;
+    font-size: .8em;
+    font-family: monospace;
+  }
   .card-header-title {text-align: left;}
 
   .episode {

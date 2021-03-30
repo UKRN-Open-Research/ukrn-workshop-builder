@@ -96,14 +96,23 @@ export default {
             const files = getters.FilesByFilter(f => fileInRepository(f.url, url));
             // Check for a config file
             const configFiles = files.filter(f => f.path === '_config.yml');
+            const extraFiles = {};
+            if(configFiles.length)
+                extraFiles.intro = getRepoIntroFile(files, configFiles[0].yaml.topic);
+            const notesFiles = files.filter(f => f.path === 'notes.md');
+            if(notesFiles.length)
+                extraFiles.notes = notesFiles[0];
             const episodes = files
                 .filter(f => /^_episodes/.test(f.path))
                 .filter(i => !i.yaml['ukrn_wb_rules'] || !i.yaml['ukrn_wb_rules'].includes('hidden'));
             const episode_template = files.filter(i => i.yaml['ukrn_wb_rules'] && i.yaml['ukrn_wb_rules'].includes('template'));
-            return {...repository, files, episodes,
+            return {
+                ...repository, files, episodes,
                 episode_template: episode_template.length? episode_template[0] : null,
                 busyFlag: () => getters.isBusy(url),
-                config: configFiles.length? configFiles[0] : null};
+                config: configFiles.length? configFiles[0] : null,
+                extraFiles
+            };
         },
         /**
          * Return Repositories matched by a specified filter_function
@@ -205,7 +214,6 @@ export default {
          * @param nsContext
          * @param url {string} URL of the file
          * @param content {string} content to set
-         * @param encode {boolean} whether to have the back end encode the file in Base64
          */
         setFileContent(nsContext, {url, content}) {
             const files = nsContext.state.files.filter(f => f.url === url);
@@ -480,20 +488,30 @@ export default {
          * @param nsContext {object}
          * @param url {string} Repository URL
          * @param includeEpisodes {boolean} Whether to search episode files
-         * @param includeConfig {boolean} Whether to search config files
+         * @param includeExtraFiles {boolean} Whether to search config files
          * @param overwrite {boolean} Whether to overwrite existing files
          * @return {null|Promise<function(*=): {files: *[]}>}
          */
-        findRepositoryFiles(nsContext, {url, includeEpisodes = true, includeConfig = true, overwrite = true}) {
+        findRepositoryFiles(nsContext, {url, includeEpisodes = true, includeConfig: includeExtraFiles = true, overwrite = true}) {
             if(!nsContext.getters.Repository(url))
                 throw new Error(`Cannot fetch files for unknown repository: ${url}`)
             if(nsContext.getters.isBusy(url))
                 return null;
             nsContext.commit('setBusyFlag', {flag: url, value: true});
+            let extraFiles = null;
+            if(includeExtraFiles) {
+                extraFiles = [
+                    ...[...nsContext.rootState.topicList, 'unknown-topic'].map(
+                        t => `_includes/intro/topic-intros/${t}.md`
+                    ),
+                    'notes.md',
+                    '_config.yml'
+                ]
+            }
             return fetch("/.netlify/functions/githubAPI", {
                 method: "POST", headers: {task: 'findRepositoryFiles'},
                 body: JSON.stringify({
-                    url, includeEpisodes, includeConfig,
+                    url, includeEpisodes, extraFiles,
                     token: nsContext.rootGetters['github/token']
                 })
             })
@@ -862,7 +880,7 @@ function parseYAML(content) {
     } catch(e) {
         body = content;
         yaml = {};
-        yamlParseError = e;
+        yamlParseError = e.message;
     }
     return {yaml, body, yamlParseError};
 }
@@ -891,10 +909,16 @@ function findFileDependencies(File) {
     ));
 }
 
-function getRepoIntroFile(r, f) {
-    const topics = [...r.topics, 'unknown-topic'];
+/**
+ * Fetch the intro file for a repository
+ * @param files {object[]} list of files
+ * @param topic {string} topic name
+ * @return {object} File
+ */
+function getRepoIntroFile(files, topic) {
+    const topics = [topic, 'unknown-topic'];
     const intros = topics.map(t => {
-        const file = f.filter(F => F.path === `_includes/intro/topic-intros/${t}.md`);
+        const file = files.filter(F => F.path === `_includes/intro/topic-intros/${t}.md`);
         return file? file[0] : null
     })
         .filter(x => x !== null);

@@ -152,9 +152,7 @@ async function findRepositories(event) {
  */
 async function findRepositoryFiles(event) {
     const d = JSON.parse(event.body);
-    const files = [
-        d.includeConfig? `${d.url}/contents/_config.yml` : null
-    ];
+    const files = d.extraFiles.map(f => `${d.url}/contents/${f}`);
     const dirs = [
       d.includeEpisodes? "_episodes" : null,
       d.includeEpisodes? "_episodes_rmd" : null
@@ -188,9 +186,9 @@ async function findRepositoryFiles(event) {
                         "authorization": `token ${cryptr.decrypt(d.token)}`
                     }
                 })
-                    .then(r => checkResponseCode(r, 200, 'GET'))
+                    .then(r => r.status === 404? null : checkResponseCode(r, 200, 'GET'))
             ));
-    return OK(response);
+    return OK(response.filter(r => r !== null));
 }
 
 /**

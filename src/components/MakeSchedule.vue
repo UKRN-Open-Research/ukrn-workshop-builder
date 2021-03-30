@@ -11,6 +11,28 @@
       </div>
     </section>
     <section class="card" v-else>
+      <header class="card-header">
+        <b-tooltip position="is-bottom" label="Special files are non-lesson files which you can edit. These include things like instructor notes and introductory information.">
+          <h1 class="card-header-title">Special files</h1>
+        </b-tooltip>
+      </header>
+      <div class="special-files content">
+        <CustomiseItem v-if="mainRepo.extraFiles.intro"
+                       :item="mainRepo.extraFiles.intro"
+                       override-name="Workshop Intro"
+                       override-link="/"
+                       :no-y-a-m-l="true"
+                       :add-buttons="['save']"
+                       :remove-buttons="['drop', 'properties']"
+        />
+        <CustomiseItem v-if="mainRepo.extraFiles.notes"
+                       :item="mainRepo.extraFiles.notes"
+                       override-name="Instructor Notes"
+                       override-link="/notes"
+                       :add-buttons="['save', 'edit']"
+                       :remove-buttons="['drop', 'properties']"
+        />
+      </div>
       <div class="content"
            v-if="schedule.days.length === 1 && schedule.days[0].items.length === 0"
       >
@@ -100,9 +122,12 @@
 <script>
   import ArrangeItems from "./ArrangeItems";
   import RemoteRepositoryView from "./RemoteRepositoryView";
+  import CustomiseItem
+    from "./CustomiseItem";
   export default {
     name: 'MakeSchedule',
     components: {
+      CustomiseItem,
       RemoteRepositoryView,
       ArrangeItems
     },
@@ -263,5 +288,12 @@
   }
   .fullscreen-modal > * {padding: 1em;}
   .unassigned-items {
+  }
+  .special-files.special-files {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1em;
+    margin-bottom: 0;
+    .item-wrapper {padding: .5em;}
   }
 </style>

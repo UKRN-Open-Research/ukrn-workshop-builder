@@ -8,9 +8,11 @@
           class="episodeList"
           :disabled="$store.state.editingItem"
   >
-    <CustomiseItem v-for="item in items"
-                   :key="item.url"
-                   :item="item"
+    <CustomiseItem v-for="i in items.length"
+                   :key="items[i - 1].url"
+                   :item="items[i - 1]"
+                   :start="times? times[i - 1].start : null"
+                   :end="times? times[i - 1].end : null"
                    @remove="remove"
     />
   </draggable>
@@ -31,7 +33,33 @@ export default {
   data: function() {
     return {}
   },
-  computed: {},
+  computed: {
+    times() {
+      if(!this.dayId)
+        return null;
+      const config = this.$store.getters['workshop/Repository']().config;
+      let times;
+      if(config.yaml.start_times.length > this.dayId - 1) {
+        times = config.yaml.start_times[this.dayId - 1].split('|');
+      }
+      else
+        times = config.yaml.start_times[0].split('|');
+      const start = parseInt(times[0]) * 60;
+      let elapsed = parseInt(times[1]);
+      console.log({dayId: this.dayId, start, elapsed})
+
+      return this.items.map(i => {
+        const out = {
+          start: [Math.floor((start + elapsed) / 60), (start + elapsed) % 60]
+        };
+        elapsed += parseInt(i.yaml.duration || "0") +
+                parseInt(i.yaml.teaching || "0") +
+                parseInt(i.yaml.exercises || "0");
+        out.end = [Math.floor((start + elapsed) / 60), (start + elapsed) % 60];
+        return out;
+      });
+    }
+  },
   methods: {
     change(evt) {
       // Only monitor add events because the store will handle removals
