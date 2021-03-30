@@ -710,10 +710,11 @@ export default {
             nsContext.commit('setBusyFlag', {flag: newURL, value: true});
 
             // Register dependencies
-            newFile.yaml.missingDependencies = findFileDependencies(File).map(ref => ref.replace(/^\.\.\//, '/'));
-            newFile.yaml.dependencies = [];
-            newFile.yaml.originalRepository = name_repo[1];
-            await nsContext.dispatch('setFileContentFromYAML', {...newFile});
+            const newYAML = {...newFile.yaml};
+            newYAML.missingDependencies = findFileDependencies(File).map(ref => ref.replace(/^\.\.\//, '/'));
+            newYAML.dependencies = [];
+            newYAML.originalRepository = name_repo[1];
+            await nsContext.dispatch('setFileContentFromYAML', {...newFile, yaml: newYAML});
 
             newFile = await nsContext.dispatch('installDependencies', {url: newURL});
 
