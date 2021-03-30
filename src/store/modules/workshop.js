@@ -96,9 +96,29 @@ export default {
             const files = getters.FilesByFilter(f => fileInRepository(f.url, url));
             // Check for a config file
             const configFiles = files.filter(f => f.path === '_config.yml');
-            const extraFiles = {};
-            if(configFiles.length)
+            const extraFiles = {
+                intro: null,
+                setup_files: [],
+                optional_intro_sections: [],
+                notes: null
+            };
+            if(configFiles.length) {
                 extraFiles.intro = getRepoIntroFile(files, configFiles[0].yaml.topic);
+                // Setup files
+                files.map(f => {
+                    const name = /^_includes\/install_instructions\/([^/.]+)\.html$/.exec(f.path);
+                    if(name)
+                        if(configFiles[0].yaml.setup_files.includes(name[1]))
+                            extraFiles.setup_files.push(f);
+                });
+                // Optional intro files
+                files.map(f => {
+                    const name = /^_includes\/intro\/optional\/([^/.]+)\.md$/.exec(f.path);
+                    if(name)
+                        if(configFiles[0].yaml.optional_intro_sections.includes(name[1]))
+                            extraFiles.optional_intro_sections.push(f);
+                });
+            }
             const notesFiles = files.filter(f => f.path === 'notes.md');
             if(notesFiles.length)
                 extraFiles.notes = notesFiles[0];

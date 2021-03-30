@@ -26,7 +26,7 @@
             <b-icon v-if="episode.yaml.missingDependencies && episode.yaml.missingDependencies.length"
                     icon="alert"
                     type="is-warning"
-                    title="This episode has missing dependencies."
+                    title="This episode has missing dependencies. You can fix this by going to 'edit properties'."
             />
             {{episode.yaml.title}}
         </span>

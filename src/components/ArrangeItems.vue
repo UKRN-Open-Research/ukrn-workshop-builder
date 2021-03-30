@@ -46,7 +46,6 @@ export default {
         times = config.yaml.start_times[0].split('|');
       const start = parseInt(times[0]) * 60;
       let elapsed = parseInt(times[1]);
-      console.log({dayId: this.dayId, start, elapsed})
 
       return this.items.map(i => {
         const out = {

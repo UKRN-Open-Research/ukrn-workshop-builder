@@ -108,7 +108,7 @@
           <b-button v-if="item.yaml.missingDependencies && item.yaml.missingDependencies.length"
                     label="Install missing dependencies"
                     type="is-warning is-light"
-                    @click="$store.dispatch('workshop/installDependencies', {url: item.url})"
+                    @click="installMissingDependencies(item)"
                     icon-left="hammer-screwdriver"
                     outlined
           />
@@ -183,6 +183,9 @@
       >
         <div class="card" v-if="currentRawContent !== null">
           <header class="card-header-title">Edit content (saved automatically)</header>
+          <b-message v-if="/\.html/.test(item.path)" class="is-warning">
+            This file is written in HTML. Please make sure to edit it carefully so that it remains valid. If you do not know how to do this, get help with editing it.
+          </b-message>
           <mavon-editor class="card-content"
                         v-model="currentRawContent"
                         language="en"
@@ -324,6 +327,30 @@ export default {
                 message: F? `Episode installed as ${F.path}.` : `Error installing ${episode.path}`,
                 type: F? `is-success` : `is-danger`
               }))
+    },
+    installMissingDependencies(episode) {
+      const me = this;
+      const currentMissing = [...episode.yaml.missingDependencies];
+      this.$store.dispatch('workshop/installDependencies', {url: episode.url})
+        .then(F => {
+          const successes = currentMissing.length - F.yaml.missingDependencies.length;
+          const failures = F.yaml.missingDependencies.length;
+          if(successes && failures)
+            me.$buefy.toast.open({
+              message: `${successes} missing dependenc${successes > 1? 'ies' : 'y'} fixed; ${failures} remaining. You can try fixing again to repair the rest.`,
+              type: 'is-warning'
+            })
+          else if(failures)
+            me.$buefy.toast.open({
+              message: 'No missing dependencies. Fixed. If this persists, seek help from the instructors.',
+              type: 'is-danger'
+            })
+          else
+            me.$buefy.toast.open({
+              message: `${successes} missing dependenc${successes > 1? 'ies' : 'y'} fixed.`,
+              type: 'is-success'
+            })
+        })
     },
     getPagesLink(item) {
       const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);

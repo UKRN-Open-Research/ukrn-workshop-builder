@@ -154,8 +154,10 @@ async function findRepositoryFiles(event) {
     const d = JSON.parse(event.body);
     const files = d.extraFiles.map(f => `${d.url}/contents/${f}`);
     const dirs = [
-      d.includeEpisodes? "_episodes" : null,
-      d.includeEpisodes? "_episodes_rmd" : null
+        d.includeEpisodes? "_episodes" : null,
+        d.includeEpisodes? "_episodes_rmd" : null,
+        d.extraFiles.length? "_includes/install_instructions" : null,
+        d.extraFiles.length? "_includes/intro/optional" : null
     ]
         .filter(p => p !== null);
 
