@@ -4,14 +4,14 @@
          role="button"
          aria-controls="select-existing-workshop"
     >
-      <span class="card-header-title">Select existing workshop to edit</span>
+      <span class="card-header-title">Select Existing Workshop to Edit</span>
     </div>
     <div class="card-content">
-      <div class="content columns" v-if="userRepositories.length">
-        <div class="column">
+      <div class="content" v-if="userRepositories.length">
+        <div class="content">
           <p>You already have a repository which is tagged with the topic "ukrn-workshop". You can select it here:</p>
         </div>
-        <div class="column select-repo">
+        <div class="content select-repo">
           https://github.com/{{ $store.getters['github/login'] }}/
           <b-select v-model="remoteRepositoryURL" :loading="$store.getters['workshop/isBusy']('findRepositories')">
             <option v-for="repo in userRepositories" :key="repo.url" :value="repo.url">
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="content">
-        <b-field label="Create new repository..."
+        <b-field :label="`${userRepositories.length? 'Alternatively, ':''}Create a New Repository...`"
                  :message="newRepositoryName === newRepositoryNameSafe? '' : `Repository will be created as ${newRepositoryNameSafe}`"
         >
           <b-input placeholder="New repository name"
