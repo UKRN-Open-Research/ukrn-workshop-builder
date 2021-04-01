@@ -878,6 +878,32 @@ export default {
 
             nsContext.commit('setBusyFlag', {flag: url, value: false});
             return out;
+        },
+        /**
+         * Reassign episode order numbers to keep the same order but add distance for inserting other episodes between them.
+         * @param nsContext {object}
+         * @param dayId {number} Day whose episodes should have their order numbers adjusted
+         * @param ignore_episodes {string[]} URLs of episodes to ignore
+         * @return {Promise<void>}
+         */
+        async rewriteEpisodeOrders(nsContext, {dayId, ignore_episodes}) {
+            const episodes = nsContext.getters.Repository().episodes
+                .filter(e => e.yaml.day === dayId);
+            episodes.sort((a, b) => a.yaml.order < b.yaml.order? -1 : a.yaml.order === b.yaml.order? 0 : 1);
+            let o = 0;
+            await Promise.all(
+                episodes.map(e => {
+                    if(ignore_episodes.includes(e.url))
+                        return;
+                    o += 100000;
+                    console.log(`(${e.yaml.day}) ${e.path} => ${o}`)
+                    const newYAML = {...e.yaml};
+                    newYAML.order = o;
+                    return nsContext.dispatch('setFileContentFromYAML', {
+                        ...e, yaml: {...newYAML}
+                    });
+                })
+            );
         }
     }
 };

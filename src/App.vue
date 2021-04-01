@@ -80,6 +80,12 @@ export default {
     },
     latestStep: function() {
       // Check for a valid config file
+      if(this.configReady &&
+              this.$store.getters['workshop/Repository']().episodes.filter(
+                      f => f.yaml && f.yaml.day
+              ).length > 0
+      )
+        return 4;
       if(this.configReady)
         return 3;
       // Check for a main repository

@@ -1,6 +1,6 @@
 <template>
   <div class="item-wrapper">
-    <div class="card-header episode" :class="item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
+    <div class="card-header episode" :class="item.yaml && item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
       <span class="time" v-if="start && end">
         {{ pad(start[0]) }}:{{ pad(start[1]) }}<br/>{{ pad(end[0]) }}:{{ pad(end[1]) }}
       </span>
@@ -13,15 +13,13 @@
                   icon-right="plus"
                   :size="iconSize"
                   type="is-success"
-                  outlined
-                  title="Install remote episode"
+                  title="Install remote lesson"
                   @click="install(item)"
         />
         <b-button v-else-if="item.hasChanged() && (item.yaml.day || addButtons.includes('save'))"
                   icon-right="content-save"
                   :size="iconSize"
                   type="is-success"
-                  outlined
                   title="Save changes to GitHub"
                   @click="$store.dispatch('workshop/pushFile', {url: item.url})"
         />
@@ -29,7 +27,6 @@
                   icon-right="text-search"
                   :size="iconSize"
                   type="is-info"
-                  outlined
                   title="View properties"
                   @click="isViewing = true"
         />
@@ -38,7 +35,6 @@
                   icon-right="playlist-edit"
                   :size="iconSize"
                   type="is-info"
-                  outlined
                   title="Edit properties"
                   @click="isEditing = true"
         />
@@ -46,7 +42,6 @@
                   icon-right="file-document-edit-outline"
                   :size="iconSize"
                   type="is-info"
-                  outlined
                   title="Edit content"
                   @click="editContent"
         />
@@ -54,7 +49,6 @@
                   icon-right="wrench"
                   :size="iconSize"
                   type="is-info"
-                  outlined
                   title="Repair raw content"
                   @click="editRawContent"
         />
@@ -62,7 +56,6 @@
                   icon-right="file-document-edit-outline"
                   :size="iconSize"
                   type="is-info"
-                  outlined
                   title="Edit content"
                   @click="editRawContent"
         />
@@ -71,34 +64,37 @@
                   :href="overrideLink? getRelativeLink(item, overrideLink) : getPagesLink(item)"
                   target="_blank"
                   type="is-dark"
-                  outlined
-                  title="Open episode website in a new tab"
+                  title="Open lesson website in a new tab"
                   icon-right="link"
                   :size="iconSize"
         />
-        <b-button v-if="item.yaml.day && !removeButtons.includes('drop')"
+        <b-button v-if="item.yaml.day && item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('allow-multiple') && !removeButtons.includes('drop')"
+                  icon-right="minus"
+                  :size="iconSize"
+                  title="Remove this lesson"
+                  @click="$store.commit('workshop/removeItem', {array: 'files', item})"
+                  type="is-danger"
+        />
+        <b-button v-else-if="item.yaml.day && !removeButtons.includes('drop')"
                   icon-right="arrow-right"
                   :size="iconSize"
                   title="Move to stash"
                   @click="$emit('remove', item)"
                   type="is-warning"
-                  outlined
         />
-        <b-button v-if="!item.yaml.day && item.remote && !removeButtons.includes('drop')"
+        <b-button v-else-if="!item.yaml.day && item.remote && !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
-                  title="Remove this episode"
+                  title="Remove this lesson"
                   @click="$store.commit('workshop/removeItem', {array: 'files', item})"
                   type="is-danger"
-                  outlined
         />
-        <b-button v-if="!item.yaml.day && !item.remote && !(item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('undeletable')) && !removeButtons.includes('drop')"
+        <b-button v-else-if="!item.yaml.day && !item.remote && !(item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('undeletable')) && !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Delete"
                   @click="$store.dispatch('workshop/deleteFile', {url: item.url})"
                   type="is-danger"
-                  outlined
         />
       </div>
 
@@ -107,10 +103,9 @@
              class="yaml-item-wrapper">
           <b-button v-if="item.yaml.missingDependencies && item.yaml.missingDependencies.length"
                     label="Install missing dependencies"
-                    type="is-warning is-light"
+                    type="is-warning"
                     @click="installMissingDependencies(item)"
                     icon-left="hammer-screwdriver"
-                    outlined
           />
           <YAMLField
                   v-for="field in Fields"
@@ -172,7 +167,7 @@
           />
         </div>
         <div v-else>
-          <b-message type="is-warning">Unable to load episode body.</b-message>
+          <b-message type="is-warning">Unable to load lesson content.</b-message>
         </div>
       </b-modal>
 
@@ -196,7 +191,7 @@
           />
         </div>
         <div v-else>
-          <b-message type="is-warning">Unable to load episode body.</b-message>
+          <b-message type="is-warning">Unable to load lesson content.</b-message>
         </div>
       </b-modal>
     </div>
@@ -324,7 +319,7 @@ export default {
       const self = this;
       this.$store.dispatch('workshop/installFile', {url: episode.url})
               .then(F => self.$buefy.toast.open({
-                message: F? `Episode installed as ${F.path}.` : `Error installing ${episode.path}`,
+                message: F? `Lesson installed as ${F.path}.` : `Error installing ${episode.path}`,
                 type: F? `is-success` : `is-danger`
               }))
     },

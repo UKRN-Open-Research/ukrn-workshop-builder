@@ -10,55 +10,57 @@
         />
       </div>
     </section>
-    <section class="card" v-else>
-      <header class="card-header">
-        <b-tooltip position="is-bottom" label="Special files are non-lesson files which you can edit. These include things like instructor notes and introductory information.">
-          <h1 class="card-header-title">Special files</h1>
-        </b-tooltip>
-      </header>
-      <div class="special-files content">
-        <CustomiseItem v-if="mainRepo.extraFiles.intro"
-                       :item="mainRepo.extraFiles.intro"
-                       override-name="Workshop Intro"
-                       override-link="/"
-                       :no-y-a-m-l="true"
-                       :add-buttons="['save']"
-                       :remove-buttons="['drop', 'properties']"
-        />
-        <CustomiseItem v-for="s in mainRepo.extraFiles.optional_intro_sections"
-                       :key="s.url"
-                       :item="s"
-                       :override-name="`Intro: ${/\/([^/.]+)\.md$/.exec(s.path)[1]}`"
-                       override-link="/"
-                       :no-y-a-m-l="true"
-                       :add-buttons="['save']"
-                       :remove-buttons="['drop', 'properties']"
-        />
-        <CustomiseItem v-for="s in mainRepo.extraFiles.setup_files"
-                       :key="s.url"
-                       :item="s"
-                       :override-name="`Setup: ${/\/([^/.]+)\.html$/.exec(s.path)[1]}`"
-                       override-link="/"
-                       :no-y-a-m-l="true"
-                       :add-buttons="['save']"
-                       :remove-buttons="['drop', 'properties']"
-        />
-        <CustomiseItem v-if="mainRepo.extraFiles.notes"
-                       :item="mainRepo.extraFiles.notes"
-                       override-name="Instructor Notes"
-                       override-link="/notes"
-                       :add-buttons="['save', 'edit']"
-                       :remove-buttons="['drop', 'properties']"
-        />
-      </div>
+    <section v-else>
+      <section class="card" v-if="mainRepo.extraFiles.intro || mainRepo.extraFiles.optional_intro_sections.length || mainRepo.extraFiles.setup_files.length">
+        <header class="card-header">
+          <b-tooltip position="is-right" label="Special files are non-lesson files which you can edit. These include things like instructor notes and introductory information.">
+            <h1 class="card-header-title">Special files</h1>
+          </b-tooltip>
+        </header>
+        <div class="special-files content">
+          <CustomiseItem v-if="mainRepo.extraFiles.intro"
+                         :item="mainRepo.extraFiles.intro"
+                         override-name="Workshop Intro"
+                         override-link="/"
+                         :no-y-a-m-l="true"
+                         :add-buttons="['save']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+          <CustomiseItem v-for="s in mainRepo.extraFiles.optional_intro_sections"
+                         :key="s.url"
+                         :item="s"
+                         :override-name="`Intro: ${/\/([^/.]+)\.md$/.exec(s.path)[1]}`"
+                         override-link="/"
+                         :no-y-a-m-l="true"
+                         :add-buttons="['save']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+          <CustomiseItem v-for="s in mainRepo.extraFiles.setup_files"
+                         :key="s.url"
+                         :item="s"
+                         :override-name="`Setup: ${/\/([^/.]+)\.html$/.exec(s.path)[1]}`"
+                         override-link="/"
+                         :no-y-a-m-l="true"
+                         :add-buttons="['save']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+          <CustomiseItem v-if="mainRepo.extraFiles.notes"
+                         :item="mainRepo.extraFiles.notes"
+                         override-name="Instructor Notes"
+                         override-link="/notes"
+                         :add-buttons="['save', 'edit']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+        </div>
+      </section>
       <div class="content"
            v-if="schedule.days.length === 1 && schedule.days[0].items.length === 0"
       >
-        <p>There are currently no episodes in the workshop. To add episodes, drag them from the stash into a day. You can search for episodes that have already been created and add them to your stash.</p>
+        <p>There are currently no lessons in the workshop. To add lessons, drag them from the stash into a day. You can search for episodes that have already been created and add them to your stash.</p>
       </div>
       <div class="columns">
         <div class="column">
-          <div class="card-content card"
+          <div class="card"
                v-for="day in schedule.days"
                :key="day.number"
           >
@@ -76,26 +78,33 @@
           </div>
         </div>
         <div class="column">
-          <div class="card-content card">
+          <div class="card">
             <header class="card-header" v-if="!mainRepo.busyFlag()">
               <h1 class="card-header-title">Stash</h1>
             </header>
             <b-skeleton size="is-large" animated :active="mainRepo.busyFlag()"/>
             <div class="card-content" v-if="!mainRepo.busyFlag()">
               <ArrangeItems :items="schedule.unassignedItems"
-                            :is-unscheduled="true"
-                            @change="updateItemDay"
+                            @assignItem="updateItemDay"
                             class="unassigned-items"
               />
             </div>
             <b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
-            <div class="card-footer">
+            <div class="stash-buttons card-footer-item">
               <b-button class="card-footer-item"
                         icon-left="plus"
                         :type="`is-primary ${allItems.length > 1? 'is-light' : ''}`"
                         @click="addRemoteItems = true"
               >
                 Add Items to Stash
+              </b-button>
+              <b-button v-if="availableEpisodes.filter(f => !f.yaml.day).length"
+                        class="card-footer-item"
+                        icon-left="delete"
+                        type="is-warning"
+                        @click="clearStash"
+              >
+                Clear stash
               </b-button>
             </div>
           </div>
@@ -105,17 +114,17 @@
       <b-modal v-model="addRemoteItems" full-screen>
         <div class="content fullscreen-modal">
           <header class="title">
-            <h1 class="">Add items from a remote repository</h1>
+            <h1 class="">Add items from a different workshop</h1>
           </header>
           <div class="content">
-            <p>Type the URL of a repository below. We will scan that repository for episodes and include them in your
-              schedule options. You can then install these remote episodes and the episodes plus any files they depend on
-              will be installed in your own repository.</p>
+            <p>Type the URL, owner, or title of a workshop below, or type a topic name. We will scan workshops that match for lessons and you can then include them in your
+              stash. You can then drag them into your schedule and install them (and any files they depend on)
+              in your own workshop.</p>
           </div>
           <b-autocomplete
                   v-model="remoteRepositoryName"
                   :data="autoCompleteOptions"
-                  placeholder="Start typing an owner, repository, or tag to filter"
+                  placeholder="Start typing an owner, workshop URL or title, or tag to filter"
                   icon="magnify"
                   clearable
                   expanded
@@ -167,8 +176,10 @@
         const T = performance.now()
         if(!this.recalculateItems || !this.mainRepo.topics || !this.mainRepo.topics.length)
           return [];
+        // Always include main repository episodes
         const episodes = [...this.mainRepo.episodes];
         const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
+        // Find repositories that overlap topics with mainRepo
         const topics = this.mainRepo.topics
                 .filter(t => this.$store.state.topicList.includes(t));
         const topicRepos = this.$store.getters['workshop/RepositoriesByFilter'](r => {
@@ -176,7 +187,12 @@
             if(r.topics.includes(t))
               return true;
         });
-        topicRepos.forEach(R => episodes.push(...R.episodes.filter(E => this.availableEpisodes.includes(E.url))));
+        // Find available, non-duplicate episodes for inclusion
+        topicRepos.forEach(R => episodes.push(...R.episodes.filter(
+          E => {
+            return this.availableEpisodes.filter(e => e.url === E.url).length &&
+          episodes.filter(x => E.body === x.body).length === 0
+        })));
         // Add remote flag
         console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories in ${Math.round(performance.now() - T)}ms`)
         return episodes.map(e => {return {...e, remote: !mainEpisodes.includes(e.url)}});
@@ -238,15 +254,21 @@
     },
     methods: {
       /**
+       * Clear stash episodes
+       */
+      clearStash() {
+        this.availableEpisodes = this.availableEpisodes.filter(f => f.yaml.day);
+      },
+      /**
        * Mark an episode as available for including in the current project
        */
       setEpisodeAvailable(E, available) {
-        if(this.availableEpisodes.includes(E.url) === available)
+        if(this.availableEpisodes.filter(e => e.url === E.url).length > 0 === available)
           return;
         if(available)
-          this.availableEpisodes.push(E.url);
+          this.availableEpisodes.push(E);
         else
-          this.availableEpisodes = this.availableEpisodes.filter(e => e!==E.url)
+          this.availableEpisodes = this.availableEpisodes.filter(e => e.url !== E.url)
       },
       updateEpisode(episode) {
         this.$store.dispatch('workshop/setFileContentFromYAML', {
@@ -267,18 +289,25 @@
                 && !item.yaml.day) {
           const remote = item.remote;
           item = await this.$store.dispatch('workshop/duplicateFile', {url: item.url});
-          if(remote && !this.availableEpisodes.includes(item.url))
-            this.availableEpisodes.push(item.url);
+          if(remote && !this.availableEpisodes.filter(e => e.url === item.url).length)
+            this.availableEpisodes.push(item);
+        } else if(item.yaml['ukrn_wb_rules']
+                && item.yaml['ukrn_wb_rules'].includes('allow-multiple')
+                && !dayId) {
+          this.$store.commit('workshop/removeItem', {array: 'files', item});
+          return;
         }
-        // TODO: Delete allow-multiple items when de-scheduled
 
         const newYAML = {...item.yaml};
-        // Strip the wb rules from the new child
-        newYAML.ukrn_wb_rules = [];
         newYAML.day = dayId;
         // Place in the correct order
         if(prevOrder && nextOrder && prevOrder === nextOrder) {
-          // TODO: implement recalculating item order values
+          // Recalculate item order values if there is no gap.
+          // Item will place itself out of order, but since this really rarely happens
+          // we're not going to fix it now.
+          await this.$store.dispatch('workshop/rewriteEpisodeOrders', {
+            dayId, ignore_episodes: [item.url]
+          });
         } else if(!prevOrder && nextOrder)
           newYAML.order = Math.round(nextOrder / 2);
         else if(prevOrder && !nextOrder)
@@ -301,6 +330,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+  .card {margin-bottom: 1em;}
   .cards {
     width: 100%;
   }
@@ -312,6 +342,12 @@
     flex-wrap: wrap;
     padding: 1em;
     margin-bottom: 0;
+    user-select: none;
     .item-wrapper {padding: .5em;}
+  }
+  .stash-buttons {
+    button {
+      margin: .5em;
+    }
   }
 </style>

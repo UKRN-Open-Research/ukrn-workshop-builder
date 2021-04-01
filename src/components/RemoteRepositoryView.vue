@@ -35,7 +35,7 @@
                         />
                     </div>
                     <b-message v-else-if="!repo.busyFlag()">
-                        <em>No episodes found for this repository.</em>
+                        <em>No lessons found in this workshop.</em>
                     </b-message>
                     <ul>
                         <li aria-role="listitem"

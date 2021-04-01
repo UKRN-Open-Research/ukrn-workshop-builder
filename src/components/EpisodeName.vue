@@ -9,7 +9,7 @@
         <b-tooltip v-else-if="!Object.keys(episode.yaml).length"
                    dashed
                    type="is-warning"
-                   label="This episode has invalid an invalid YAML header, so its details cannot be read."
+                   label="This lesson has invalid an invalid YAML header, so its details cannot be read."
                    position="is-bottom"
         >
             {{ episode.path }}
@@ -17,7 +17,7 @@
         <b-tooltip v-else-if="!episode.yaml.title"
                    dashed
                    type="is-info"
-                   label="This episode has no 'title' set in its YAML header."
+                   label="This lesson has no 'title' set in its YAML header."
                    position="is-bottom"
         >
             {{ episode.path }}
@@ -26,7 +26,7 @@
             <b-icon v-if="episode.yaml.missingDependencies && episode.yaml.missingDependencies.length"
                     icon="alert"
                     type="is-warning"
-                    title="This episode has missing dependencies. You can fix this by going to 'edit properties'."
+                    title="This lesson has missing dependencies. You can fix this by going to 'edit properties'."
             />
             {{episode.yaml.title}}
         </span>

@@ -9,7 +9,7 @@
     <div class="card-content">
       <div class="content" v-if="userRepositories.length">
         <div class="content">
-          <p>You already have a repository which is tagged with the topic "ukrn-workshop". You can select it here:</p>
+          <p>You already have a workshop repository which is tagged with the topic "ukrn-workshop". You can select it here:</p>
         </div>
         <div class="content select-repo">
           https://github.com/{{ $store.getters['github/login'] }}/
@@ -28,17 +28,17 @@
       </div>
       <div class="content columns" v-else>
         <div class="column">
-          <p>You don't have any repositories tagged with the topic "ukrn-workshop". If you think this is a mistake, or you have just created one, you can refresh the search using this button.</p>
+          <p>You don't have any workshop repositories tagged with the topic "ukrn-workshop". If you think this is a mistake, or you have just created one, you can refresh the search using this button.</p>
         </div>
         <div class="column">
           <b-button @click="checkUserRepositories" :loading="$store.getters['workshop/isBusy']('findRepositories')">Check again</b-button>
         </div>
       </div>
       <div class="content">
-        <b-field :label="`${userRepositories.length? 'Alternatively, ':''}Create a New Repository...`"
+        <b-field :label="`${userRepositories.length? 'Alternatively, ':''}Create a New Workshop...`"
                  :message="newRepositoryName === newRepositoryNameSafe? '' : `Repository will be created as ${newRepositoryNameSafe}`"
         >
-          <b-input placeholder="New repository name"
+          <b-input placeholder="New workshop name"
                    type="search"
                    v-model="newRepositoryName"
                    expanded
@@ -53,7 +53,7 @@
                       :loading="$store.getters['workshop/isBusy']('createRepository')"
                       @click="createRepository"
             >
-              Create repository
+              Create
             </b-button>
           </p>
         </b-field>

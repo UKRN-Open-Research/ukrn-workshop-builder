@@ -15,7 +15,7 @@ const store = new Vuex.Store({
     },
     state: {
         topicList: [
-            'open-data', 'open-access', 'open-code', 'preprints', 'preregistration'
+            'data-sharing', 'open-access', 'open-code', 'preprints', 'preregistration'
         ],
         editingItem: false,
     },
