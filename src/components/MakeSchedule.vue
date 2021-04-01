@@ -191,7 +191,9 @@
         topicRepos.forEach(R => episodes.push(...R.episodes.filter(
           E => {
             return this.availableEpisodes.filter(e => e.url === E.url).length &&
-          episodes.filter(x => E.body === x.body).length === 0
+                    ((E.yaml.ukrn_wb_rules &&
+                            E.yaml.ukrn_wb_rules.includes('allow-multiple')) ||
+                    episodes.filter(x => E.body === x.body).length === 0)
         })));
         // Add remote flag
         console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories in ${Math.round(performance.now() - T)}ms`)
@@ -227,10 +229,17 @@
       },
       filteredTopicRepositories() {
         return this.$store.getters['workshop/RepositoriesByFilter'](
+                // exclude main repo
                 r => !r.isMain &&
+                        // match filter
                         `${r.ownerLogin}|${r.name}|${r.topics.join('|')}`
                         .toLowerCase()
-                        .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0
+                        .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0 &&
+                        // match topics
+                        r.topics.filter(
+                                t => this.mainRepo.topics.includes(t) &&
+                                        this.$store.state.topicList.includes(t)
+                        ).length
         )
       },
       autoCompleteOptions() {
@@ -292,7 +301,7 @@
           if(remote && !this.availableEpisodes.filter(e => e.url === item.url).length)
             this.availableEpisodes.push(item);
         } else if(item.yaml['ukrn_wb_rules']
-                && item.yaml['ukrn_wb_rules'].includes('allow-multiple')
+                && item.yaml['ukrn_wb_rules'].includes('remove-on-stash')
                 && !dayId) {
           this.$store.commit('workshop/removeItem', {array: 'files', item});
           return;

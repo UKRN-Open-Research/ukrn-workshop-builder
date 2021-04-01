@@ -68,7 +68,7 @@
                   icon-right="link"
                   :size="iconSize"
         />
-        <b-button v-if="item.yaml.day && item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('allow-multiple') && !removeButtons.includes('drop')"
+        <b-button v-if="item.yaml.day && item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('remove-on-stash') && !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Remove this lesson"

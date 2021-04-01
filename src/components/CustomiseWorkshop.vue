@@ -65,9 +65,11 @@
       </section>
 
       <b-modal v-model="isEditingTemplate"
+               class="fullscreen-modal"
                scroll="keep"
                @open="currentTemplate = template"
                @close="template = currentTemplate"
+               full-screen
       >
         <div class="card" v-if="currentTemplate">
           <header class="card-header-title">Edit template (saved automatically)</header>
@@ -139,11 +141,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  $colour-workshop-main: #c4ffe1;
-  $colour-workshop-dark: darkgreen;
-
-  .workshop {
-    /*background-color: $colour-workshop-main;*/
-  }
-
+  .fullscreen-modal > * {padding: 1em;}
 </style>
