@@ -9,8 +9,14 @@
       <div class="github-menu-buttons">
         <div class="github-components">
           <header>
-            <b-icon icon="github" size="is-large"/>
-            <span v-if="expanded">GitHub Integration</span>
+            <a :href="`https://github.com/${mainRepo.ownerLogin}/${mainRepo.name}/`"
+               target="_blank"
+               class="has-text-black"
+               title="Open repository in GitHub"
+            >
+              <b-icon icon="github" size="is-large"/>
+              <span v-if="expanded">GitHub Integration</span>
+            </a>
           </header>
           <b-button icon-left="delete"
                     :label="expanded? 'Discard local changes' : ''"
@@ -180,7 +186,7 @@ export default {
     .github-components {
       display: flex;
       flex-direction: column;
-      header {
+      header a {
         display: flex;
         align-items: center;
         justify-content: space-evenly;
