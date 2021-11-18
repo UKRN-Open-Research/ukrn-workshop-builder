@@ -130,8 +130,8 @@ async function findRepositories(event) {
     let user = "";
     if(d.topics)
         topics = '+' + d.topics.map(t => `topic:${t}`).join('+');
-    if(d.user)
-        user = `+user:${user}`;
+    if(d.owner)
+        user = `+user:${d.owner}`;
     const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-open-research${user}${topics}`;
     console.log(`findRepositories(${url})`)
     const items = await fetch(url, {
