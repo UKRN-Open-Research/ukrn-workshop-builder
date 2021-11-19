@@ -72,7 +72,7 @@
         methods: {
             doLookup() {
                 if(!this.repo.episodes.length)
-                    this.$store.dispatch(
+                    return this.$store.dispatch(
                         'workshop/findRepositoryFiles',
                         {url: this.repo.url}
                     )

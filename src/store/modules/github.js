@@ -15,6 +15,7 @@ export default {
             return Es? state.errors[Es - 1] : null
         },
         login(state) {return state.user.login},
+        loginInProgress(state) {return state.loginInProgress},
         code() {return queryString.parse(window.location.search).code},
         token() {return queryString.parse(window.location.search).token}
     },
@@ -42,12 +43,12 @@ export default {
             }, {skipNull: true});
         },
         redeemCode(nsContext) {
-            if (nsContext.state.loginInProgress)
+            if (nsContext.getters.loginInProgress)
                 return;
             if (nsContext.getters.code === "")
                 return nsContext.commit('addError', "Cannot login with empty code");
             nsContext.commit('setLoginFlag', true);
-            fetch(
+            return fetch(
                 '/.netlify/functions/githubAPI',
                 {method: "POST",
                     headers: {
@@ -64,7 +65,7 @@ export default {
                 .then(r => {
                     console.log(r)
                     if (!r.access_token)
-                        throw new Error(`Response had no token ${r}`);
+                        throw new Error(`Response had no token.`);
                     nsContext.dispatch('processToken', r.access_token);
                     nsContext.commit('setLoginFlag', false);
                 })
@@ -97,7 +98,6 @@ export default {
             })
                 .then(r => {
                     if (r.status !== 200) {
-                        nsContext.dispatch('logout');
                         throw new Error(`Could not retrieve user details, logging out.`);
                     }
                     return r.json();
@@ -130,7 +130,7 @@ export default {
             const time = (lastCheck? lastCheck : performance.now()) + delay;
             nsContext.commit('addBuildStatusCheck', time);
             // Set the timeout
-            setTimeout(() => nsContext.dispatch('getBuildStatus'), time - performance.now());
+            return setTimeout(() => nsContext.dispatch('getBuildStatus'), time - performance.now());
         },
         /**
          * Fetch the latest build status for the workshop website
@@ -138,7 +138,7 @@ export default {
          */
         getBuildStatus(nsContext) {
             nsContext.commit('removeBuildStatusCheck');
-            fetch('/.netlify/functions/githubAPI', {
+            return fetch('/.netlify/functions/githubAPI', {
                 method: "POST",
                 headers: {task: "getLastBuild"},
                 body: JSON.stringify({
@@ -152,7 +152,7 @@ export default {
                     return r.json();
                 })
                 .then(status => nsContext.commit('updateBuildStatus', status))
-                .catch(e => this.addError(e))
+                .catch(e => nsContext.commit('addError', e))
         }
     }
 };

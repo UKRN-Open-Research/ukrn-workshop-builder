@@ -113,7 +113,7 @@ export default {
             }
             this.fileList = [];
             const self = this;
-            this.field.special.forEach(path => {
+            return this.field.special.forEach(path => {
                 this.$store.dispatch('workshop/pullURL', {
                     url: `${self.$store.getters['workshop/Repository']().url}/contents/${path}`
                 })
@@ -143,7 +143,7 @@ export default {
                 )
         }
     },
-    mounted() {this.getFileList()}
+    mounted() {return this.getFileList()}
 }
 </script>
 

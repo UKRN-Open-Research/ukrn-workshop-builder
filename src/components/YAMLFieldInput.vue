@@ -6,7 +6,7 @@
                  :key="t"
                  :native-value="t"
                  @input="evt => $emit('blur', evt)"
-        >{{ `${t[0].toUpperCase()}${t.substring(1).replaceAll(/-/g, ' ')}` }}</b-radio>
+        >{{ `${t[0].toUpperCase()}${t.substring(1).replace(/-/g, ' ')}` }}</b-radio>
     </div>
     <b-select v-else-if="field.format === 'iso-3166-1-alpha-2'"
               v-model="currentValue"

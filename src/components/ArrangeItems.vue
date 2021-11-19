@@ -41,8 +41,7 @@ export default {
       let times;
       if(config.yaml.start_times.length > this.dayId - 1) {
         times = config.yaml.start_times[this.dayId - 1].split('|');
-      }
-      else
+      } else
         times = config.yaml.start_times[0].split('|');
       const start = parseInt(times[0]) * 60;
       let elapsed = parseInt(times[1]);

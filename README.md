@@ -1,4 +1,6 @@
-[![DOI](https://zenodo.org/badge/331747772.svg)](https://zenodo.org/badge/latestdoi/331747772) [![Netlify Status](https://api.netlify.com/api/v1/badges/e38e5eae-c1e1-434e-85a7-b761c0d40806/deploy-status)](https://app.netlify.com/sites/ukrn-wb/deploys)
+[![DOI](https://zenodo.org/badge/331747772.svg)](https://zenodo.org/badge/latestdoi/331747772)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e38e5eae-c1e1-434e-85a7-b761c0d40806/deploy-status)](https://app.netlify.com/sites/ukrn-wb/deploys)
+[![codecov](https://codecov.io/gh/UKRN-Open-Research/ukrn-workshop-builder/branch/dev/graph/badge.svg?token=JCV0CNRKMF)](https://codecov.io/gh/UKRN-Open-Research/ukrn-workshop-builder)
 
 # UKRN Workshop Builder Tool
 
@@ -54,7 +56,7 @@ The app's Client Secret should be listed in `.env.local` with the key `GITHUB_AP
 The app should be configured to redirect to your local server, e.g. `http://localhost:8080/`.
 
 The Workshop Builder also has the user keep track of an encrypted version of their GitHub authorisation token, which is sent to the user with each GitHub interaction. 
-The key for this encryption can be anything you like, but you must include it in your `.env.local` file as `GITHUB_TOKEN_ENCRYPTION_KEY`, e.g.: `GITHUB_TOKEN_ENCRYPTION_KEY=ThisIsOnlyAnExample`.
+The key for this encryption can be anything you like, but you must include it in your `.env.local` file as `GH_TOKEN_ENCRYPTION_KEY`, e.g.: `GH_TOKEN_ENCRYPTION_KEY=ThisIsOnlyAnExample`.
 
 #### Serve for local testing
 Uses webpack compiling and supports hot-reloading of files.

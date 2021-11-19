@@ -29,3 +29,7 @@ pnpm-debug.log*
 
 # Cypress
 cypress/.*
+
+cypress/videos/
+
+coverage/

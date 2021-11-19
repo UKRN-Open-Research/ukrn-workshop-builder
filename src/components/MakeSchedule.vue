@@ -11,7 +11,7 @@
       </div>
     </section>
     <section v-else>
-      <section class="card" v-if="mainRepo.extraFiles.intro || mainRepo.extraFiles.optional_intro_sections.length || mainRepo.extraFiles.setup_files.length">
+      <section class="card" v-if="mainRepo.extraFiles && (mainRepo.extraFiles.intro || mainRepo.extraFiles.optional_intro_sections.length || mainRepo.extraFiles.setup_files.length)">
         <header class="card-header">
           <b-tooltip position="is-right" label="Special files are non-lesson files which you can edit. These include things like instructor notes and introductory information.">
             <h1 class="card-header-title">Special files</h1>
@@ -168,7 +168,14 @@
       }
     },
     computed: {
-      mainRepo() {return this.$store.getters['workshop/Repository']();},
+      mainRepo() {
+        let repo;
+        try {
+          repo = this.$store.getters['workshop/Repository']();
+        }
+        catch(e) {throw new Error(`Error retrieving Repository from store: ${e}`)}
+        return repo;
+      },
       /**
        * Return all the episodes in a Repository which has a matching topic.
        */

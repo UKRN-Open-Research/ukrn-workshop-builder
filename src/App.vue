@@ -43,10 +43,14 @@
 import SelectWorkshop from './components/SelectWorkshop'
 import GitHubLogin from './components/GitHubLogin'
 import CustomiseWorkshop from "./components/CustomiseWorkshop";
+import Vuex from 'vuex'
+Vue.use(Vuex);
 import store from './store/store.js'
 import MakeSchedule
   from "./components/MakeSchedule";
 import GitHubMenu from "@/components/GitHubMenu";
+import Vue
+  from "vue";
 
 export default {
   name: 'App',
@@ -103,10 +107,6 @@ export default {
     }
   },
   methods: {
-    readPreamble: function() {
-      this.preambleRead = true;
-      this.activeStep = 1;
-    },
     stepType: function(myStepNum) {
       const n = myStepNum - 1;
       if(this.latestStep > n)
@@ -117,7 +117,7 @@ export default {
     }
   },
   mounted() {this.activeStep = this.latestStep},
-  store: store
+  store: new Vuex.Store(store)
 }
 </script>
 

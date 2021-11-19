@@ -1,6 +1,6 @@
 <template>
     <span class="episode-name">
-        <span v-if="includeRepo" class="repository has-background-white-ter">
+        <span v-if="includeRepo && owner_repo" class="repository has-background-white-ter">
             {{ owner_repo.owner }} / {{ owner_repo.repo }}
         </span>
         <span v-if="typeof episode.yaml !== 'object'" class="has-text-danger">

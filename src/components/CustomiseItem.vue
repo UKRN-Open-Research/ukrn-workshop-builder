@@ -8,7 +8,7 @@
         <span v-if="overrideName">{{ overrideName }}</span>
         <EpisodeName v-else :episode="item" :include-repo="item.remote"/>
       </span>
-      <div class="action-icons has-background-white-ter">
+      <div class="action-icons has-background-white-ter" v-if="mainRepo">
         <b-button v-if="item.remote && item.yaml.day"
                   icon-right="plus"
                   :size="iconSize"
@@ -98,25 +98,22 @@
         />
       </div>
 
-      <b-modal v-model="isEditing" class="yaml-modal" full-screen>
-        <div v-if="$store.getters['workshop/Repository']().episodes.map(e => e.url).includes(item.url)"
-             class="yaml-item-wrapper">
-          <b-button v-if="item.yaml.missingDependencies && item.yaml.missingDependencies.length"
-                    label="Install missing dependencies"
-                    type="is-warning"
-                    @click="installMissingDependencies(item)"
-                    icon-left="hammer-screwdriver"
-          />
-          <YAMLField
-                  v-for="field in Fields"
-                  :key="`${item.url}-${field.key}`"
-                  :field="field"
-                  @save="save"
-          />
-        </div>
+      <b-modal v-model="isEditing" class="yaml-modal" full-screen v-if="mainRepo">
+        <b-button v-if="item.yaml.missingDependencies && item.yaml.missingDependencies.length"
+                  label="Install missing dependencies"
+                  type="is-warning"
+                  @click="installMissingDependencies(item)"
+                  icon-left="hammer-screwdriver"
+        />
+        <YAMLField
+                v-for="field in Fields"
+                :key="`${item.url}-${field.key}`"
+                :field="field"
+                @save="save"
+        />
       </b-modal>
 
-      <b-modal v-model="isViewing" class="yaml-modal yaml-read-only" full-screen>
+      <b-modal v-model="isViewing" class="yaml-modal yaml-read-only" full-screen v-if="mainRepo">
         <div class="yaml-item-wrapper">
           <header>Viewing <EpisodeName :episode="item"/></header>
           <div class="columns">
@@ -153,6 +150,7 @@
                scroll="keep"
                @close="content = currentContent"
                full-screen
+               v-if="mainRepo"
       >
         <div class="card" v-if="currentContent !== null">
           <header class="card-header-title">Edit content (saved automatically)</header>
@@ -175,6 +173,7 @@
                scroll="keep"
                @close="rawContent = currentRawContent"
                full-screen
+               v-if="mainRepo"
       >
         <div class="card" v-if="currentRawContent !== null">
           <header class="card-header-title">Edit content (saved automatically)</header>
@@ -242,19 +241,44 @@ export default {
   },
   computed: {
     /**
+     * Find the main repository
+     * @return {Repository}
+     */
+    mainRepo() {
+      let repo;
+      try {
+        repo = this.$store.getters['workshop/Repository']();
+      }
+      catch(e) {throw new Error(`Error retrieving Repository from store: ${e}`)}
+        if(typeof repo !== "object" || repo === null)
+          throw('No Repository found.');
+      return repo;
+    },
+    /**
      * Find the template attached to the main repository
-     * @return {{yaml: []}|File}
+     * @return {File}
      */
     template() {
-      try {return this.$store.getters['workshop/Repository']().episode_template}
-      catch(e) {console.log(e); return {yaml: []};}
+      return this.mainRepo.episode_template
     },
     content: {
       get() {return this.item.body},
       set(v) {
-        this.$store.dispatch('workshop/setFileContentFromYAML', {
+        const self = this;
+        return this.$store.dispatch('workshop/setFileContentFromYAML', {
           url: this.item.url, yaml: this.item.yaml, body: v
         })
+                .catch(e => {
+                  console.error(e);
+                  self.$buefy.toast.open({
+                    message: `Error updating ${self.item.title}`,
+                    type: 'is-danger'
+                  })
+                })
+                .then(() => self.$buefy.toast.open({
+                  message: `Changed ${self.item.title}`,
+                  type: `is-info`
+                }))
       }
     },
     rawContent: {
@@ -262,10 +286,22 @@ export default {
         return this.item.content
       },
       set(v) {
-        this.$store.dispatch('workshop/setFileContent', {
+        const self = this;
+        return this.$store.dispatch('workshop/setFileContent', {
           url: this.item.url,
           content: v
         })
+                .catch(e => {
+                  console.error(e);
+                  self.$buefy.toast.open({
+                    message: `Error updating ${self.item.path}`,
+                    type: 'is-danger'
+                  })
+                })
+                .then(() => self.$buefy.toast.open({
+                  message: `Changed ${self.item.path}`,
+                  type: `is-info`
+                }))
       }
     },
       /**
@@ -311,13 +347,13 @@ export default {
     save({key, value}) {
       const newYAML = {...this.item.yaml};
       newYAML[key] = value;
-      this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.item.url, yaml: newYAML, body: this.item.body})
+      return this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.item.url, yaml: newYAML, body: this.item.body})
               .then(() => this.$emit('refresh'))
     },
     install(episode) {
       console.log(`Install ${episode.path}`)
       const self = this;
-      this.$store.dispatch('workshop/installFile', {url: episode.url})
+      return this.$store.dispatch('workshop/installFile', {url: episode.url})
               .then(F => self.$buefy.toast.open({
                 message: F? `Lesson installed as ${F.path}.` : `Error installing ${episode.path}`,
                 type: F? `is-success` : `is-danger`
@@ -326,7 +362,7 @@ export default {
     installMissingDependencies(episode) {
       const me = this;
       const currentMissing = [...episode.yaml.missingDependencies];
-      this.$store.dispatch('workshop/installDependencies', {url: episode.url})
+      return this.$store.dispatch('workshop/installDependencies', {url: episode.url})
         .then(F => {
           const successes = currentMissing.length - F.yaml.missingDependencies.length;
           const failures = F.yaml.missingDependencies.length;

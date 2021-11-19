@@ -1,9 +1,8 @@
-exports.handler = main;
 import fetch from 'node-fetch'
 require('dotenv').config();
-const {VUE_APP_GITHUB_ID, GITHUB_APP_SECRET, GITHUB_TOKEN_ENCRYPTION_KEY} = process.env;
+const {VUE_APP_GITHUB_ID, GH_APP_SECRET, GH_TOKEN_ENCRYPTION_KEY} = process.env;
 const Cryptr = require('cryptr');
-const cryptr = new Cryptr(GITHUB_TOKEN_ENCRYPTION_KEY);
+const cryptr = new Cryptr(GH_TOKEN_ENCRYPTION_KEY);
 
 /**
  * Process requests from a client
@@ -88,7 +87,7 @@ async function checkResponseCode(response, code, method = 'GET') {
  */
 async function redeemCode(event) {
     console.log(`Exchanging code ${event.headers['github-code']} for token`)
-    const url = `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GITHUB_APP_SECRET}&code=${event.headers["github-code"]}`;
+    const url = `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&client_secret=${GH_APP_SECRET}&code=${event.headers["github-code"]}`;
     const access_token = await fetch(
         url,
         {headers: {"accept": "application/vnd.github.v3+json"}}
@@ -130,8 +129,8 @@ async function findRepositories(event) {
     let user = "";
     if(d.topics)
         topics = '+' + d.topics.map(t => `topic:${t}`).join('+');
-    if(d.user)
-        user = `+user:${user}`;
+    if(d.owner)
+        user = `+user:${d.owner}`;
     const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-open-research${user}${topics}`;
     console.log(`findRepositories(${url})`)
     const items = await fetch(url, {
@@ -413,3 +412,24 @@ async function getLastBuild(event) {
         .then(r => checkResponseCode(r, 200, 'GET'))
     return OK(status);
 }
+
+if(process.env.NODE_ENV === 'test') {
+    module.exports = {
+        main,
+        OK,
+        checkResponseCode,
+        redeemCode,
+        getUserDetails,
+        findRepositories,
+        findRepositoryFiles,
+        createRepository,
+        pushFile,
+        pullItem,
+        setTopics,
+        getTopics,
+        copyFile,
+        deleteFile,
+        getLastBuild
+    }
+}
+exports.handler = main;

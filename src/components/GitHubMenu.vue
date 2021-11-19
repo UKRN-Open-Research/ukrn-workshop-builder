@@ -121,7 +121,7 @@ export default {
   methods: {
     reload() {
       const self = this;
-      this.$store.dispatch('workshop/loadRepository', {url: self.mainRepo.url})
+      return this.$store.dispatch('workshop/loadRepository', {url: self.mainRepo.url})
               .then(R => self.$store.dispatch('workshop/findRepositoryFiles', {url: R.url}))
               .then(() => self.$buefy.toast.open({
                 message: "Repository reloaded", type: "is-success"
@@ -132,7 +132,7 @@ export default {
     },
     save() {
       const self = this;
-      this.$store.dispatch('workshop/saveRepositoryChanges')
+      return this.$store.dispatch('workshop/saveRepositoryChanges')
               .then(({successes, failures}) => {
                 if(failures && !successes)
                   self.$buefy.toast.open({
