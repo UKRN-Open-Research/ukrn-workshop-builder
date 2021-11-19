@@ -17,7 +17,7 @@ export default {
                 if(nsContext.state.fetchInProgress)
                     return;
                 nsContext.commit('setSearchFlag', true);
-                fetch(`https://api.github.com/repos/${repo}/contents/_config.yml`)
+                return fetch(`https://api.github.com/repos/${repo}/contents/_config.yml`)
                     .then(r => r.json())
                     .then(j => atob(j.content))
                     .then(c => {

@@ -122,7 +122,7 @@ export default {
     },
     pushConfig: function() {
       const self = this;
-      this.$store.dispatch('workshop/pushFile', {url: self.template.url})
+      return this.$store.dispatch('workshop/pushFile', {url: self.template.url})
               .then(() => self.$store.dispatch('workshop/setTopics', {
                 topics: [self.template.yaml.topic]
               }))

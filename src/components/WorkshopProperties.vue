@@ -82,7 +82,7 @@ export default {
                 delete this.saveOperations[k];
             }
 
-            this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.template.url, yaml: newYAML, body: this.template.body})
+            return this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.template.url, yaml: newYAML, body: this.template.body})
                 .then(() => me.$emit('refresh'))
                 .then(() => me.saving = false);
         }

@@ -3,7 +3,8 @@
               icon-left="github"
               size="is-medium"
               :type="!$store.getters['github/login']? '' : 'is-dark'"
-              :loading="$store.state.github.loginInProgress"
+              :loading="$store.getters['github/loginInProgress']"
+              class="github-login"
     >
       <span v-if="$store.getters['github/login']">{{ $store.getters['github/login'] }} (logout)</span>
       <span v-else>Log in to GitHub</span>

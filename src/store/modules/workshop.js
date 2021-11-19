@@ -19,6 +19,8 @@ export default {
         setItem(store, {array, item}) {
             // Strip the branch identifier if it exists
             item.url = queryString.parseUrl(item.url).url;
+            if(!store[array] || !(store[array] instanceof Array))
+                throw new Error(`Cannot set unknown store item type ${array}`)
             const existing = store[array].filter(i => i.url === item.url);
             if(existing.length)
                 store[array] = store[array].map(
@@ -28,6 +30,8 @@ export default {
                 store[array].push(item);
         },
         removeItem(store, {array, item}) {
+            if(!store[array] || !(store[array] instanceof Array))
+                throw new Error(`Cannot remove unknown store item type ${array}`)
             store[array] = store[array].filter(i => i.url !== item.url)
         },
         setBusyFlag(store, {flag, value}) {
@@ -171,7 +175,7 @@ export default {
             if(!config.yaml.title)
                 errors.title = "The title cannot be blank";
             if(!config.yaml.topic)
-                errors.topic = "The topic cannot be empty.";
+                errors.topic = "The topic cannot be empty";
             return errors;
         },
         isConfigValid: (state, getters) => config => {
@@ -512,7 +516,7 @@ export default {
          * @param overwrite {boolean} Whether to overwrite existing files
          * @return {null|Promise<function(*=): {files: *[]}>}
          */
-        findRepositoryFiles(nsContext, {url, includeEpisodes = true, includeConfig: includeExtraFiles = true, overwrite = true}) {
+        findRepositoryFiles(nsContext, {url, includeEpisodes = true, includeExtraFiles = true, overwrite = true}) {
             if(!nsContext.getters.Repository(url))
                 throw new Error(`Cannot fetch files for unknown repository: ${url}`)
             if(nsContext.getters.isBusy(url))
@@ -615,7 +619,7 @@ export default {
                 .filter(F => F.hasChanged())
                 .map(F => {
                     console.log(`Updating ${F.path}`)
-                    nsContext.dispatch('pushFile', F)
+                    nsContext.dispatch('pushFile', {url: F.url})
                 })
             )
                 .then(results => {
@@ -702,7 +706,7 @@ export default {
                 url: newURL,
                 content: Base64.encode(File.content),
                 sha: null,
-                path: newURL.replace(Repo.url, "")
+                path: newURL.replace(`${Repo.url}/contents/`, "")
             });
 
             let newFile = nsContext.getters.File(newURL);
@@ -805,7 +809,7 @@ export default {
             let dependencies = [];
             if(deleteDependencies && file.yaml.dependencies && file.yaml.dependencies.length) {
                 // Check and remove dependencies which will be orphaned
-                dependencies = await Promise.allSettled(file.yaml.dependencies.map(f => {
+                await Promise.allSettled(file.yaml.dependencies.map(f => {
                     // Don't delete if other episodes depend on this file
                     if(nsContext.getters.FilesByFilter(F => {
                         return F.url !== url
@@ -861,7 +865,7 @@ export default {
 
             dependencies = dependencies.map(d => {
                 return {
-                    fileName: `${file.yaml.originalRepository}${d.fileName}`,
+                    fileName: `${file.yaml.originalRepository}/${d.fileName}`,
                     skipped: d.skipped,
                     deleted: d.deleted
                 }
