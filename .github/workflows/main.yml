@@ -31,7 +31,7 @@ jobs:
 
       - name: Remove master branch name
         if: env.BRANCH == 'master' || env.BRANCH == 'main'
-        run: echo "BRANCH="" >> $GITHUB_ENV
+        run: echo "BRANCH=" >> $GITHUB_ENV
 
       - name: Set base Cypress Base URL
         run: echo "CYPRESS_BASE_URL=https://$(echo ${{ env.BRANCH }})ukrn-wb.netlify.app" >> $GITHUB_ENV
