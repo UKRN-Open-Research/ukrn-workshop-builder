@@ -1,65 +1,93 @@
-<template>
-  <div class="item-wrapper">
-    <div class="card-header episode" :class="item.yaml && item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
-      <span class="time" v-if="start && end">
-        {{ pad(start[0]) }}:{{ pad(start[1]) }}<br/>{{ pad(end[0]) }}:{{ pad(end[1]) }}
-      </span>
-      <span class="card-header-title">
-        <span v-if="overrideName">{{ overrideName }}</span>
-        <EpisodeName v-else :episode="item" :include-repo="item.remote"/>
-      </span>
-      <div class="action-icons has-background-white-ter" v-if="mainRepo">
-        <b-button v-if="item.remote && item.yaml.day"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/CustomiseItem.vue</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/CustomiseItem.vue</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;template>
+  &lt;div class="item-wrapper">
+    &lt;div class="card-header episode" :class="item.yaml &amp;&amp; item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
+      &lt;span class="time" v-if="start &amp;&amp; end">
+        {{ pad(start[0]) }}:{{ pad(start[1]) }}&lt;br/>{{ pad(end[0]) }}:{{ pad(end[1]) }}
+      &lt;/span>
+      &lt;span class="card-header-title">
+        &lt;span v-if="overrideName">{{ overrideName }}&lt;/span>
+        &lt;EpisodeName v-else :episode="item" :include-repo="item.remote"/>
+      &lt;/span>
+      &lt;div class="action-icons has-background-white-ter" v-if="mainRepo">
+        &lt;b-button v-if="item.remote &amp;&amp; item.yaml.day"
                   icon-right="plus"
                   :size="iconSize"
                   type="is-success"
                   title="Install remote lesson"
                   @click="install(item)"
         />
-        <b-button v-else-if="item.hasChanged() && (item.yaml.day || addButtons.includes('save'))"
+        &lt;b-button v-else-if="item.hasChanged() &amp;&amp; (item.yaml.day || addButtons.includes('save'))"
                   icon-right="content-save"
                   :size="iconSize"
                   type="is-success"
                   title="Save changes to GitHub"
                   @click="$store.dispatch('workshop/pushFile', {url: item.url})"
         />
-        <b-button v-if="item.remote || !item.yaml.day && !removeButtons.includes('properties')"
+        &lt;b-button v-if="item.remote || !item.yaml.day &amp;&amp; !removeButtons.includes('properties')"
                   icon-right="text-search"
                   :size="iconSize"
                   type="is-info"
                   title="View properties"
                   @click="isViewing = true"
         />
-        <!-- We use the title yaml field to determine if the yaml is valid -->
-        <b-button v-if="(!item.remote && item.yaml.day && item.yaml.title && !removeButtons.includes('properties')) || addButtons.includes('properties')"
+        &lt;!-- We use the title yaml field to determine if the yaml is valid -->
+        &lt;b-button v-if="(!item.remote &amp;&amp; item.yaml.day &amp;&amp; item.yaml.title &amp;&amp; !removeButtons.includes('properties')) || addButtons.includes('properties')"
                   icon-right="playlist-edit"
                   :size="iconSize"
                   type="is-info"
                   title="Edit properties"
                   @click="isEditing = true"
         />
-        <b-button v-if="(!item.remote && item.yaml.day && item.yaml.title && !removeButtons.includes('edit')) || addButtons.includes('edit')"
+        &lt;b-button v-if="(!item.remote &amp;&amp; item.yaml.day &amp;&amp; item.yaml.title &amp;&amp; !removeButtons.includes('edit')) || addButtons.includes('edit')"
                   icon-right="file-document-edit-outline"
                   :size="iconSize"
                   type="is-info"
                   title="Edit content"
                   @click="editContent"
         />
-        <b-button v-if="(!item.remote && item.yaml.day && !item.yaml.title && !removeButtons.includes('repair')) || addButtons.includes('repair')"
+        &lt;b-button v-if="(!item.remote &amp;&amp; item.yaml.day &amp;&amp; !item.yaml.title &amp;&amp; !removeButtons.includes('repair')) || addButtons.includes('repair')"
                   icon-right="wrench"
                   :size="iconSize"
                   type="is-info"
                   title="Repair raw content"
                   @click="editRawContent"
         />
-        <b-button v-else-if="noYAML"
+        &lt;b-button v-else-if="noYAML"
                   icon-right="file-document-edit-outline"
                   :size="iconSize"
                   type="is-info"
                   title="Edit content"
                   @click="editRawContent"
         />
-        <b-button v-if="!removeButtons.includes('link')"
+        &lt;b-button v-if="!removeButtons.includes('link')"
                   tag="a"
                   :href="overrideLink? getRelativeLink(item, overrideLink) : getPagesLink(item)"
                   target="_blank"
@@ -68,72 +96,72 @@
                   icon-right="link"
                   :size="iconSize"
         />
-        <b-button v-if="item.yaml.day && item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('remove-on-stash') && !removeButtons.includes('drop')"
+        &lt;b-button v-if="item.yaml.day &amp;&amp; item.yaml.ukrn_wb_rules &amp;&amp; item.yaml.ukrn_wb_rules.includes('remove-on-stash') &amp;&amp; !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Remove this lesson"
                   @click="$store.commit('workshop/removeItem', {array: 'files', item})"
                   type="is-danger"
         />
-        <b-button v-else-if="item.yaml.day && !removeButtons.includes('drop')"
+        &lt;b-button v-else-if="item.yaml.day &amp;&amp; !removeButtons.includes('drop')"
                   icon-right="arrow-right"
                   :size="iconSize"
                   title="Move to stash"
                   @click="$emit('remove', item)"
                   type="is-warning"
         />
-        <b-button v-else-if="!item.yaml.day && item.remote && !removeButtons.includes('drop')"
+        &lt;b-button v-else-if="!item.yaml.day &amp;&amp; item.remote &amp;&amp; !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Remove this lesson"
                   @click="$store.commit('workshop/removeItem', {array: 'files', item})"
                   type="is-danger"
         />
-        <b-button v-else-if="!item.yaml.day && !item.remote && !(item.yaml.ukrn_wb_rules && item.yaml.ukrn_wb_rules.includes('undeletable')) && !removeButtons.includes('drop')"
+        &lt;b-button v-else-if="!item.yaml.day &amp;&amp; !item.remote &amp;&amp; !(item.yaml.ukrn_wb_rules &amp;&amp; item.yaml.ukrn_wb_rules.includes('undeletable')) &amp;&amp; !removeButtons.includes('drop')"
                   icon-right="minus"
                   :size="iconSize"
                   title="Delete"
                   @click="$store.dispatch('workshop/deleteFile', {url: item.url})"
                   type="is-danger"
         />
-      </div>
+      &lt;/div>
 
-      <b-modal v-model="isEditing" class="yaml-modal" full-screen v-if="mainRepo">
-        <b-button v-if="item.yaml.missingDependencies && item.yaml.missingDependencies.length"
+      &lt;b-modal v-model="isEditing" class="yaml-modal" full-screen v-if="mainRepo">
+        &lt;b-button v-if="item.yaml.missingDependencies &amp;&amp; item.yaml.missingDependencies.length"
                   label="Install missing dependencies"
                   type="is-warning"
                   @click="installMissingDependencies(item)"
                   icon-left="hammer-screwdriver"
         />
-        <YAMLField
+        &lt;YAMLField
                 v-for="field in Fields"
                 :key="`${item.url}-${field.key}`"
                 :field="field"
                 @save="save"
         />
-      </b-modal>
+      &lt;/b-modal>
 
-      <b-modal v-model="isViewing" class="yaml-modal yaml-read-only" full-screen v-if="mainRepo">
-        <div class="yaml-item-wrapper">
-          <header>Viewing <EpisodeName :episode="item"/></header>
-          <div class="columns">
-            <div class="column yaml-panel">
-              <div v-for="f in Fields.filter(x => x.value !== undefined)"
+      &lt;b-modal v-model="isViewing" class="yaml-modal yaml-read-only" full-screen v-if="mainRepo">
+        &lt;div class="yaml-item-wrapper">
+          &lt;header>Viewing &lt;EpisodeName :episode="item"/>&lt;/header>
+          &lt;div class="columns">
+            &lt;div class="column yaml-panel">
+              &lt;div v-for="f in Fields.filter(x => x.value !== undefined)"
                    :key="f.key"
                    class="yaml-read-only"
               >
-                <header class="title">{{ f.name }}</header>
-                <ul v-if="f.is_array && item.yaml[f.key] !== null">
-                  <li v-for="i in item.yaml[f.key].length" :key="i">
+                &lt;header class="title">{{ f.name }}&lt;/header>
+                &lt;ul v-if="f.is_array &amp;&amp; item.yaml[f.key] !== null">
+                  &lt;li v-for="i in item.yaml[f.key].length" :key="i">
                     {{ item.yaml[f.key][i - 1] }}
-                  </li>
-                </ul>
-                <p v-else-if="!f.is_array">{{ item.yaml[f.key] }}</p>
-              </div>
-            </div>
-            <div class="column">
-              <header class="title">Content</header>
-              <mavon-editor class="card-content"
+                  &lt;/li>
+                &lt;/ul>
+                &lt;p v-else-if="!f.is_array">{{ item.yaml[f.key] }}&lt;/p>
+              &lt;/div>
+            &lt;/div>
+            &lt;div class="column">
+              &lt;header class="title">Content&lt;/header>
+              &lt;mavon-editor class="card-content"
                             :value="item.body"
                             language="en"
                             defaultOpen="preview"
@@ -141,20 +169,20 @@
                             :toolbars="{}"
                             :editable="false"
               />
-            </div>
-          </div>
-        </div>
-      </b-modal>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      &lt;/b-modal>
 
-      <b-modal v-model="isEditingContent"
+      &lt;b-modal v-model="isEditingContent"
                scroll="keep"
                @close="content = currentContent"
                full-screen
                v-if="mainRepo"
       >
-        <div class="card" v-if="currentContent !== null">
-          <header class="card-header-title">Edit content (saved automatically)</header>
-          <mavon-editor class="card-content"
+        &lt;div class="card" v-if="currentContent !== null">
+          &lt;header class="card-header-title">Edit content (saved automatically)&lt;/header>
+          &lt;mavon-editor class="card-content"
                         v-model="currentContent"
                         language="en"
                         defaultOpen="edit"
@@ -163,24 +191,24 @@
                         @save="content = currentContent"
                         ref="editor"
           />
-        </div>
-        <div v-else>
-          <b-message type="is-warning">Unable to load lesson content.</b-message>
-        </div>
-      </b-modal>
+        &lt;/div>
+        &lt;div v-else>
+          &lt;b-message type="is-warning">Unable to load lesson content.&lt;/b-message>
+        &lt;/div>
+      &lt;/b-modal>
 
-      <b-modal v-model="isEditingRawContent"
+      &lt;b-modal v-model="isEditingRawContent"
                scroll="keep"
                @close="rawContent = currentRawContent"
                full-screen
                v-if="mainRepo"
       >
-        <div class="card" v-if="currentRawContent !== null">
-          <header class="card-header-title">Edit content (saved automatically)</header>
-          <b-message v-if="/\.html/.test(item.path)" class="is-warning">
+        &lt;div class="card" v-if="currentRawContent !== null">
+          &lt;header class="card-header-title">Edit content (saved automatically)&lt;/header>
+          &lt;b-message v-if="/\.html/.test(item.path)" class="is-warning">
             This file is written in HTML. Please make sure to edit it carefully so that it remains valid. If you do not know how to do this, get help with editing it.
-          </b-message>
-          <mavon-editor class="card-content"
+          &lt;/b-message>
+          &lt;mavon-editor class="card-content"
                         v-model="currentRawContent"
                         language="en"
                         defaultOpen="edit"
@@ -188,17 +216,17 @@
                         :toolbars="{...toolbars, imagelink: false}"
                         @save="rawContent = currentRawContent"
           />
-        </div>
-        <div v-else>
-          <b-message type="is-warning">Unable to load lesson content.</b-message>
-        </div>
-      </b-modal>
-    </div>
-    <b-loading :active="item.busyFlag()" :is-full-page="false"/>
-  </div>
-</template>
+        &lt;/div>
+        &lt;div v-else>
+          &lt;b-message type="is-warning">Unable to load lesson content.&lt;/b-message>
+        &lt;/div>
+      &lt;/b-modal>
+    &lt;/div>
+    &lt;b-loading :active="item.busyFlag()" :is-full-page="false"/>
+  &lt;/div>
+&lt;/template>
 
-<script>
+&lt;script>
 import YAMLField from "./YAMLField";
 import EpisodeName from "./EpisodeName";
 export default {
@@ -276,7 +304,7 @@ export default {
                   })
                 })
                 .then(() => self.$buefy.toast.open({
-                  message: `Changed ${self.item.yaml.title}.<br/>Remember to save changes to GitHub to update the website.`,
+                  message: `Changed ${self.item.yaml.title}.&lt;br/>Remember to save changes to GitHub to update the website.`,
                   type: `is-info`
                 }))
       }
@@ -299,14 +327,14 @@ export default {
                   })
                 })
                 .then(() => self.$buefy.toast.open({
-                  message: `Changed ${self.item.path}.<br/>Remember to save changes to GitHub to update the website.`,
+                  message: `Changed ${self.item.path}.&lt;br/>Remember to save changes to GitHub to update the website.`,
                   type: `is-info`
                 }))
       }
     },
       /**
      * Rip properties and keys from their respective YAML lists and combine
-     * @return {Array<{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}>}
+     * @return {Array&lt;{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}>}
      * @constructor
      */
     Fields() {
@@ -366,7 +394,7 @@ export default {
         .then(F => {
           const successes = currentMissing.length - F.yaml.missingDependencies.length;
           const failures = F.yaml.missingDependencies.length;
-          if(successes && failures)
+          if(successes &amp;&amp; failures)
             me.$buefy.toast.open({
               message: `${successes} missing dependenc${successes > 1? 'ies' : 'y'} fixed; ${failures} remaining. You can try fixing again to repair the rest.`,
               type: 'is-warning'
@@ -396,7 +424,7 @@ export default {
     imgAdd(pos, img) {
       console.log({pos, img})
       this.$buefy.dialog.prompt({
-        message: `${img.size > 75000? '<p class="has-background-warning-light has-text-warning-dark size-note">Note: <strong>image files over 75kb in size may need to be uploaded to GitHub manually.</strong></p><br/>' : ''}Upload image as /fig/`,
+        message: `${img.size > 75000? '&lt;p class="has-background-warning-light has-text-warning-dark size-note">Note: &lt;strong>image files over 75kb in size may need to be uploaded to GitHub manually.&lt;/strong>&lt;/p>&lt;br/>' : ''}Upload image as /fig/`,
         inputAttrs: {
           type: 'text',
           placeholder: 'filename.png',
@@ -443,7 +471,7 @@ export default {
      * @return {string}
      */
     pad(x) {
-      if(x < 10)
+      if(x &lt; 10)
         return `0${Math.floor(x).toString()}`;
       return Math.floor(x).toString();
     }
@@ -455,10 +483,10 @@ export default {
     isEditingRawContent(newVal) {this.$store.commit('setEditItem', newVal)},
   }
 }
-</script>
+&lt;/script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
+&lt;!-- Add "scoped" attribute to limit CSS to this component only -->
+&lt;style lang="scss" scoped>
   .time {
     margin-left: .5rem;
     font-size: .8em;
@@ -510,4 +538,27 @@ export default {
     ul {text-align: left}
   }
 
-</style>
+&lt;/style>
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-CustomiseItem.computed.Fields.html">Fields</a></li><li><a href="module-WorkshopProperties.computed.Fields.html">Fields</a></li><li><a href="store.html">store</a></li><li><a href="template.html">template</a></li><li><a href="workshop.html">workshop</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkResponseCode">checkResponseCode</a></li><li><a href="global.html#copyFile">copyFile</a></li><li><a href="global.html#createRepository">createRepository</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#findRepositories">findRepositories</a></li><li><a href="global.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="global.html#getLastBuild">getLastBuild</a></li><li><a href="global.html#getRepoIntroFile">getRepoIntroFile</a></li><li><a href="global.html#getTopics">getTopics</a></li><li><a href="global.html#getUserDetails">getUserDetails</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#OK">OK</a></li><li><a href="global.html#onConfirm">onConfirm</a></li><li><a href="global.html#parseYAML">parseYAML</a></li><li><a href="global.html#pullItem">pullItem</a></li><li><a href="global.html#pushFile">pushFile</a></li><li><a href="global.html#redeemCode">redeemCode</a></li><li><a href="global.html#setTopics">setTopics</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Dec 03 2021 18:21:22 GMT+0000 (Greenwich Mean Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

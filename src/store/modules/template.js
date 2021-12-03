@@ -1,10 +1,28 @@
+/**
+ * @class template
+ */
 export default {
     namespaced: true,
+    /**
+     * @name State
+     * @memberOf template
+     * @property master {null|string} Template repository _config.yml file.
+     * @property fetchInProgress {boolean} Whether a template fetch is in progress.
+     * @property errors {Error[]} List of errors encountered.
+     */
     state: {
         master: null,
         fetchInProgress: false,
         errors: []
     },
+    /**
+     * @name Mutations
+     * @memberOf template
+     * @type {Object}
+     * @mutator {boolean} setSearchFlag=fetchInProgress Set the search flag.
+     * @mutator {string} setMaster=master Set the master template content.
+     * @mutator {Error} addError=errors Add an error to the log.
+     */
     mutations: {
         setSearchFlag: function(state, v) {state.fetchInProgress = v},
         setMaster: function(state, v) {state.master = v},
@@ -13,6 +31,15 @@ export default {
     actions: {
         fetchTemplateMaster: {
             root: true,
+            /**
+             * Fetch the _config.yml file from repo to use as a template.
+             * @memberOf template
+             * @action fetchTemplateMaster=master
+             * @method Actions/fetchTemplateMaster
+             * @param {StoreContext} nsContext
+             * @param {string} repo Repository to use as a template.
+             * @returns {Promise<void>|void}
+             */
             handler (nsContext, repo) {
                 if(nsContext.state.fetchInProgress)
                     return;

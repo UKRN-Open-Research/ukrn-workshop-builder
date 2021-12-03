@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/WorkshopProperties.vue</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/WorkshopProperties.vue</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;template>
+    &lt;div class="yaml-panel">
+        &lt;div v-for="Field in Fields"
+             :key="Field.key"
+             class="yaml-item-wrapper"
+        >
+            &lt;YAMLField :field="Field" @save="registerSave"/>
+        &lt;/div>
+        &lt;b-loading :active="$store.getters['workshop/isBusy'](template.url) || saving"
+                   :is-full-page="false"
+        />
+    &lt;/div>
+&lt;/template>
+
+&lt;script>
+import YAMLField from "./YAMLField";
+export default {
+    name: "WorkshopProperties",
+    components: {YAMLField},
+    props: {
+        template: {type: Object, required: true}
+    },
+    data: function() {
+        return {
+            currentValue: {}, // dictionary of values indexed by YAML keys
+            valueChanged: {}, // dictionary of change flags indexed by YAML keys
+            loadingFileList: true,
+            fileList: [],
+            saving: false,
+            saveTimeout: null,
+            minSaveDelay: 500,
+            lastSaveTime: 0,
+            saveOperations: {},
+            checkboxGroup: []
+        }
+    },
+    computed: {
+        /**
+         * Rip properties and keys from their respective YAML lists and combine
+         * @return {Array&lt;{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}>}
+         * @constructor
+         */
+        Fields() {
+            const out = [];
+            // Find the keys
+            const keyList = this.template.yaml['ukrn_wb']
+                .filter(f => f.fields_structure)[0].fields_structure;
+            // Next, find the properties
+            const obj = this.template.yaml['ukrn_wb']
+                .filter(f => f.fields)[0].fields;
+            const fields = obj.map(o => Object.keys(o)[0]); // Field YAML keys
+            obj.forEach((o, n) => {
+                const propList = o[Object.keys(o)[0]];
+                const properties = {};
+                propList.forEach((p, i) => properties[keyList[i]] = propList[i]);
+                // Add the actual value
+                out.push({
+                    ...properties,
+                    value: this.template.yaml[fields[n]],
+                    key: fields[n]
+                })
+            });
+            return out;
+        },
+    },
+    methods: {
+        registerSave({key, value}) {
+            this.saveOperations[key] = value;
+            if(this.saveTimeout)
+                clearTimeout(this.saveTimeout);
+            this.saveTimeout = setTimeout(() => this.save(), this.minSaveDelay);
+        },
+        save() {
+            this.saving = true;
+            const me = this;
+            this.saveTimeout = null;
+            this.lastSaveTime = performance.now();
+            const newYAML = {...this.template.yaml};
+            for(let k of Object.keys(this.saveOperations)) {
+                console.log(`Saving ${k} => ${this.saveOperations[k]}`)
+                newYAML[k] = this.saveOperations[k];
+                delete this.saveOperations[k];
+            }
+
+            return this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.template.url, yaml: newYAML, body: this.template.body})
+                .then(() => me.$emit('refresh'))
+                .then(() => me.saving = false);
+        }
+    }
+}
+&lt;/script>
+
+&lt;style scoped>
+.yaml-panel {
+    display: grid;
+    grid-auto-flow: row;
+    grid-row-gap: 1em;
+}
+.yaml-item-wrapper {
+    display: grid;
+    min-width: 45%;
+}
+&lt;/style>
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-CustomiseItem.computed.Fields.html">Fields</a></li><li><a href="module-WorkshopProperties.computed.Fields.html">Fields</a></li><li><a href="store.html">store</a></li><li><a href="template.html">template</a></li><li><a href="workshop.html">workshop</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkResponseCode">checkResponseCode</a></li><li><a href="global.html#copyFile">copyFile</a></li><li><a href="global.html#createRepository">createRepository</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#findRepositories">findRepositories</a></li><li><a href="global.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="global.html#getLastBuild">getLastBuild</a></li><li><a href="global.html#getRepoIntroFile">getRepoIntroFile</a></li><li><a href="global.html#getTopics">getTopics</a></li><li><a href="global.html#getUserDetails">getUserDetails</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#OK">OK</a></li><li><a href="global.html#onConfirm">onConfirm</a></li><li><a href="global.html#parseYAML">parseYAML</a></li><li><a href="global.html#pullItem">pullItem</a></li><li><a href="global.html#pushFile">pushFile</a></li><li><a href="global.html#redeemCode">redeemCode</a></li><li><a href="global.html#setTopics">setTopics</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Dec 03 2021 18:21:22 GMT+0000 (Greenwich Mean Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

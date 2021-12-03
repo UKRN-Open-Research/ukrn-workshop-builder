@@ -37,7 +37,7 @@ export default {
     computed: {
         /**
          * Rip properties and keys from their respective YAML lists and combine
-         * @return {{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}[]}
+         * @return {Array<{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}>}
          * @constructor
          */
         Fields() {
