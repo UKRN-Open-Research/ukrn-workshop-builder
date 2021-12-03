@@ -99,11 +99,29 @@ export default {
       if(this.$store.getters['github/login'])
         return 1;
       return 0;
+    },
+    lastError: function() {
+      return [
+        this.$store.state.github.errors[this.$store.state.github.errors.length - 1],
+        this.$store.state.template.errors[this.$store.state.template.errors.length - 1],
+        this.$store.state.workshop.errors[this.$store.state.workshop.errors.length - 1]
+      ];
     }
   },
   watch: {
     latestStep: function(value) {
       this.activeStep = value;
+    },
+    lastError: function(n, o) {
+      if(n.length) {
+        const e = n.filter(e => !o.includes(e))[0];
+        console.error(e);
+        this.$buefy.toast.open({
+          message: e,
+          type: "is-danger",
+          duration: 5000
+        });
+      }
     }
   },
   methods: {

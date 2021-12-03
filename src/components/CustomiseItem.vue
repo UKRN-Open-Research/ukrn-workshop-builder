@@ -271,12 +271,12 @@ export default {
                 .catch(e => {
                   console.error(e);
                   self.$buefy.toast.open({
-                    message: `Error updating ${self.item.title}`,
+                    message: `Error updating ${self.item.yaml.title}`,
                     type: 'is-danger'
                   })
                 })
                 .then(() => self.$buefy.toast.open({
-                  message: `Changed ${self.item.title}`,
+                  message: `Changed ${self.item.yaml.title}.<br/>Remember to save changes to GitHub to update the website.`,
                   type: `is-info`
                 }))
       }
@@ -299,7 +299,7 @@ export default {
                   })
                 })
                 .then(() => self.$buefy.toast.open({
-                  message: `Changed ${self.item.path}`,
+                  message: `Changed ${self.item.path}.<br/>Remember to save changes to GitHub to update the website.`,
                   type: `is-info`
                 }))
       }
