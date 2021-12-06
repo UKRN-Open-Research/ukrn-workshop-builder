@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: components/CustomiseItem.vue | UKRN Workshop Builder Tool</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="jsdoc-tweaks.css">
+        
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">UKRN Workshop Builder Tool</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-App.html">App</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:App_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-App.html#stepType">stepType</a></li></ul></div></li><li><a href="module-ArrangeItems.html">ArrangeItems</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:ArrangeItems_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-ArrangeItems.html#change">change</a></li><li><a href="module-ArrangeItems.html#remove">remove</a></li></ul></div></li><li><a href="module-CustomiseItem.html">CustomiseItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseItem_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseItem.html#editContent">editContent</a></li><li><a href="module-CustomiseItem.html#editRawContent">editRawContent</a></li><li><a href="module-CustomiseItem.html#getPagesLink">getPagesLink</a></li><li><a href="module-CustomiseItem.html#getRelativeLink">getRelativeLink</a></li><li><a href="module-CustomiseItem.html#imgAdd">imgAdd</a></li><li><a href="module-CustomiseItem.html#install">install</a></li><li><a href="module-CustomiseItem.html#installMissingDependencies">installMissingDependencies</a></li><li><a href="module-CustomiseItem.html#pad">pad</a></li><li><a href="module-CustomiseItem.html#save">save</a></li></ul></div></li><li><a href="module-CustomiseWorkshop.html">CustomiseWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseWorkshop.html#editConfig">editConfig</a></li><li><a href="module-CustomiseWorkshop.html#pushConfig">pushConfig</a></li><li><a href="module-CustomiseWorkshop.html#refresh">refresh</a></li></ul></div></li><li><a href="module-EpisodeName.html">EpisodeName</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:EpisodeName_sub"></div></li><li><a href="module-GitHubLogin.html">GitHubLogin</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubLogin_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubLogin.html#loginRequest">loginRequest</a></li></ul></div></li><li><a href="module-GitHubMenu.html">GitHubMenu</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubMenu_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubMenu.html#reload">reload</a></li><li><a href="module-GitHubMenu.html#save">save</a></li></ul></div></li><li><a href="module-MakeSchedule.html">MakeSchedule</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:MakeSchedule_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-MakeSchedule.html#addRepositoryEpisodes">addRepositoryEpisodes</a></li><li><a href="module-MakeSchedule.html#clearStash">clearStash</a></li><li><a href="module-MakeSchedule.html#setEpisodeAvailable">setEpisodeAvailable</a></li><li><a href="module-MakeSchedule.html#updateEpisode">updateEpisode</a></li><li><a href="module-MakeSchedule.html#updateItemDay">updateItemDay</a></li></ul></div></li><li><a href="module-RemoteRepositoryView.html">RemoteRepositoryView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:RemoteRepositoryView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-RemoteRepositoryView.html#doLookup">doLookup</a></li></ul></div></li><li><a href="module-SelectWorkshop.html">SelectWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:SelectWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-SelectWorkshop.html#checkUserRepositories">checkUserRepositories</a></li><li><a href="module-SelectWorkshop.html#chooseWorkshop">chooseWorkshop</a></li><li><a href="module-SelectWorkshop.html#createRepository">createRepository</a></li></ul></div></li><li><a href="module-TextEditable.html">TextEditable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:TextEditable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-TextEditable.html#input">input</a></li><li><a href="module-TextEditable.html#keydown">keydown</a></li></ul></div></li><li><a href="module-WorkshopProperties.html">WorkshopProperties</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:WorkshopProperties_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-WorkshopProperties.html#registerSave">registerSave</a></li><li><a href="module-WorkshopProperties.html#save">save</a></li></ul></div></li><li><a href="module-YAMLField.html">YAMLField</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLField_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLField.html#getFileList">getFileList</a></li><li><a href="module-YAMLField.html#save">save</a></li><li><a href="module-YAMLField.html#setSaveStatus">setSaveStatus</a></li><li><a href="module-YAMLField.html#toBackendValue">toBackendValue</a></li><li><a href="module-YAMLField.html#validTime">validTime</a></li></ul></div></li><li><a href="module-YAMLFieldInput.html">YAMLFieldInput</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInput_sub"></div></li><li><a href="module-YAMLFieldInputArray.html">YAMLFieldInputArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInputArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLFieldInputArray.html#updateValue">updateValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="github.html">github</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="github_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="github.html#.Getters">Getters</a></li><li><a href="github.html#.Mutations">Mutations</a></li><li><a href="github.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="github.html#getBuildStatus">getBuildStatus</a></li><li><a href="github.html#getUserDetails">getUserDetails</a></li><li><a href="github.html#logout">logout</a></li><li><a href="github.html#processToken">processToken</a></li><li><a href="github.html#redeemCode">redeemCode</a></li><li><a href="github.html#registerBuildCheck">registerBuildCheck</a></li></ul></div></li><li><a href="GitHubAPI.html">GitHubAPI</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GitHubAPI_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GitHubAPI.html#.checkResponseCode">checkResponseCode</a></li><li><a href="GitHubAPI.html#.copyFile">copyFile</a></li><li><a href="GitHubAPI.html#.createRepository">createRepository</a></li><li><a href="GitHubAPI.html#.deleteFile">deleteFile</a></li><li><a href="GitHubAPI.html#.findRepositories">findRepositories</a></li><li><a href="GitHubAPI.html#.findRepositoryFiles">findRepositoryFiles</a></li><li><a href="GitHubAPI.html#.getLastBuild">getLastBuild</a></li><li><a href="GitHubAPI.html#.getTopics">getTopics</a></li><li><a href="GitHubAPI.html#.getUserDetails">getUserDetails</a></li><li><a href="GitHubAPI.html#.main">main</a></li><li><a href="GitHubAPI.html#.OK">OK</a></li><li><a href="GitHubAPI.html#.pullItem">pullItem</a></li><li><a href="GitHubAPI.html#.pushFile">pushFile</a></li><li><a href="GitHubAPI.html#.redeemCode">redeemCode</a></li><li><a href="GitHubAPI.html#.setTopics">setTopics</a></li></ul></div></li><li><a href="store.html">store</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="store_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="store.html#.Modules">Modules</a></li><li><a href="store.html#.Mutations">Mutations</a></li><li><a href="store.html#.State">State</a></li></ul></div></li><li><a href="template.html">template</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="template_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="template.html#.Mutations">Mutations</a></li><li><a href="template.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="template.html#handler">handler</a></li></ul></div></li><li><a href="workshop.html">workshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="workshop_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="workshop.html#.Getters">Getters</a></li><li><a href="workshop.html#.Mutations">Mutations</a></li><li><a href="workshop.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="workshop.html#addFile">addFile</a></li><li><a href="workshop.html#addRepository">addRepository</a></li><li><a href="workshop.html#createRepository">createRepository</a></li><li><a href="workshop.html#deleteFile">deleteFile</a></li><li><a href="workshop.html#duplicateFile">duplicateFile</a></li><li><a href="workshop.html#.fileInRepository">fileInRepository</a></li><li><a href="workshop.html#.findFileDependencies">findFileDependencies</a></li><li><a href="workshop.html#findRepositories">findRepositories</a></li><li><a href="workshop.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="workshop.html#.getRepoIntroFile">getRepoIntroFile</a></li><li><a href="workshop.html#installDependencies">installDependencies</a></li><li><a href="workshop.html#installFile">installFile</a></li><li><a href="workshop.html#loadRepository">loadRepository</a></li><li><a href="workshop.html#.parseYAML">parseYAML</a></li><li><a href="workshop.html#pullURL">pullURL</a></li><li><a href="workshop.html#pushFile">pushFile</a></li><li><a href="workshop.html#rewriteEpisodeOrders">rewriteEpisodeOrders</a></li><li><a href="workshop.html#saveRepositoryChanges">saveRepositoryChanges</a></li><li><a href="workshop.html#setFileContent">setFileContent</a></li><li><a href="workshop.html#setFileContentFromYAML">setFileContentFromYAML</a></li><li><a href="workshop.html#setTopics">setTopics</a></li><li><a href="workshop.html#uploadImage">uploadImage</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3><a href="global.html">Global</a></h3></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;template>
+  &lt;div class="item-wrapper">
+    &lt;div class="card-header episode" :class="item.yaml &amp;&amp; item.yaml['is-break']? 'has-background-light' : item.remote? 'has-background-info-light' : 'has-background-primary-light'">
+      &lt;span class="time" v-if="start &amp;&amp; end">
+        {{ pad(start[0]) }}:{{ pad(start[1]) }}&lt;br/>{{ pad(end[0]) }}:{{ pad(end[1]) }}
+      &lt;/span>
+      &lt;span class="card-header-title">
+        &lt;span v-if="overrideName">{{ overrideName }}&lt;/span>
+        &lt;EpisodeName v-else :episode="item" :include-repo="item.remote"/>
+      &lt;/span>
+      &lt;div class="action-icons has-background-white-ter" v-if="mainRepo">
+        &lt;b-button v-if="item.remote &amp;&amp; item.yaml.day"
+                  icon-right="plus"
+                  :size="iconSize"
+                  type="is-success"
+                  title="Install remote lesson"
+                  @click="install(item)"
+        />
+        &lt;b-button v-else-if="item.hasChanged() &amp;&amp; (item.yaml.day || addButtons.includes('save'))"
+                  icon-right="content-save"
+                  :size="iconSize"
+                  type="is-success"
+                  title="Save changes to GitHub"
+                  @click="$store.dispatch('workshop/pushFile', {url: item.url})"
+        />
+        &lt;b-button v-if="item.remote || !item.yaml.day &amp;&amp; !removeButtons.includes('properties')"
+                  icon-right="text-search"
+                  :size="iconSize"
+                  type="is-info"
+                  title="View properties"
+                  @click="isViewing = true"
+        />
+        &lt;!-- We use the title yaml field to determine if the yaml is valid -->
+        &lt;b-button v-if="(!item.remote &amp;&amp; item.yaml.day &amp;&amp; item.yaml.title &amp;&amp; !removeButtons.includes('properties')) || addButtons.includes('properties')"
+                  icon-right="playlist-edit"
+                  :size="iconSize"
+                  type="is-info"
+                  title="Edit properties"
+                  @click="isEditing = true"
+        />
+        &lt;b-button v-if="(!item.remote &amp;&amp; item.yaml.day &amp;&amp; item.yaml.title &amp;&amp; !removeButtons.includes('edit')) || addButtons.includes('edit')"
+                  icon-right="file-document-edit-outline"
+                  :size="iconSize"
+                  type="is-info"
+                  title="Edit content"
+                  @click="editContent"
+        />
+        &lt;b-button v-if="(!item.remote &amp;&amp; item.yaml.day &amp;&amp; !item.yaml.title &amp;&amp; !removeButtons.includes('repair')) || addButtons.includes('repair')"
+                  icon-right="wrench"
+                  :size="iconSize"
+                  type="is-info"
+                  title="Repair raw content"
+                  @click="editRawContent"
+        />
+        &lt;b-button v-else-if="noYAML"
+                  icon-right="file-document-edit-outline"
+                  :size="iconSize"
+                  type="is-info"
+                  title="Edit content"
+                  @click="editRawContent"
+        />
+        &lt;b-button v-if="!removeButtons.includes('link')"
+                  tag="a"
+                  :href="overrideLink? getRelativeLink(item, overrideLink) : getPagesLink(item)"
+                  target="_blank"
+                  type="is-dark"
+                  title="Open lesson website in a new tab"
+                  icon-right="link"
+                  :size="iconSize"
+        />
+        &lt;b-button v-if="item.yaml.day &amp;&amp; item.yaml.ukrn_wb_rules &amp;&amp; item.yaml.ukrn_wb_rules.includes('remove-on-stash') &amp;&amp; !removeButtons.includes('drop')"
+                  icon-right="minus"
+                  :size="iconSize"
+                  title="Remove this lesson"
+                  @click="$store.commit('workshop/removeItem', {array: 'files', item})"
+                  type="is-danger"
+        />
+        &lt;b-button v-else-if="item.yaml.day &amp;&amp; !removeButtons.includes('drop')"
+                  icon-right="arrow-right"
+                  :size="iconSize"
+                  title="Move to stash"
+                  @click="$emit('remove', item)"
+                  type="is-warning"
+        />
+        &lt;b-button v-else-if="!item.yaml.day &amp;&amp; item.remote &amp;&amp; !removeButtons.includes('drop')"
+                  icon-right="minus"
+                  :size="iconSize"
+                  title="Remove this lesson"
+                  @click="$store.commit('workshop/removeItem', {array: 'files', item})"
+                  type="is-danger"
+        />
+        &lt;b-button v-else-if="!item.yaml.day &amp;&amp; !item.remote &amp;&amp; !(item.yaml.ukrn_wb_rules &amp;&amp; item.yaml.ukrn_wb_rules.includes('undeletable')) &amp;&amp; !removeButtons.includes('drop')"
+                  icon-right="minus"
+                  :size="iconSize"
+                  title="Delete"
+                  @click="$store.dispatch('workshop/deleteFile', {url: item.url})"
+                  type="is-danger"
+        />
+      &lt;/div>
+
+      &lt;b-modal v-model="isEditing" class="yaml-modal" full-screen v-if="mainRepo">
+        &lt;b-button v-if="item.yaml.missingDependencies &amp;&amp; item.yaml.missingDependencies.length"
+                  label="Install missing dependencies"
+                  type="is-warning"
+                  @click="installMissingDependencies(item)"
+                  icon-left="hammer-screwdriver"
+        />
+        &lt;YAMLField
+                v-for="field in Fields"
+                :key="`${item.url}-${field.key}`"
+                :field="field"
+                @save="save"
+        />
+      &lt;/b-modal>
+
+      &lt;b-modal v-model="isViewing" class="yaml-modal yaml-read-only" full-screen v-if="mainRepo">
+        &lt;div class="yaml-item-wrapper">
+          &lt;header>Viewing &lt;EpisodeName :episode="item"/>&lt;/header>
+          &lt;div class="columns">
+            &lt;div class="column yaml-panel">
+              &lt;div v-for="f in Fields.filter(x => x.value !== undefined)"
+                   :key="f.key"
+                   class="yaml-read-only"
+              >
+                &lt;header class="title">{{ f.name }}&lt;/header>
+                &lt;ul v-if="f.is_array &amp;&amp; item.yaml[f.key] !== null">
+                  &lt;li v-for="i in item.yaml[f.key].length" :key="i">
+                    {{ item.yaml[f.key][i - 1] }}
+                  &lt;/li>
+                &lt;/ul>
+                &lt;p v-else-if="!f.is_array">{{ item.yaml[f.key] }}&lt;/p>
+              &lt;/div>
+            &lt;/div>
+            &lt;div class="column">
+              &lt;header class="title">Content&lt;/header>
+              &lt;mavon-editor class="card-content"
+                            :value="item.body"
+                            language="en"
+                            defaultOpen="preview"
+                            :subfield="false"
+                            :toolbars="{}"
+                            :editable="false"
+              />
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      &lt;/b-modal>
+
+      &lt;b-modal v-model="isEditingContent"
+               scroll="keep"
+               @close="content = currentContent"
+               full-screen
+               v-if="mainRepo"
+      >
+        &lt;div class="card" v-if="currentContent !== null">
+          &lt;header class="card-header-title">Edit content (saved automatically)&lt;/header>
+          &lt;mavon-editor class="card-content"
+                        v-model="currentContent"
+                        language="en"
+                        defaultOpen="edit"
+                        :toolbars="toolbars"
+                        @imgAdd="imgAdd"
+                        @save="content = currentContent"
+                        ref="editor"
+          />
+        &lt;/div>
+        &lt;div v-else>
+          &lt;b-message type="is-warning">Unable to load lesson content.&lt;/b-message>
+        &lt;/div>
+      &lt;/b-modal>
+
+      &lt;b-modal v-model="isEditingRawContent"
+               scroll="keep"
+               @close="rawContent = currentRawContent"
+               full-screen
+               v-if="mainRepo"
+      >
+        &lt;div class="card" v-if="currentRawContent !== null">
+          &lt;header class="card-header-title">Edit content (saved automatically)&lt;/header>
+          &lt;b-message v-if="/\.html/.test(item.path)" class="is-warning">
+            This file is written in HTML. Please make sure to edit it carefully so that it remains valid. If you do not know how to do this, get help with editing it.
+          &lt;/b-message>
+          &lt;mavon-editor class="card-content"
+                        v-model="currentRawContent"
+                        language="en"
+                        defaultOpen="edit"
+                        :tabSize="2"
+                        :toolbars="{...toolbars, imagelink: false}"
+                        @save="rawContent = currentRawContent"
+          />
+        &lt;/div>
+        &lt;div v-else>
+          &lt;b-message type="is-warning">Unable to load lesson content.&lt;/b-message>
+        &lt;/div>
+      &lt;/b-modal>
+    &lt;/div>
+    &lt;b-loading :active="item.busyFlag()" :is-full-page="false"/>
+  &lt;/div>
+&lt;/template>
+
+&lt;script>
+import YAMLField from "./YAMLField";
+import EpisodeName from "./EpisodeName";
+
+/**
+ * @typedef Field
+ * @description A Field describes a YAML field's properties.
+ * @property name {string} Name of the field
+ * @property type {string} Basic data type of the field.
+ * @property is_required {boolean} Whether the field is required.
+ * @property is_array {boolean} Whether the field has an array of values.
+ * @property format {string} Special formatting rules to use for the field.
+ * @property special {string|Array&lt;string>} Special tags governing how the field is rendered in the Workshop Builder Tool
+ * @property value {any|Array&lt;any>} Value for the field.
+ * @property key {string} Key used to retrieve the field in the template metadata.
+ */
+
+/**
+ * @description The CustomiseItem component performs the majority of the work involved in editing individual GitHub markdown files. An item in this component makes available various detailed views depending upon what is relevant for that item.
+ *
+ * Items that are already part of the main repository and are well-specified allow editing of YAML headers (if applicable) using a form and body content using a markdown editor. Files that are not well-specified allow editing of the raw file content. Items that have been modified in this way make available an option to push the changes to GitHub.
+ *
+ * Items from other repositories are made available to install into the main repository. They also offer the opportunity to view the YAML headers and body content side-by-side.
+ *
+ * Items assigned to a day in the scheduler allow removing the item back to the stash, and stashed items allow removing the item from the stash entirely. Stashed items that belong to the main repository can be deleted (rather than simply dropped).
+ *
+ * All items include a link to where their content can be viewed in the rendered website.
+ *
+ * @vue-prop item {File} The markdown file object being customised.
+ * @vue-prop [overrideName] {String} A name to use instead of the item's YAML name field.
+ * @vue-prop [overrideLink] {String} A link to use instead of the item's episode-adjusted path.
+ * @vue-prop [noYAML=false] {Boolean} Whether the item is missing YAML information.
+ * @vue-prop [addButtons=[]] {Array&lt;String>} Names of buttons to add to the item, overriding the default presence/absence determination for those buttons.
+ * @vue-prop [removeButtons=[]] {Array&lt;String>} Names of buttons not to add to the item, overriding the default presence/absence determination for those buttons.
+ * @vue-prop [start] {Array&lt;Number>} The start time of the item, as an array of [minutes, hours], each of which is a number.
+ * @vue-prop [end] {Array&lt;Number>} The end time of the item, as an array of [minutes, hours], each of which is a number.
+ *
+ * @vue-data isViewing=false {Boolean} Whether the user is viewing the details of the item. Updates store.editingItem via watcher.
+ * @vue-data isEditing=false {Boolean} Whether the user is editing the details of the item. Updates store.editingItem via watcher.
+ * @vue-data isEditingContent=false {Boolean} Whether the user is editing the content of the item. Updates store.editingItem via watcher.
+ * @vue-data isEditingRawContent=false {Boolean} Whether the user is editing the raw content of the item. Updates store.editingItem via watcher.
+ * @vue-data currentContent="" {String} The current content of the item.
+ * @vue-data currentRawContent="" {String} The current raw content of the item.
+ * @vue-data iconSize='is-small' {String} Buefy size class for the icons.
+ * @vue-data toolbars=Object {Object} {@link https://github.com/hinesboy/mavonEditor#toolbars|mavon-editor toolbar} specification.
+ *
+ * @vue-computed mainRepo {Repository|null} The main repository being edited.
+ * @vue-computed template {String} The template of the main repository.
+ * @vue-computed content {String} The content of the item as held in the store.
+ * @vue-computed rawContent {String} The raw content of the item as held in the store.
+ * @vue-computed Fields {Array&lt;Field>} The YAML fields in the item's content.
+ *
+ * @vue-event refresh Emit a request to refresh the item's content from the store.
+ *
+ * @requires mavon-editor
+ */
+export default {
+  name: 'CustomiseItem',
+  components: {YAMLField, EpisodeName},
+  props: {
+    item: {type: Object, required: true}, // list of episodes selected
+    overrideName: {type: String, required: false},
+    overrideLink: {type: String, required: false},
+    noYAML: {type: Boolean, required: false, default: false},
+    addButtons: {type: Array, required: false, default: ()=>[]},
+    removeButtons: {type: Array, required: false, default: ()=>[]},
+    start: {type: Array, required: false},
+    end: {type: Array, required: false}
+  },
+  data: function() {
+    return {
+      isViewing: false,
+      isEditing: false,
+      isEditingContent: false,
+      isEditingRawContent: false,
+      currentContent: "",
+      currentRawContent: "",
+      iconSize: 'is-small',
+      toolbars: {
+        bold: true, italic: true, header: true, underline: true,
+        strikethrough: true, mark: true, superscript: true, subscript: true,
+        quote: true, ol: true, ul: true, link: true, imagelink: true, code: true,
+        table: true, fullscreen: true, readmodel: true, htmlcode: false, help: true,
+        /* 1.3.5 */
+        undo: true, redo: true, trash: false, save: true,
+        /* 1.4.2 */
+        navigation: true,
+        /* 2.1.8 */
+        alignleft: true, aligncenter: true, alignright: true,
+        /* 2.2.1 */
+        subfield: true, preview: true
+      }
+    }
+  },
+  computed: {
+    /**
+     * Find the main repository.
+     * @return {Repository}
+     */
+    mainRepo() {
+      let repo;
+      try {
+        repo = this.$store.getters['workshop/Repository']();
+      }
+      catch(e) {throw new Error(`Error retrieving Repository from store: ${e}`)}
+        if(typeof repo !== "object" || repo === null)
+          throw('No Repository found.');
+      return repo;
+    },
+    /**
+     * Find the template attached to the main repository.
+     * @return {File}
+     */
+    template() {
+      return this.mainRepo.episode_template
+    },
+    content: {
+      get() {return this.item.body},
+      set(v) {
+        const self = this;
+        return this.$store.dispatch('workshop/setFileContentFromYAML', {
+          url: this.item.url, yaml: this.item.yaml, body: v
+        })
+                .catch(e => {
+                  console.error(e);
+                  self.$buefy.toast.open({
+                    message: `Error updating ${self.item.yaml.title}`,
+                    type: 'is-danger'
+                  })
+                })
+                .then(() => self.$buefy.toast.open({
+                  message: `Changed ${self.item.yaml.title}.&lt;br/>Remember to save changes to GitHub to update the website.`,
+                  type: `is-info`
+                }))
+      }
+    },
+    rawContent: {
+      get() {
+        return this.item.content
+      },
+      set(v) {
+        const self = this;
+        return this.$store.dispatch('workshop/setFileContent', {
+          url: this.item.url,
+          content: v
+        })
+                .catch(e => {
+                  console.error(e);
+                  self.$buefy.toast.open({
+                    message: `Error updating ${self.item.path}`,
+                    type: 'is-danger'
+                  })
+                })
+                .then(() => self.$buefy.toast.open({
+                  message: `Changed ${self.item.path}.&lt;br/>Remember to save changes to GitHub to update the website.`,
+                  type: `is-info`
+                }))
+      }
+    },
+    Fields() {
+      // Find the keys
+      let keyList = [];
+      try {
+        keyList = this.template.yaml['ukrn_wb']
+                .filter(f => f.fields_structure)[0].fields_structure;
+      } catch (e) {throw new Error(`Could not load key list from template.`)}
+      // Process each of the fields from the template
+      const templateFields = this.template.yaml['ukrn_wb']
+                  .filter(f => f.fields)[0].fields;
+      const fields = templateFields.map(o => Object.keys(o)[0])
+              .filter(f => !/^ukrn_wb$/.test(f));
+      const out = [];
+      templateFields.forEach((o, n) => {
+        if(!Object.keys(o).includes(fields[n]))
+          return console.warn(`Skipping unmatched property ${n} ${fields[n]}`);
+        const props = {};
+        fields.forEach((f, i) => props[keyList[i]] = o[fields[n]][i]);
+        out.push({
+          ...props, value: this.item.yaml[fields[n]], key: fields[n]
+        })
+      });
+      // Add the actual value
+      return out;
+    }
+  },
+  methods: {
+    /**
+     * Start editing the item's content.
+     */
+    editContent() {
+      this.currentContent = this.content;
+      this.isEditingContent = true;
+    },
+    /**
+     * Start editing the item's raw content.
+     */
+    editRawContent() {
+      this.currentRawContent = this.rawContent;
+      this.isEditingRawContent = true;
+    },
+    /**
+     * Save the current version of an item.
+     * @returns {Promise&lt;void>}
+     */
+    save({key, value}) {
+      const newYAML = {...this.item.yaml};
+      newYAML[key] = value;
+      return this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.item.url, yaml: newYAML, body: this.item.body})
+              .then(() => this.$emit('refresh'))
+    },
+    /**
+     * Install a remote item into the current main repository. Issues a Buefy toast on completion.
+     * @returns {Promise&lt;BNoticeComponent>}
+     */
+    install(episode) {
+      console.log(`Install ${episode.path}`)
+      const self = this;
+      return this.$store.dispatch('workshop/installFile', {url: episode.url})
+              .then(F => self.$buefy.toast.open({
+                message: F? `Lesson installed as ${F.path}.` : `Error installing ${episode.path}`,
+                type: F? `is-success` : `is-danger`
+              }))
+    },
+    /**
+     * Iterate through the dependencies for an item and attempt to install the missing ones from the original non-main repository.
+     * Issues a Buefy toast on completion.
+     * @return {Promise&lt;BNoticeComponent>}
+     */
+    installMissingDependencies(episode) {
+      const me = this;
+      const currentMissing = [...episode.yaml.missingDependencies];
+      return this.$store.dispatch('workshop/installDependencies', {url: episode.url})
+        .then(F => {
+          const successes = currentMissing.length - F.yaml.missingDependencies.length;
+          const failures = F.yaml.missingDependencies.length;
+          if(successes &amp;&amp; failures)
+            me.$buefy.toast.open({
+              message: `${successes} missing dependenc${successes > 1? 'ies' : 'y'} fixed; ${failures} remaining. You can try fixing again to repair the rest.`,
+              type: 'is-warning'
+            })
+          else if(failures)
+            me.$buefy.toast.open({
+              message: 'No missing dependencies. Fixed. If this persists, seek help from the instructors.',
+              type: 'is-danger'
+            })
+          else
+            me.$buefy.toast.open({
+              message: `${successes} missing dependenc${successes > 1? 'ies' : 'y'} fixed.`,
+              type: 'is-success'
+            })
+        })
+    },
+    /**
+     * Convert an item's link into a link to the item's page when rendered with GitHub pages.
+     * @param item {File} The item whose link is required.
+     * @return {String}
+     */
+    getPagesLink(item) {
+      const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);
+      const name = /\/([^/]+)$/.exec(item.path);
+      const webDir = name[1].replace(/\.[^.]*$/, "");
+      return `https://${match[1]}.github.io/${match[2]}/${webDir}/`;
+    },
+    /**
+     * Generate a link from the item's GitHub Pages instance to a specified extension.
+     * @param item {File} The item whose link is required.
+     * @param link {String} Extra pathing to append to the end of the generated pages link.
+     * @return {String}
+     */
+    getRelativeLink(item, link) {
+      const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);
+      return `https://${match[1]}.github.io/${match[2]}${link}`;
+    },
+    /**
+     * Upload an image in the maven-editor and store it for including in a markdown file.
+     * @param pos {Number} The index of the image.
+     * @param img {Object} The image to store.
+     */
+    imgAdd(pos, img) {
+      console.log({pos, img})
+      this.$buefy.dialog.prompt({
+        message: `${img.size > 75000? '&lt;p class="has-background-warning-light has-text-warning-dark size-note">Note: &lt;strong>image files over 75kb in size may need to be uploaded to GitHub manually.&lt;/strong>&lt;/p>&lt;br/>' : ''}Upload image as /fig/`,
+        inputAttrs: {
+          type: 'text',
+          placeholder: 'filename.png',
+          value: img.name
+        },
+        confirmText: 'Confirm upload',
+        trapFocus: true,
+        closeOnConfirm: false,
+        /**
+         * Try to upload the selected image.
+         * @memberOf imgAdd
+         * @param value {string} Dialogue user input.
+         * @param close {function} Callback to close the dialogue.
+         */
+        onConfirm: (value, {close}) => {
+          const path = `/fig/${value.replaceAll('../', '/')}`;
+          this.$buefy.toast.open({
+            message: `Uploading as /fig/${value}...`,
+            type: 'is-success is-light'
+          });
+          this.$store.dispatch('workshop/uploadImage', {path, file: img})
+                  .then(r => {
+                    if(r) {
+                      this.$buefy.toast.open({
+                        message: r === true? `Upload successful` : `Upload replaced existing file`,
+                        type: r === true? 'is-success' : 'is-warning'
+                      });
+                      close();
+                      this.$refs.editor.$img2Url(pos, `..${path}`);
+                    } else {
+                      this.$buefy.toast.open({
+                        message: `Failed to upload as /fig/${value}`,
+                        type: 'is-danger',
+                        duration: 10000
+                      });
+                    }
+                  });
+        },
+        /**
+         * @memberOf imgAdd
+         * Remove a temporary image from memory.
+         */
+        onCancel: () => {this.$refs.editor.$refs.toolbar_left.$imgDelByFilename(img.name)}
+      });
+    },
+    /**
+     * Pad a number to two digits with leading zero.
+     * @param x {Number}
+     * @return {string}
+     */
+    pad(x) {
+      if(x &lt; 10)
+        return `0${Math.floor(x).toString()}`;
+      return Math.floor(x).toString();
+    }
+  },
+  watch: {
+    isViewing(newVal) {this.$store.commit('setEditItem', newVal)},
+    isEditing(newVal) {this.$store.commit('setEditItem', newVal)},
+    isEditingContent(newVal) {this.$store.commit('setEditItem', newVal)},
+    isEditingRawContent(newVal) {this.$store.commit('setEditItem', newVal)},
+  }
+}
+&lt;/script>
+
+&lt;!-- Add "scoped" attribute to limit CSS to this component only -->
+&lt;style lang="scss" scoped>
+  .time {
+    margin-left: .5rem;
+    font-size: .8em;
+    font-family: monospace;
+  }
+  .card-header-title {text-align: left;}
+
+  .episode {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: .25em 0;
+    width: 100%;
+  }
+  .action-icons {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    align-self: start;
+    justify-self: right;
+    margin-right: .1em;
+    margin-top: .1em;
+    padding: .25em;
+    height: min-content;
+    border-radius: .1em;
+    button {
+      margin: auto .25em;
+      border-radius: 0;
+    }
+  }
+
+  .yaml-panel {
+    display: grid;
+    grid-auto-flow: row;
+    grid-row-gap: 1em;
+    height: min-content;
+  }
+  .yaml-item-wrapper {
+    padding: 1em;
+    display: grid;
+    min-width: 45%;
+  }
+  .yaml-read-only {
+    header {
+      font-size: 1em;
+      margin-bottom: .25em;
+    }
+    p, ul {margin: 0}
+    ul {text-align: left}
+  }
+
+&lt;/style>
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">Documentation generated by JSDOC. Template by TOAST UI.</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>

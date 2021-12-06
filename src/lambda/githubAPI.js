@@ -5,10 +5,24 @@ const Cryptr = require('cryptr');
 const cryptr = new Cryptr(GH_TOKEN_ENCRYPTION_KEY);
 
 /**
- * Process requests from a client
- * @param event {object} request details
- * @param context {object} environment details
- * @param callback {function(error: string|null, response: HTTPResponse) => void} function to send the response to the client
+ * @class GitHubAPI
+ * @description The GitHubAPI backend is a lambda function invoked via Netlify's functions system. It receives HTTP requests and conducts GitHub API calls based on the instructions in the request header and data provided in the body.
+ */
+
+/**
+ * Callback to return the results of the API interaction to the client. Returns a status of 500 if error is set, otherwise returns the status given in response.
+ * @callback returnResponse
+ * @param error {Error} An error encountered while using the API.
+ * @param response {{statusText: string, body: string, statusCode: number}} HTTPResponse-like object returned to the client.
+ * @return {void}
+ */
+
+/**
+ * Process requests from a client.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @param context {object} environment details.
+ * @param callback {returnResponse} function to send the response to the client.
  */
 async function main(event, context, callback) {
     try {
@@ -49,8 +63,9 @@ async function main(event, context, callback) {
 }
 
 /**
- * Send an OK response
- * @param obj {object} Body content to be JSON.stringified()
+ * Send an OK response.
+ * @memberOf GitHubAPI
+ * @param obj {object} Body content to be JSON.stringified().
  * @return {{statusText: string, body: string, statusCode: number}}
  */
 function OK(obj) {
@@ -62,10 +77,11 @@ function OK(obj) {
 
 
 /**
- *
- * @param response {object} GitHub API response
- * @param code {number|number[]} status code to check for
- * @param method {string} request method
+ * Check a response code matches one of the expected codes.
+ * @memberOf GitHubAPI
+ * @param response {object} GitHub API response.
+ * @param code {number|number[]} status code to check for.
+ * @param method {string} request method.
  * @return {Promise<object>}
  */
 async function checkResponseCode(response, code, method = 'GET') {
@@ -81,9 +97,10 @@ async function checkResponseCode(response, code, method = 'GET') {
 }
 
 /**
- * Send a code to GitHub and request a token in exchange
- * @param event {object} request details
- * @return {statusText: string, body: string, statusCode: number}
+ * Send a code to GitHub and request a token in exchange.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
  */
 async function redeemCode(event) {
     console.log(`Exchanging code ${event.headers['github-code']} for token`)
@@ -103,9 +120,10 @@ async function redeemCode(event) {
 }
 
 /**
- * Get the GitHub user details
- * @param event {object} request details
- * @return {statusText: string, body: string, statusCode: number}
+ * Get the GitHub user details.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
  */
 async function getUserDetails(event) {
     const d = JSON.parse(event.body);
@@ -119,9 +137,10 @@ async function getUserDetails(event) {
 }
 
 /**
- * Look up the repositories
+ * Look up the repositories.
+ * @memberOf GitHubAPI
  * @param event
- * @return {statusText: string, body: string, statusCode: number}
+ * @return {{statusText: string, body: string, statusCode: number}}
  */
 async function findRepositories(event) {
     const d = JSON.parse(event.body);
@@ -145,9 +164,10 @@ async function findRepositories(event) {
 }
 
 /**
- * Find all the files in a given repository
+ * Find all the files in a given repository.
+ * @memberOf GitHubAPI
  * @param event
- * @return {statusText: string, body: string, statusCode: number}
+ * @return {{statusText: string, body: string, statusCode: number}}
  */
 async function findRepositoryFiles(event) {
     const d = JSON.parse(event.body);
@@ -181,22 +201,23 @@ async function findRepositoryFiles(event) {
             return fList.filter(f => f !== null);
         });
     const response = await Promise.all(fileList.map(f => fetch(f, {
-                    method: "GET",
-                    headers: {
-                        "accept": "application/vnd.github.v3+json",
-                        "authorization": `token ${cryptr.decrypt(d.token)}`
-                    }
-                })
-                    .then(r => r.status === 404? null : checkResponseCode(r, 200, 'GET'))
-            ));
+            method: "GET",
+            headers: {
+                "accept": "application/vnd.github.v3+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            }
+        })
+            .then(r => r.status === 404? null : checkResponseCode(r, 200, 'GET'))
+    ));
     return OK(response.filter(r => r !== null));
 }
 
 /**
-* Create a repository on GitHub for the currently authorised user
-* @param event {object} request details
-* @return {statusText: string, body: string, statusCode: number}
-*/
+ * Create a repository on GitHub for the currently authorised user.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
 async function createRepository(event) {
     const d = JSON.parse(event.body);
     const newRepo = await fetch(`https://api.github.com/repos/${d.template}/generate`, {
@@ -212,27 +233,28 @@ async function createRepository(event) {
     })
         .then(r => checkResponseCode(r, 201, 'POST'));
     await fetch(`${newRepo.url}/topics`, {
-            method: "PUT",
-            headers: {
-                "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${cryptr.decrypt(d.token)}`
-            },
-            body: JSON.stringify({
-                names: ['ukrn-open-research', 'ukrn-workshop']
-            })
+        method: "PUT",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        },
+        body: JSON.stringify({
+            names: ['ukrn-open-research', 'ukrn-workshop']
         })
+    })
         .then(r => checkResponseCode(r, 200, 'PUT'));
     // Fetch a fresh copy with the updated topics
     return pullItem({body: JSON.stringify({
             url: newRepo.url, token: d.token
-    })});
+        })});
 }
 
 /**
-* Replace a file with a new version via github commit
-* @param event {object} request details
-* @return {statusText: string, body: string, statusCode: number}
-*/
+ * Replace a file with a new version via github commit.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
 async function pushFile(event) {
     const d = JSON.parse(event.body);
     const upload = await fetch(d.url, {
@@ -250,20 +272,20 @@ async function pushFile(event) {
         .then(r => checkResponseCode(r, [200, 201], 'PUT'));
     // retrieve updated version
     const file = await fetch(upload.content.url, {
-            method: "GET", headers: {
-                "accept": "application/vnd.github.mercy-preview+json",
-                "authorization": `token ${cryptr.decrypt(d.token)}`
-            }
-        })
+        method: "GET", headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
         .then(r => checkResponseCode(r, 200, 'GET'));
     return OK(file);
 }
 
 /**
- * Pull an item from GitHub by its URL
+ * Pull an item from GitHub by its URL.
+ * @memberOf GitHubAPI
  * @param event
- * @param context
- * @return {statusText: string, body: string, statusCode: number}
+ * @return {{statusText: string, body: string, statusCode: number}}
  */
 async function pullItem(event) {
     const d = JSON.parse(event.body);
@@ -279,10 +301,11 @@ async function pullItem(event) {
 }
 
 /**
-* Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily
-* @param event {object} request details
-* @return {statusText: string, body: string, statusCode: number}
-*/
+ * Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
 async function setTopics(event) {
     const d = JSON.parse(event.body);
     // Find current topics
@@ -310,8 +333,9 @@ async function setTopics(event) {
 }
 
 /**
- * Get the topics associated with a repository
- * @param event {{body: string, ...:*}}
+ * Get the topics associated with a repository.
+ * @memberOf GitHubAPI
+ * @param event {{body: string, ...*:any}}
  * @return {Promise<Object>}
  */
 async function getTopics(event) {
@@ -328,8 +352,9 @@ async function getTopics(event) {
 }
 
 /**
- * Copy a file from one repository to another, and return the copy
- * @param event {{body: string, ...:*}}
+ * Copy a file from one repository to another, and return the copy.
+ * @memberOf GitHubAPI
+ * @param event {{body: string, ...*:any}}
  * @return {Promise<Object>}
  */
 async function copyFile(event) {
@@ -366,9 +391,10 @@ async function copyFile(event) {
 }
 
 /**
- * Delete a file via github commit
- * @param event {object} request details
- * @return {statusText: string, body: string, statusCode: number}
+ * Delete a file via github commit.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
  */
 async function deleteFile(event) {
     const d = JSON.parse(event.body);
@@ -398,8 +424,9 @@ async function deleteFile(event) {
 }
 
 /**
- *
- * @param event {object} Should have body JSON string with repository URL and GitHub access token
+ * Retrieve the build status report for the last GitHub Pages build attempt.
+ * @memberOf GitHubAPI
+ * @param event {object} Should have body JSON string with repository URL and GitHub access token.
  * @return {Promise<{statusText: string, body: string, statusCode: number}>}
  */
 async function getLastBuild(event) {

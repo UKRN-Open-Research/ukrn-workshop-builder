@@ -59,7 +59,21 @@
 </template>
 
 <script>
-export default {
+    /**
+     * @description The YAMLFieldInput component presents the appropriate input type for any YAML field whose value is not an array. For YAML fields with array values, see {@link YAMLFieldInputArray}.
+     *
+     * @vue-prop field {Field} Field to display.
+     * @vue-prop value {any} Current value of the field.
+     * @vue-prop [data] {Array} Options for special-case fields.
+     *
+     * @vue-data countries {Array<String>} List of country codes retrieved from country-codes.json library file.
+     * @vue-data languages {Array<String>} List of language codes retrieved from language-codes.json library file.
+     *
+     * @vue-computed currentValue {any} The current field value. Emits input event on change.
+     *
+     * @vue-event input {any} Signal that the value of the field has been changed.
+     */
+    export default {
     name: "YAMLFieldInput",
     props: {
         field: {type: Object, required: true},

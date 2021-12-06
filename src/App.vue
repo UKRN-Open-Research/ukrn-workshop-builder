@@ -52,6 +52,19 @@ import GitHubMenu from "@/components/GitHubMenu";
 import Vue
   from "vue";
 
+/**
+ * @description The UKRN Workshop Builder is an interface for GitHub that enables users to clone and customise GitHub Pages websites based on The Carpentries' workshop template. Users require a GitHub account. Once they have logged in an authorised the app to make changes on their behalf, they can create a new workshop website using the tool (creating a new GitHub repository), find content created by other users of the tool, and customise content.
+ *
+ * @vue-data templateRepository="UKRN-Open-Research/workshop-template" {String} Owner/Repo string for the main template repository.
+ * @vue-data activeStep=0 {Number} Progression stage through the workshop creation and customisation process. Used to navigate between the Buefy step children.
+ * @vue-data preambleRead=false {Boolean} Whether the user has read the initial preamble and attempted to log into GitHub.
+ * @vue-data workshopTemplate=null {null} Currently unused.
+ *
+ * @vue-computed configReady {Boolean} Whether the configuration file (_config.yml) of the user's main repository is complete and well formatted.
+ * @vue-computed latestStep {Number} The most advanced step the user should be able to access in the create-and-customise process.
+ * @vue-computed lastError {Array<Error>} The most recent error from any of the store components.
+ *
+ */
 export default {
   name: 'App',
   components: {
@@ -99,14 +112,37 @@ export default {
       if(this.$store.getters['github/login'])
         return 1;
       return 0;
+    },
+    lastError: function() {
+      return [
+        this.$store.state.github.errors[this.$store.state.github.errors.length - 1],
+        this.$store.state.template.errors[this.$store.state.template.errors.length - 1],
+        this.$store.state.workshop.errors[this.$store.state.workshop.errors.length - 1]
+      ];
     }
   },
   watch: {
     latestStep: function(value) {
       this.activeStep = value;
+    },
+    lastError: function(n, o) {
+      if(n.length) {
+        const e = n.filter(e => !o.includes(e))[0];
+        console.error(e);
+        this.$buefy.toast.open({
+          message: e,
+          type: "is-danger",
+          duration: 5000
+        });
+      }
     }
   },
   methods: {
+    /**
+     * Calculate the appropriate Buefy style string for a step.
+     * @param myStepNum {Number} Number of the step.
+     * @return {string} 'is-success' if the step is complete, otherwise ''
+     */
     stepType: function(myStepNum) {
       const n = myStepNum - 1;
       if(this.latestStep > n)

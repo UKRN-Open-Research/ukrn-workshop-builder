@@ -1,0 +1,495 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: components/MakeSchedule.vue | UKRN Workshop Builder Tool</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="jsdoc-tweaks.css">
+        
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">UKRN Workshop Builder Tool</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-App.html">App</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:App_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-App.html#stepType">stepType</a></li></ul></div></li><li><a href="module-ArrangeItems.html">ArrangeItems</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:ArrangeItems_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-ArrangeItems.html#change">change</a></li><li><a href="module-ArrangeItems.html#remove">remove</a></li></ul></div></li><li><a href="module-CustomiseItem.html">CustomiseItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseItem_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseItem.html#editContent">editContent</a></li><li><a href="module-CustomiseItem.html#editRawContent">editRawContent</a></li><li><a href="module-CustomiseItem.html#getPagesLink">getPagesLink</a></li><li><a href="module-CustomiseItem.html#getRelativeLink">getRelativeLink</a></li><li><a href="module-CustomiseItem.html#imgAdd">imgAdd</a></li><li><a href="module-CustomiseItem.html#install">install</a></li><li><a href="module-CustomiseItem.html#installMissingDependencies">installMissingDependencies</a></li><li><a href="module-CustomiseItem.html#pad">pad</a></li><li><a href="module-CustomiseItem.html#save">save</a></li></ul></div></li><li><a href="module-CustomiseWorkshop.html">CustomiseWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseWorkshop.html#editConfig">editConfig</a></li><li><a href="module-CustomiseWorkshop.html#pushConfig">pushConfig</a></li><li><a href="module-CustomiseWorkshop.html#refresh">refresh</a></li></ul></div></li><li><a href="module-EpisodeName.html">EpisodeName</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:EpisodeName_sub"></div></li><li><a href="module-GitHubLogin.html">GitHubLogin</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubLogin_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubLogin.html#loginRequest">loginRequest</a></li></ul></div></li><li><a href="module-GitHubMenu.html">GitHubMenu</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubMenu_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubMenu.html#reload">reload</a></li><li><a href="module-GitHubMenu.html#save">save</a></li></ul></div></li><li><a href="module-MakeSchedule.html">MakeSchedule</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:MakeSchedule_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-MakeSchedule.html#addRepositoryEpisodes">addRepositoryEpisodes</a></li><li><a href="module-MakeSchedule.html#clearStash">clearStash</a></li><li><a href="module-MakeSchedule.html#setEpisodeAvailable">setEpisodeAvailable</a></li><li><a href="module-MakeSchedule.html#updateEpisode">updateEpisode</a></li><li><a href="module-MakeSchedule.html#updateItemDay">updateItemDay</a></li></ul></div></li><li><a href="module-RemoteRepositoryView.html">RemoteRepositoryView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:RemoteRepositoryView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-RemoteRepositoryView.html#doLookup">doLookup</a></li></ul></div></li><li><a href="module-SelectWorkshop.html">SelectWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:SelectWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-SelectWorkshop.html#checkUserRepositories">checkUserRepositories</a></li><li><a href="module-SelectWorkshop.html#chooseWorkshop">chooseWorkshop</a></li><li><a href="module-SelectWorkshop.html#createRepository">createRepository</a></li></ul></div></li><li><a href="module-TextEditable.html">TextEditable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:TextEditable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-TextEditable.html#input">input</a></li><li><a href="module-TextEditable.html#keydown">keydown</a></li></ul></div></li><li><a href="module-WorkshopProperties.html">WorkshopProperties</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:WorkshopProperties_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-WorkshopProperties.html#registerSave">registerSave</a></li><li><a href="module-WorkshopProperties.html#save">save</a></li></ul></div></li><li><a href="module-YAMLField.html">YAMLField</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLField_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLField.html#getFileList">getFileList</a></li><li><a href="module-YAMLField.html#save">save</a></li><li><a href="module-YAMLField.html#setSaveStatus">setSaveStatus</a></li><li><a href="module-YAMLField.html#toBackendValue">toBackendValue</a></li><li><a href="module-YAMLField.html#validTime">validTime</a></li></ul></div></li><li><a href="module-YAMLFieldInput.html">YAMLFieldInput</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInput_sub"></div></li><li><a href="module-YAMLFieldInputArray.html">YAMLFieldInputArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInputArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLFieldInputArray.html#updateValue">updateValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="github.html">github</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="github_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="github.html#.Getters">Getters</a></li><li><a href="github.html#.Mutations">Mutations</a></li><li><a href="github.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="github.html#getBuildStatus">getBuildStatus</a></li><li><a href="github.html#getUserDetails">getUserDetails</a></li><li><a href="github.html#logout">logout</a></li><li><a href="github.html#processToken">processToken</a></li><li><a href="github.html#redeemCode">redeemCode</a></li><li><a href="github.html#registerBuildCheck">registerBuildCheck</a></li></ul></div></li><li><a href="GitHubAPI.html">GitHubAPI</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GitHubAPI_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GitHubAPI.html#.checkResponseCode">checkResponseCode</a></li><li><a href="GitHubAPI.html#.copyFile">copyFile</a></li><li><a href="GitHubAPI.html#.createRepository">createRepository</a></li><li><a href="GitHubAPI.html#.deleteFile">deleteFile</a></li><li><a href="GitHubAPI.html#.findRepositories">findRepositories</a></li><li><a href="GitHubAPI.html#.findRepositoryFiles">findRepositoryFiles</a></li><li><a href="GitHubAPI.html#.getLastBuild">getLastBuild</a></li><li><a href="GitHubAPI.html#.getTopics">getTopics</a></li><li><a href="GitHubAPI.html#.getUserDetails">getUserDetails</a></li><li><a href="GitHubAPI.html#.main">main</a></li><li><a href="GitHubAPI.html#.OK">OK</a></li><li><a href="GitHubAPI.html#.pullItem">pullItem</a></li><li><a href="GitHubAPI.html#.pushFile">pushFile</a></li><li><a href="GitHubAPI.html#.redeemCode">redeemCode</a></li><li><a href="GitHubAPI.html#.setTopics">setTopics</a></li></ul></div></li><li><a href="store.html">store</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="store_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="store.html#.Modules">Modules</a></li><li><a href="store.html#.Mutations">Mutations</a></li><li><a href="store.html#.State">State</a></li></ul></div></li><li><a href="template.html">template</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="template_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="template.html#.Mutations">Mutations</a></li><li><a href="template.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="template.html#handler">handler</a></li></ul></div></li><li><a href="workshop.html">workshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="workshop_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="workshop.html#.Getters">Getters</a></li><li><a href="workshop.html#.Mutations">Mutations</a></li><li><a href="workshop.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="workshop.html#addFile">addFile</a></li><li><a href="workshop.html#addRepository">addRepository</a></li><li><a href="workshop.html#createRepository">createRepository</a></li><li><a href="workshop.html#deleteFile">deleteFile</a></li><li><a href="workshop.html#duplicateFile">duplicateFile</a></li><li><a href="workshop.html#.fileInRepository">fileInRepository</a></li><li><a href="workshop.html#.findFileDependencies">findFileDependencies</a></li><li><a href="workshop.html#findRepositories">findRepositories</a></li><li><a href="workshop.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="workshop.html#.getRepoIntroFile">getRepoIntroFile</a></li><li><a href="workshop.html#installDependencies">installDependencies</a></li><li><a href="workshop.html#installFile">installFile</a></li><li><a href="workshop.html#loadRepository">loadRepository</a></li><li><a href="workshop.html#.parseYAML">parseYAML</a></li><li><a href="workshop.html#pullURL">pullURL</a></li><li><a href="workshop.html#pushFile">pushFile</a></li><li><a href="workshop.html#rewriteEpisodeOrders">rewriteEpisodeOrders</a></li><li><a href="workshop.html#saveRepositoryChanges">saveRepositoryChanges</a></li><li><a href="workshop.html#setFileContent">setFileContent</a></li><li><a href="workshop.html#setFileContentFromYAML">setFileContentFromYAML</a></li><li><a href="workshop.html#setTopics">setTopics</a></li><li><a href="workshop.html#uploadImage">uploadImage</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3><a href="global.html">Global</a></h3></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;template>
+  &lt;section>
+    &lt;section class="card" v-if="!mainRepo">
+      &lt;div class="card-content">
+        &lt;p>No workshop detected.&lt;/p>
+        &lt;b-button label="Go to create workshop section"
+                  icon-left="arrow-left"
+                  type="is-warning"
+                  @click="$emit('goToCreateWorkshop')"
+        />
+      &lt;/div>
+    &lt;/section>
+    &lt;section v-else>
+      &lt;section class="card" v-if="mainRepo.extraFiles &amp;&amp; (mainRepo.extraFiles.intro || mainRepo.extraFiles.optional_intro_sections.length || mainRepo.extraFiles.setup_files.length)">
+        &lt;header class="card-header">
+          &lt;b-tooltip position="is-right" label="Special files are non-lesson files which you can edit. These include things like instructor notes and introductory information.">
+            &lt;h1 class="card-header-title">Special files&lt;/h1>
+          &lt;/b-tooltip>
+        &lt;/header>
+        &lt;div class="special-files content">
+          &lt;CustomiseItem v-if="mainRepo.extraFiles.intro"
+                         :item="mainRepo.extraFiles.intro"
+                         override-name="Workshop Intro"
+                         override-link="/"
+                         :no-y-a-m-l="true"
+                         :add-buttons="['save']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+          &lt;CustomiseItem v-for="s in mainRepo.extraFiles.optional_intro_sections"
+                         :key="s.url"
+                         :item="s"
+                         :override-name="`Intro: ${/\/([^/.]+)\.md$/.exec(s.path)[1]}`"
+                         override-link="/"
+                         :no-y-a-m-l="true"
+                         :add-buttons="['save']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+          &lt;CustomiseItem v-for="s in mainRepo.extraFiles.setup_files"
+                         :key="s.url"
+                         :item="s"
+                         :override-name="`Setup: ${/\/([^/.]+)\.html$/.exec(s.path)[1]}`"
+                         override-link="/"
+                         :no-y-a-m-l="true"
+                         :add-buttons="['save']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+          &lt;CustomiseItem v-if="mainRepo.extraFiles.notes"
+                         :item="mainRepo.extraFiles.notes"
+                         override-name="Instructor Notes"
+                         override-link="/notes"
+                         :add-buttons="['save', 'edit']"
+                         :remove-buttons="['drop', 'properties']"
+          />
+        &lt;/div>
+      &lt;/section>
+      &lt;div class="content"
+           v-if="schedule.days.length === 1 &amp;&amp; schedule.days[0].items.length === 0"
+      >
+        &lt;p>There are currently no lessons in the workshop. To add lessons, drag them from the stash into a day. You can search for episodes that have already been created and add them to your stash.&lt;/p>
+      &lt;/div>
+      &lt;div class="columns">
+        &lt;div class="column">
+          &lt;div class="card"
+               v-for="day in schedule.days"
+               :key="day.number"
+          >
+            &lt;header class="card-header" v-if="!mainRepo.busyFlag()">
+              &lt;h1 class="card-header-title">Day {{ day.number }}&lt;/h1>
+            &lt;/header>
+            &lt;b-skeleton size="is-large" animated :active="mainRepo.busyFlag()"/>
+            &lt;div class="card-content" v-if="!mainRepo.busyFlag()">
+              &lt;ArrangeItems :items="day.items"
+                            :dayId="day.number"
+                            @assignItem="updateItemDay"
+              />
+            &lt;/div>
+            &lt;b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
+          &lt;/div>
+        &lt;/div>
+        &lt;div class="column">
+          &lt;div class="card">
+            &lt;header class="card-header" v-if="!mainRepo.busyFlag()">
+              &lt;h1 class="card-header-title">Stash&lt;/h1>
+            &lt;/header>
+            &lt;b-skeleton size="is-large" animated :active="mainRepo.busyFlag()"/>
+            &lt;div class="card-content" v-if="!mainRepo.busyFlag()">
+              &lt;ArrangeItems :items="schedule.unassignedItems"
+                            @assignItem="updateItemDay"
+                            class="unassigned-items"
+              />
+            &lt;/div>
+            &lt;b-skeleton size="is-medium" animated :active="mainRepo.busyFlag()"/>
+            &lt;div class="stash-buttons card-footer-item">
+              &lt;b-button class="card-footer-item"
+                        icon-left="plus"
+                        :type="`is-primary ${allItems.length > 1? 'is-light' : ''}`"
+                        @click="addRemoteItems = true"
+              >
+                Add Items to Stash
+              &lt;/b-button>
+              &lt;b-button v-if="availableEpisodes.filter(f => !f.yaml.day).length"
+                        class="card-footer-item"
+                        icon-left="delete"
+                        type="is-warning"
+                        @click="clearStash"
+              >
+                Clear stash
+              &lt;/b-button>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
+
+      &lt;b-modal v-model="addRemoteItems" full-screen>
+        &lt;div class="content fullscreen-modal">
+          &lt;header class="title">
+            &lt;h1 class="">Add items from a different workshop&lt;/h1>
+          &lt;/header>
+          &lt;div class="content">
+            &lt;p>Type the URL, owner, or title of a workshop below, or type a topic name. We will scan workshops that match for lessons and you can then include them in your
+              stash. You can then drag them into your schedule and install them (and any files they depend on)
+              in your own workshop.&lt;/p>
+          &lt;/div>
+          &lt;b-autocomplete
+                  v-model="remoteRepositoryName"
+                  :data="autoCompleteOptions"
+                  placeholder="Start typing an owner, workshop URL or title, or tag to filter"
+                  icon="magnify"
+                  clearable
+                  expanded
+          >
+            &lt;template #empty>No results found&lt;/template>
+          &lt;/b-autocomplete>
+          &lt;div class="content cards">
+            &lt;RemoteRepositoryView v-for="repo in filteredTopicRepositories"
+                                  :key="repo.url"
+                                  :repo="repo"
+                                  @selectRepo="addRepositoryEpisodes"
+                                  :is-open="expandedRepo === repo.url"
+                                  @open="url => expandedRepo = url"
+            />
+          &lt;/div>
+        &lt;/div>
+      &lt;/b-modal>
+    &lt;/section>
+  &lt;/section>
+&lt;/template>
+
+&lt;script>
+  import ArrangeItems from "./ArrangeItems";
+  import RemoteRepositoryView from "./RemoteRepositoryView";
+  import CustomiseItem
+    from "./CustomiseItem";
+
+  /**
+   * @typedef Schedule
+   * A schedule contains a number of days, each of which contains episodes in a particular order. There are also episodes that are not assigned to days in the stash.
+   * @property days {Array&lt;ScheduleDay>} The days in the schedule.
+   * @property unassignedItems {Array&lt;File>} The episodes not assigned to any day.
+   */
+
+  /**
+   * @typedef ScheduleDay
+   * A schedule day represents a single day in the schedule. It has a number of episodes in a given order and an identifier for which day it is.
+   * @property number {Number} The number of the day in the schedule.
+   * @property items {Array&lt;File>} The episodes occurring on the day.
+   */
+
+  /**
+   * @description The MakeSchedule component separates a repository's files into three groups: extra files, which are displayed at the top of the page for customisation; scheduled episodes, which are displayed in the day to which they have been assigned and which show their start time; and unscheduled episodes, which are displayed in a stash for allocation to the schedule by the user. The stash offers a button to add additional episodes by conducting a GitHub search.
+   *
+   * @vue-prop [recalculateItems=true] {Boolean} Whether the time-consuming operation of detecting the files available should be conducted.
+   *
+   * @vue-data addRemoteItems=false {Boolean} Whether the modal for adding remote items to the stash is open.
+   * @vue-data remoteRepositoryName="" {String} Search string used for filtering repositories when adding items to the stash.
+   * @vue-data availableEpisodes=[] {Array&lt;File>|Array} Episodes available scheduling.
+   * @vue-data expandedRepo="" {String} Name of the repository currently expanded in the add-items-to-stash modal.
+   *
+   * @vue-computed mainRepo {Repository} Repository currently being created by the Workshop Builder Tool.
+   * @vue-computed allItems {Array&lt;File>} Items available for scheduling, including both local and remote episodes.
+   * @vue-computed schedule {Schedule} The schedule for the workshop.
+   * @vue-computed filteredTopicRepositories {Array&lt;Repository>} A list of repositories matching the current text filter in the add-items-to-stash search box.
+   * @vue-computed autoCompleteOptions {Array&lt;String>} Autocomplete prompts for entering remoteRepositoryName filter string.
+   * @vue-computed remoteRepositoryEpisodes {Array&lt;File>} Currently unused.
+   */
+  export default {
+    name: 'MakeSchedule',
+    components: {
+      CustomiseItem,
+      RemoteRepositoryView,
+      ArrangeItems
+    },
+    props: {recalculateItems: {type: Boolean, required: false, default: true}},
+    data: function() {
+      return {
+        addRemoteItems: false,
+        remoteRepositoryName: "",
+        availableEpisodes: [],
+        expandedRepo: ""
+      }
+    },
+    computed: {
+      mainRepo() {
+        let repo;
+        try {
+          repo = this.$store.getters['workshop/Repository']();
+        }
+        catch(e) {throw new Error(`Error retrieving Repository from store: ${e}`)}
+        return repo;
+      },
+      /**
+       * Return all the episodes in a Repository which has a matching topic.
+       */
+      allItems() {
+        const T = performance.now()
+        if(!this.recalculateItems || !this.mainRepo.topics || !this.mainRepo.topics.length)
+          return [];
+        // Always include main repository episodes
+        const episodes = [...this.mainRepo.episodes];
+        const mainEpisodes = this.mainRepo.episodes.map(e => e.url);
+        // Find repositories that overlap topics with mainRepo
+        const topics = this.mainRepo.topics
+                .filter(t => this.$store.state.topicList.includes(t));
+        const topicRepos = this.$store.getters['workshop/RepositoriesByFilter'](r => {
+          for(let t of topics)
+            if(r.topics.includes(t))
+              return true;
+        });
+        // Find available, non-duplicate episodes for inclusion
+        topicRepos.forEach(R => episodes.push(...R.episodes.filter(
+          E => {
+            return this.availableEpisodes.filter(e => e.url === E.url).length &amp;&amp;
+                    ((E.yaml.ukrn_wb_rules &amp;&amp;
+                            E.yaml.ukrn_wb_rules.includes('allow-multiple')) ||
+                    episodes.filter(x => E.body === x.body).length === 0)
+        })));
+        // Add remote flag
+        console.log(`Found ${episodes.length} episodes in ${topicRepos.length} repositories in ${Math.round(performance.now() - T)}ms`)
+        return episodes.map(e => {return {...e, remote: !mainEpisodes.includes(e.url)}});
+      },
+      // The schedule is a representation of the episodes in a workshop arranged by day and time
+      schedule: function() {
+        const T = performance.now()
+        const schedule = {days: [], unassignedItems: []};
+        this.allItems.forEach(item => {
+          // Items without valid day/start_time inputs are unassigned
+          if(!item.yaml.day || item.yaml.start_time)
+            return schedule.unassignedItems.push(item);
+          const dayList = schedule.days.filter(d => d.number === item.yaml.day);
+          // create a new day for this item
+          if(!dayList.length)
+            schedule.days.push({number: item.yaml.day, items: [item]});
+          else
+            dayList[0].items.push(item);
+        });
+        // Pad schedule days and add an extra one at the end
+        let lastDay = Math.max(...schedule.days.map(d => d.number));
+        if(isNaN(lastDay) || lastDay &lt; 0)
+          lastDay = 0;
+        for(let d = 1; d &lt;= lastDay + 1; d++)
+          if(!schedule.days.filter(day => day.number === d).length)
+            schedule.days.push({number: d, items: []});
+        // Arrange days and items
+        schedule.days.sort((a,b) => a.number &lt; b.number? -1 : 1);
+        schedule.days.forEach(d => d.items.sort((a, b) => a.yaml.order > b.yaml.order? 1 : -1));
+        console.log(`Generated schedule in ${Math.round(performance.now() - T)}ms`)
+        return schedule;
+      },
+      filteredTopicRepositories() {
+        return this.$store.getters['workshop/RepositoriesByFilter'](
+                // exclude main repo
+                r => !r.isMain &amp;&amp;
+                        // match filter
+                        `${r.ownerLogin}|${r.name}|${r.topics.join('|')}`
+                        .toLowerCase()
+                        .indexOf(this.remoteRepositoryName.toLowerCase()) >= 0 &amp;&amp;
+                        // match topics
+                        r.topics.filter(
+                                t => this.mainRepo.topics.includes(t) &amp;&amp;
+                                        this.$store.state.topicList.includes(t)
+                        ).length
+        )
+      },
+      autoCompleteOptions() {
+        const options = [];
+        this.filteredTopicRepositories.forEach(r => {
+          const entries = [r.name, r.ownerLogin, ...r.topics];
+          entries.forEach(e => {
+            if(!options.includes(e))
+              options.push(e);
+          })
+        });
+        return options;
+      },
+      remoteRepositoryEpisodes() {
+        if(!this.remoteRepositoryName)
+          return [];
+        return this.$store.getters['workshop/RepositoriesByFilter'](
+                r => r.name === this.remoteRepositoryName
+        )[0].episodes;
+      }
+    },
+    methods: {
+      /**
+       * Clear stash episodes.
+       */
+      clearStash() {
+        this.availableEpisodes = this.availableEpisodes.filter(f => f.yaml.day);
+      },
+      /**
+       * Mark an episode as available for including in the current project.
+       * @param E {File} Episode to mark.
+       * @param available {boolean} Whether the episode should be available.
+       */
+      setEpisodeAvailable(E, available) {
+        if(this.availableEpisodes.filter(e => e.url === E.url).length > 0 === available)
+          return;
+        if(available)
+          this.availableEpisodes.push(E);
+        else
+          this.availableEpisodes = this.availableEpisodes.filter(e => e.url !== E.url)
+      },
+      /**
+       * Update an episode to mark its new place in the schedule.
+       * @param episode {File} Episode to update.
+       */
+      updateEpisode(episode) {
+        this.$store.dispatch('workshop/setFileContentFromYAML', {
+          url: episode.url, yaml: episode.yaml, body: episode.body
+        })
+      },
+      /**
+       * Update the scheduled day for an item. If attempting to update a duplicatable item, the item will be duplicated. If stashing an item that deletes when stashed, that item will be deleted.
+       * @param item {File} Episode to update.
+       * @param dayId {Number|""} Day to which the episode belongs.
+       * @param [prevOrder] {Number} The order number of the episode before this one.
+       * @param [nextOrder] {Number} The order number of the episode after this one.
+       */
+      async updateItemDay({item, dayId, prevOrder, nextOrder}) {
+        console.log(`${item.path} DAY => ${dayId} [${prevOrder}, ${nextOrder}]`)
+        // Duplicate allow-multiple items
+        if(item.yaml['ukrn_wb_rules']
+                &amp;&amp; item.yaml['ukrn_wb_rules'].includes('allow-multiple')
+                &amp;&amp; dayId !== ""
+                &amp;&amp; !item.yaml.day) {
+          const remote = item.remote;
+          item = await this.$store.dispatch('workshop/duplicateFile', {url: item.url});
+          if(remote &amp;&amp; !this.availableEpisodes.filter(e => e.url === item.url).length)
+            this.availableEpisodes.push(item);
+        } else if(item.yaml['ukrn_wb_rules']
+                &amp;&amp; item.yaml['ukrn_wb_rules'].includes('remove-on-stash')
+                &amp;&amp; !dayId) {
+          this.$store.commit('workshop/removeItem', {array: 'files', item});
+          return;
+        }
+
+        const newYAML = {...item.yaml};
+        newYAML.day = dayId;
+        // Place in the correct order
+        if(prevOrder &amp;&amp; nextOrder &amp;&amp; prevOrder === nextOrder) {
+          // Recalculate item order values if there is no gap.
+          // Item will place itself out of order, but since this really rarely happens
+          // we're not going to fix it now.
+          await this.$store.dispatch('workshop/rewriteEpisodeOrders', {
+            dayId, ignore_episodes: [item.url]
+          });
+        } else if(!prevOrder &amp;&amp; nextOrder)
+          newYAML.order = Math.round(nextOrder / 2);
+        else if(prevOrder &amp;&amp; !nextOrder)
+          newYAML.order = Math.round(prevOrder + 100000);
+        else if(prevOrder &amp;&amp; nextOrder)
+          newYAML.order = Math.round(prevOrder + (nextOrder - prevOrder) / 2);
+        else
+          newYAML.order = 100000;
+        this.updateEpisode({...item, yaml: newYAML});
+      },
+      /**
+       * Add episodes into the stash from a remote repository by marking them as available.
+       * @param episodes {Array&lt;File>} Episodes to add.
+       */
+      addRepositoryEpisodes(episodes) {
+        // Close modal
+        this.addRemoteItems = false;
+        episodes.forEach(E => this.setEpisodeAvailable(E, true));
+      }
+    },
+    mounted() {}
+  }
+&lt;/script>
+
+&lt;!-- Add "scoped" attribute to limit CSS to this component only -->
+&lt;style lang="scss" scoped>
+  .card {margin-bottom: 1em;}
+  .cards {
+    width: 100%;
+  }
+  .fullscreen-modal > * {padding: 1em;}
+  .unassigned-items {
+  }
+  .special-files.special-files {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1em;
+    margin-bottom: 0;
+    user-select: none;
+    .item-wrapper {padding: .5em;}
+  }
+  .stash-buttons {
+    button {
+      margin: .5em;
+    }
+  }
+&lt;/style>
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">Documentation generated by JSDOC. Template by TOAST UI.</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>

@@ -6,13 +6,24 @@
 </template>
 
 <script>
-export default {
+  /**
+   * The TextEditable component wraps inline text to allow it to be edited using the HTML contenteditable property. Newlines are replaced with the empty string.
+   *
+   * @vue-prop [value] {String} Text content.
+   * @vue-prop [enabled=true] {Boolean} Whether the content can be edited.
+   */
+  export default {
   name: 'TextEditable',
   props: {
     value: {type: String, required: false},
     enabled: {type: Boolean, required: false, default: true}
   },
   methods: {
+    /**
+     * Catch keydown events and translate 'enter' to signal completed input.
+     * @param e {KeyboardEvent}
+     * @return {boolean|void} Whether to continue event bubbling.
+     */
     keydown: function(e) {
       if(e.key.toLowerCase() === 'enter') {
         this.input(e);
@@ -20,6 +31,10 @@ export default {
         return false;
       }
     },
+    /**
+     * Set the content to a new value.
+     * @param e {Event}
+     */
     input: function(e) {
       const value = e.target.innerText.replace(/\n/g, '');
       this.$refs.text.innerText = value;

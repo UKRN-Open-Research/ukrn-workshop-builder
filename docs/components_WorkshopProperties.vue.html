@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: components/WorkshopProperties.vue | UKRN Workshop Builder Tool</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="jsdoc-tweaks.css">
+        
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">UKRN Workshop Builder Tool</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-App.html">App</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:App_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-App.html#stepType">stepType</a></li></ul></div></li><li><a href="module-ArrangeItems.html">ArrangeItems</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:ArrangeItems_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-ArrangeItems.html#change">change</a></li><li><a href="module-ArrangeItems.html#remove">remove</a></li></ul></div></li><li><a href="module-CustomiseItem.html">CustomiseItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseItem_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseItem.html#editContent">editContent</a></li><li><a href="module-CustomiseItem.html#editRawContent">editRawContent</a></li><li><a href="module-CustomiseItem.html#getPagesLink">getPagesLink</a></li><li><a href="module-CustomiseItem.html#getRelativeLink">getRelativeLink</a></li><li><a href="module-CustomiseItem.html#imgAdd">imgAdd</a></li><li><a href="module-CustomiseItem.html#install">install</a></li><li><a href="module-CustomiseItem.html#installMissingDependencies">installMissingDependencies</a></li><li><a href="module-CustomiseItem.html#pad">pad</a></li><li><a href="module-CustomiseItem.html#save">save</a></li></ul></div></li><li><a href="module-CustomiseWorkshop.html">CustomiseWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseWorkshop.html#editConfig">editConfig</a></li><li><a href="module-CustomiseWorkshop.html#pushConfig">pushConfig</a></li><li><a href="module-CustomiseWorkshop.html#refresh">refresh</a></li></ul></div></li><li><a href="module-EpisodeName.html">EpisodeName</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:EpisodeName_sub"></div></li><li><a href="module-GitHubLogin.html">GitHubLogin</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubLogin_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubLogin.html#loginRequest">loginRequest</a></li></ul></div></li><li><a href="module-GitHubMenu.html">GitHubMenu</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubMenu_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubMenu.html#reload">reload</a></li><li><a href="module-GitHubMenu.html#save">save</a></li></ul></div></li><li><a href="module-MakeSchedule.html">MakeSchedule</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:MakeSchedule_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-MakeSchedule.html#addRepositoryEpisodes">addRepositoryEpisodes</a></li><li><a href="module-MakeSchedule.html#clearStash">clearStash</a></li><li><a href="module-MakeSchedule.html#setEpisodeAvailable">setEpisodeAvailable</a></li><li><a href="module-MakeSchedule.html#updateEpisode">updateEpisode</a></li><li><a href="module-MakeSchedule.html#updateItemDay">updateItemDay</a></li></ul></div></li><li><a href="module-RemoteRepositoryView.html">RemoteRepositoryView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:RemoteRepositoryView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-RemoteRepositoryView.html#doLookup">doLookup</a></li></ul></div></li><li><a href="module-SelectWorkshop.html">SelectWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:SelectWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-SelectWorkshop.html#checkUserRepositories">checkUserRepositories</a></li><li><a href="module-SelectWorkshop.html#chooseWorkshop">chooseWorkshop</a></li><li><a href="module-SelectWorkshop.html#createRepository">createRepository</a></li></ul></div></li><li><a href="module-TextEditable.html">TextEditable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:TextEditable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-TextEditable.html#input">input</a></li><li><a href="module-TextEditable.html#keydown">keydown</a></li></ul></div></li><li><a href="module-WorkshopProperties.html">WorkshopProperties</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:WorkshopProperties_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-WorkshopProperties.html#registerSave">registerSave</a></li><li><a href="module-WorkshopProperties.html#save">save</a></li></ul></div></li><li><a href="module-YAMLField.html">YAMLField</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLField_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLField.html#getFileList">getFileList</a></li><li><a href="module-YAMLField.html#save">save</a></li><li><a href="module-YAMLField.html#setSaveStatus">setSaveStatus</a></li><li><a href="module-YAMLField.html#toBackendValue">toBackendValue</a></li><li><a href="module-YAMLField.html#validTime">validTime</a></li></ul></div></li><li><a href="module-YAMLFieldInput.html">YAMLFieldInput</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInput_sub"></div></li><li><a href="module-YAMLFieldInputArray.html">YAMLFieldInputArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInputArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLFieldInputArray.html#updateValue">updateValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="github.html">github</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="github_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="github.html#.Getters">Getters</a></li><li><a href="github.html#.Mutations">Mutations</a></li><li><a href="github.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="github.html#getBuildStatus">getBuildStatus</a></li><li><a href="github.html#getUserDetails">getUserDetails</a></li><li><a href="github.html#logout">logout</a></li><li><a href="github.html#processToken">processToken</a></li><li><a href="github.html#redeemCode">redeemCode</a></li><li><a href="github.html#registerBuildCheck">registerBuildCheck</a></li></ul></div></li><li><a href="GitHubAPI.html">GitHubAPI</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GitHubAPI_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GitHubAPI.html#.checkResponseCode">checkResponseCode</a></li><li><a href="GitHubAPI.html#.copyFile">copyFile</a></li><li><a href="GitHubAPI.html#.createRepository">createRepository</a></li><li><a href="GitHubAPI.html#.deleteFile">deleteFile</a></li><li><a href="GitHubAPI.html#.findRepositories">findRepositories</a></li><li><a href="GitHubAPI.html#.findRepositoryFiles">findRepositoryFiles</a></li><li><a href="GitHubAPI.html#.getLastBuild">getLastBuild</a></li><li><a href="GitHubAPI.html#.getTopics">getTopics</a></li><li><a href="GitHubAPI.html#.getUserDetails">getUserDetails</a></li><li><a href="GitHubAPI.html#.main">main</a></li><li><a href="GitHubAPI.html#.OK">OK</a></li><li><a href="GitHubAPI.html#.pullItem">pullItem</a></li><li><a href="GitHubAPI.html#.pushFile">pushFile</a></li><li><a href="GitHubAPI.html#.redeemCode">redeemCode</a></li><li><a href="GitHubAPI.html#.setTopics">setTopics</a></li></ul></div></li><li><a href="store.html">store</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="store_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="store.html#.Modules">Modules</a></li><li><a href="store.html#.Mutations">Mutations</a></li><li><a href="store.html#.State">State</a></li></ul></div></li><li><a href="template.html">template</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="template_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="template.html#.Mutations">Mutations</a></li><li><a href="template.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="template.html#handler">handler</a></li></ul></div></li><li><a href="workshop.html">workshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="workshop_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="workshop.html#.Getters">Getters</a></li><li><a href="workshop.html#.Mutations">Mutations</a></li><li><a href="workshop.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="workshop.html#addFile">addFile</a></li><li><a href="workshop.html#addRepository">addRepository</a></li><li><a href="workshop.html#createRepository">createRepository</a></li><li><a href="workshop.html#deleteFile">deleteFile</a></li><li><a href="workshop.html#duplicateFile">duplicateFile</a></li><li><a href="workshop.html#.fileInRepository">fileInRepository</a></li><li><a href="workshop.html#.findFileDependencies">findFileDependencies</a></li><li><a href="workshop.html#findRepositories">findRepositories</a></li><li><a href="workshop.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="workshop.html#.getRepoIntroFile">getRepoIntroFile</a></li><li><a href="workshop.html#installDependencies">installDependencies</a></li><li><a href="workshop.html#installFile">installFile</a></li><li><a href="workshop.html#loadRepository">loadRepository</a></li><li><a href="workshop.html#.parseYAML">parseYAML</a></li><li><a href="workshop.html#pullURL">pullURL</a></li><li><a href="workshop.html#pushFile">pushFile</a></li><li><a href="workshop.html#rewriteEpisodeOrders">rewriteEpisodeOrders</a></li><li><a href="workshop.html#saveRepositoryChanges">saveRepositoryChanges</a></li><li><a href="workshop.html#setFileContent">setFileContent</a></li><li><a href="workshop.html#setFileContentFromYAML">setFileContentFromYAML</a></li><li><a href="workshop.html#setTopics">setTopics</a></li><li><a href="workshop.html#uploadImage">uploadImage</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3><a href="global.html">Global</a></h3></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>&lt;template>
+    &lt;div class="yaml-panel">
+        &lt;div v-for="Field in Fields"
+             :key="Field.key"
+             class="yaml-item-wrapper"
+        >
+            &lt;YAMLField :field="Field" @save="registerSave"/>
+        &lt;/div>
+        &lt;b-loading :active="$store.getters['workshop/isBusy'](template.url) || saving"
+                   :is-full-page="false"
+        />
+    &lt;/div>
+&lt;/template>
+
+&lt;script>
+import YAMLField from "./YAMLField";
+
+/**
+ * @description The WorkshopProperties component lists the fields described in the workshop metadata and allows a user to customise their content.
+ *
+ * @vue-prop template {File} Template workshop with metadata describing the fields to display.
+ *
+ * @vue-data currentValue={} {Object&lt;key, any>} Dictionary of values indexed by YAML keys.
+ * @vue-data valueChanged={} {Object&lt;key, boolean>} Dictionary of change flags indexed by YAML keys.
+ * @vue-data loadingFileList=true {Boolean} Whether the file list special property of any field is being determined.
+ * @vue-data [fileList=[]] {Array&lt;String>} List of files that can be selected as options for certain special fields.
+ * @vue-data saving=false {Boolean} Whether the local changes to the fields are being saved to the store.
+ * @vue-data saveTimeout=null {null|Number} Timeout index for the store save event.
+ * @vue-data minSaveDelay=500 {Number} Minimum delay between editing a field and its content being saved to the store.
+ * @vue-data lastSaveTime=0 {Number} Time the last save occurred.
+ * @vue-data saveOperations={} {Object} Dictionary of pending save operations.
+ * @vue-data [checkboxGroup=[]] {Array} Currently unused.
+ *
+ * @vue-computed Fields {Array&lt;Field>} YAML Fields that can be edited.
+ *
+ * @vue-event refresh Signal that the _config.yml file in the store has been changed.
+ */
+export default {
+    name: "WorkshopProperties",
+    components: {YAMLField},
+    props: {
+        template: {type: Object, required: true}
+    },
+    data: function() {
+        return {
+            currentValue: {}, // dictionary of values indexed by YAML keys
+            valueChanged: {}, // dictionary of change flags indexed by YAML keys
+            loadingFileList: true,
+            fileList: [],
+            saving: false,
+            saveTimeout: null,
+            minSaveDelay: 500,
+            lastSaveTime: 0,
+            saveOperations: {},
+            checkboxGroup: []
+        }
+    },
+    computed: {
+        Fields() {
+            const out = [];
+            // Find the keys
+            const keyList = this.template.yaml['ukrn_wb']
+                .filter(f => f.fields_structure)[0].fields_structure;
+            // Next, find the properties
+            const obj = this.template.yaml['ukrn_wb']
+                .filter(f => f.fields)[0].fields;
+            const fields = obj.map(o => Object.keys(o)[0]); // Field YAML keys
+            obj.forEach((o, n) => {
+                const propList = o[Object.keys(o)[0]];
+                const properties = {};
+                propList.forEach((p, i) => properties[keyList[i]] = propList[i]);
+                // Add the actual value
+                out.push({
+                    ...properties,
+                    value: this.template.yaml[fields[n]],
+                    key: fields[n]
+                })
+            });
+            return out;
+        },
+    },
+    methods: {
+        /**
+         * Set a save operation to happen because a change has occurred.
+         * @param key {String} Key of the YAML field that should be saved.
+         * @param value {any} Value of the YAML field to save.
+         */
+        registerSave({key, value}) {
+            this.saveOperations[key] = value;
+            if(this.saveTimeout)
+                clearTimeout(this.saveTimeout);
+            this.saveTimeout = setTimeout(() => this.save(), this.minSaveDelay);
+        },
+        /**
+         * Save the content of any changed YAML fields to the _config.yml file in the store.
+         * @return {Promise&lt;boolean>}
+         */
+        save() {
+            this.saving = true;
+            const me = this;
+            this.saveTimeout = null;
+            this.lastSaveTime = performance.now();
+            const newYAML = {...this.template.yaml};
+            for(let k of Object.keys(this.saveOperations)) {
+                console.log(`Saving ${k} => ${this.saveOperations[k]}`)
+                newYAML[k] = this.saveOperations[k];
+                delete this.saveOperations[k];
+            }
+
+            return this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.template.url, yaml: newYAML, body: this.template.body})
+                .then(() => me.$emit('refresh'))
+                .then(() => me.saving = false);
+        }
+    }
+}
+&lt;/script>
+
+&lt;style scoped>
+.yaml-panel {
+    display: grid;
+    grid-auto-flow: row;
+    grid-row-gap: 1em;
+}
+.yaml-item-wrapper {
+    display: grid;
+    min-width: 45%;
+}
+&lt;/style>
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">Documentation generated by JSDOC. Template by TOAST UI.</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>

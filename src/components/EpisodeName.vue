@@ -34,6 +34,14 @@
 </template>
 
 <script>
+    /**
+     * @description The EpisodeName component is allows episodes to be displayed in a safe manner, catching issues where required YAML properties are not set. It also allows for including the owner and repository information to contextualise where an episode is located. Episodes with missing dependencies will have a warning appended to their name.
+     *
+     * @vue-prop episode {File} Episode whose name should be displayed.
+     * @vue-prop [includeRepo=true] {Boolean} Whether to display the owner/repository information for the episode.
+     *
+     * @vue-computed owner_repo {string|{owner:string, repo:string}} Episode owner and repository information, if available.
+     */
     export default {
         name: 'EpisodeName',
         components: {},

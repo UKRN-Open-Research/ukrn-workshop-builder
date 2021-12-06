@@ -12,7 +12,14 @@
 </template>
 
 <script>
-export default {
+    /**
+     * @description The GitHubLogin component displays a button that allows users to log in and out of GitHub. When mounted, this component requests the store move to the next step of the login-code-token OAuth exchange chain.
+     *
+     * @vue-data checkingToken=false {Boolean} Whether the app is checking a GitHub token.
+     * @vue-data invalidLogin=false {Boolean} Whether the login attempt is invalid.
+     * @vue-data response="" {String} Currently unused.
+     */
+    export default {
   name: 'GitHubLogin',
   props: {},
   data: function() {
@@ -23,6 +30,9 @@ export default {
     }
   },
   methods: {
+      /**
+       * Redirect a user to GitHub to attempt a login.
+       */
     loginRequest: function() {
       window.location = `https://github.com/login/oauth/authorize?client_id=${process.env.VUE_APP_GITHUB_ID}&scope=public_repo repo`;
     }

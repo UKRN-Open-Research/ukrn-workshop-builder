@@ -201,6 +201,59 @@
 <script>
 import YAMLField from "./YAMLField";
 import EpisodeName from "./EpisodeName";
+
+/**
+ * @typedef Field
+ * @description A Field describes a YAML field's properties.
+ * @property name {string} Name of the field
+ * @property type {string} Basic data type of the field.
+ * @property is_required {boolean} Whether the field is required.
+ * @property is_array {boolean} Whether the field has an array of values.
+ * @property format {string} Special formatting rules to use for the field.
+ * @property special {string|Array<string>} Special tags governing how the field is rendered in the Workshop Builder Tool
+ * @property value {any|Array<any>} Value for the field.
+ * @property key {string} Key used to retrieve the field in the template metadata.
+ */
+
+/**
+ * @description The CustomiseItem component performs the majority of the work involved in editing individual GitHub markdown files. An item in this component makes available various detailed views depending upon what is relevant for that item.
+ *
+ * Items that are already part of the main repository and are well-specified allow editing of YAML headers (if applicable) using a form and body content using a markdown editor. Files that are not well-specified allow editing of the raw file content. Items that have been modified in this way make available an option to push the changes to GitHub.
+ *
+ * Items from other repositories are made available to install into the main repository. They also offer the opportunity to view the YAML headers and body content side-by-side.
+ *
+ * Items assigned to a day in the scheduler allow removing the item back to the stash, and stashed items allow removing the item from the stash entirely. Stashed items that belong to the main repository can be deleted (rather than simply dropped).
+ *
+ * All items include a link to where their content can be viewed in the rendered website.
+ *
+ * @vue-prop item {File} The markdown file object being customised.
+ * @vue-prop [overrideName] {String} A name to use instead of the item's YAML name field.
+ * @vue-prop [overrideLink] {String} A link to use instead of the item's episode-adjusted path.
+ * @vue-prop [noYAML=false] {Boolean} Whether the item is missing YAML information.
+ * @vue-prop [addButtons=[]] {Array<String>} Names of buttons to add to the item, overriding the default presence/absence determination for those buttons.
+ * @vue-prop [removeButtons=[]] {Array<String>} Names of buttons not to add to the item, overriding the default presence/absence determination for those buttons.
+ * @vue-prop [start] {Array<Number>} The start time of the item, as an array of [minutes, hours], each of which is a number.
+ * @vue-prop [end] {Array<Number>} The end time of the item, as an array of [minutes, hours], each of which is a number.
+ *
+ * @vue-data isViewing=false {Boolean} Whether the user is viewing the details of the item. Updates store.editingItem via watcher.
+ * @vue-data isEditing=false {Boolean} Whether the user is editing the details of the item. Updates store.editingItem via watcher.
+ * @vue-data isEditingContent=false {Boolean} Whether the user is editing the content of the item. Updates store.editingItem via watcher.
+ * @vue-data isEditingRawContent=false {Boolean} Whether the user is editing the raw content of the item. Updates store.editingItem via watcher.
+ * @vue-data currentContent="" {String} The current content of the item.
+ * @vue-data currentRawContent="" {String} The current raw content of the item.
+ * @vue-data iconSize='is-small' {String} Buefy size class for the icons.
+ * @vue-data toolbars=Object {Object} {@link https://github.com/hinesboy/mavonEditor#toolbars|mavon-editor toolbar} specification.
+ *
+ * @vue-computed mainRepo {Repository|null} The main repository being edited.
+ * @vue-computed template {String} The template of the main repository.
+ * @vue-computed content {String} The content of the item as held in the store.
+ * @vue-computed rawContent {String} The raw content of the item as held in the store.
+ * @vue-computed Fields {Array<Field>} The YAML fields in the item's content.
+ *
+ * @vue-event refresh Emit a request to refresh the item's content from the store.
+ *
+ * @requires mavon-editor
+ */
 export default {
   name: 'CustomiseItem',
   components: {YAMLField, EpisodeName},
@@ -241,7 +294,7 @@ export default {
   },
   computed: {
     /**
-     * Find the main repository
+     * Find the main repository.
      * @return {Repository}
      */
     mainRepo() {
@@ -255,7 +308,7 @@ export default {
       return repo;
     },
     /**
-     * Find the template attached to the main repository
+     * Find the template attached to the main repository.
      * @return {File}
      */
     template() {
@@ -271,12 +324,12 @@ export default {
                 .catch(e => {
                   console.error(e);
                   self.$buefy.toast.open({
-                    message: `Error updating ${self.item.title}`,
+                    message: `Error updating ${self.item.yaml.title}`,
                     type: 'is-danger'
                   })
                 })
                 .then(() => self.$buefy.toast.open({
-                  message: `Changed ${self.item.title}`,
+                  message: `Changed ${self.item.yaml.title}.<br/>Remember to save changes to GitHub to update the website.`,
                   type: `is-info`
                 }))
       }
@@ -299,16 +352,11 @@ export default {
                   })
                 })
                 .then(() => self.$buefy.toast.open({
-                  message: `Changed ${self.item.path}`,
+                  message: `Changed ${self.item.path}.<br/>Remember to save changes to GitHub to update the website.`,
                   type: `is-info`
                 }))
       }
     },
-      /**
-     * Rip properties and keys from their respective YAML lists and combine
-     * @return {{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}[]}
-     * @constructor
-     */
     Fields() {
       // Find the keys
       let keyList = [];
@@ -336,20 +384,34 @@ export default {
     }
   },
   methods: {
+    /**
+     * Start editing the item's content.
+     */
     editContent() {
       this.currentContent = this.content;
       this.isEditingContent = true;
     },
+    /**
+     * Start editing the item's raw content.
+     */
     editRawContent() {
       this.currentRawContent = this.rawContent;
       this.isEditingRawContent = true;
     },
+    /**
+     * Save the current version of an item.
+     * @returns {Promise<void>}
+     */
     save({key, value}) {
       const newYAML = {...this.item.yaml};
       newYAML[key] = value;
       return this.$store.dispatch('workshop/setFileContentFromYAML', {url: this.item.url, yaml: newYAML, body: this.item.body})
               .then(() => this.$emit('refresh'))
     },
+    /**
+     * Install a remote item into the current main repository. Issues a Buefy toast on completion.
+     * @returns {Promise<BNoticeComponent>}
+     */
     install(episode) {
       console.log(`Install ${episode.path}`)
       const self = this;
@@ -359,6 +421,11 @@ export default {
                 type: F? `is-success` : `is-danger`
               }))
     },
+    /**
+     * Iterate through the dependencies for an item and attempt to install the missing ones from the original non-main repository.
+     * Issues a Buefy toast on completion.
+     * @return {Promise<BNoticeComponent>}
+     */
     installMissingDependencies(episode) {
       const me = this;
       const currentMissing = [...episode.yaml.missingDependencies];
@@ -383,16 +450,32 @@ export default {
             })
         })
     },
+    /**
+     * Convert an item's link into a link to the item's page when rendered with GitHub pages.
+     * @param item {File} The item whose link is required.
+     * @return {String}
+     */
     getPagesLink(item) {
       const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);
       const name = /\/([^/]+)$/.exec(item.path);
       const webDir = name[1].replace(/\.[^.]*$/, "");
       return `https://${match[1]}.github.io/${match[2]}/${webDir}/`;
     },
+    /**
+     * Generate a link from the item's GitHub Pages instance to a specified extension.
+     * @param item {File} The item whose link is required.
+     * @param link {String} Extra pathing to append to the end of the generated pages link.
+     * @return {String}
+     */
     getRelativeLink(item, link) {
       const match = /github\.com\/repos\/([^/]+)\/([^/]+)/.exec(item.url);
       return `https://${match[1]}.github.io/${match[2]}${link}`;
     },
+    /**
+     * Upload an image in the maven-editor and store it for including in a markdown file.
+     * @param pos {Number} The index of the image.
+     * @param img {Object} The image to store.
+     */
     imgAdd(pos, img) {
       console.log({pos, img})
       this.$buefy.dialog.prompt({
@@ -406,9 +489,10 @@ export default {
         trapFocus: true,
         closeOnConfirm: false,
         /**
-         * Try to upload the image
-         * @param value {string} dialogue user input
-         * @param close {function} callback to close
+         * Try to upload the selected image.
+         * @memberOf imgAdd
+         * @param value {string} Dialogue user input.
+         * @param close {function} Callback to close the dialogue.
          */
         onConfirm: (value, {close}) => {
           const path = `/fig/${value.replaceAll('../', '/')}`;
@@ -434,11 +518,15 @@ export default {
                     }
                   });
         },
+        /**
+         * @memberOf imgAdd
+         * Remove a temporary image from memory.
+         */
         onCancel: () => {this.$refs.editor.$refs.toolbar_left.$imgDelByFilename(img.name)}
       });
     },
     /**
-     * Pad a number to two digits with leading zero
+     * Pad a number to two digits with leading zero.
      * @param x {Number}
      * @return {string}
      */

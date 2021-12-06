@@ -80,6 +80,17 @@ npm run build
 npm run lint
 ```
 
+#### Documentation
+
+The documentation is produced by [JSDoc](https://jsdoc.app/index.html), relying on [jsdoc-vuejs](https://github.com/Kocal/jsdoc-vuejs/tree/3.x) and [jsdoc-vuex-plugin](https://github.com/martiensk/vuex-jsdoc, and styled with the [tui-jsdoc-template](https://github.com/nhn/tui.jsdoc-template).
+To generate documentation use:
+```
+npm run document
+```
+
+Documentation can be viewed by serving the contents of `./docs`. 
+The live documentation can be viewed on the GitHub Pages [site](https://UKRN-Open-Research.github.io/ukrn-workshop-builder/) for the repository.
+
 #### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 

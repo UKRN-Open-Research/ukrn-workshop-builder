@@ -1,0 +1,544 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: lambda/githubAPI.js | UKRN Workshop Builder Tool</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="jsdoc-tweaks.css">
+        
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">UKRN Workshop Builder Tool</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-App.html">App</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:App_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-App.html#stepType">stepType</a></li></ul></div></li><li><a href="module-ArrangeItems.html">ArrangeItems</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:ArrangeItems_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-ArrangeItems.html#change">change</a></li><li><a href="module-ArrangeItems.html#remove">remove</a></li></ul></div></li><li><a href="module-CustomiseItem.html">CustomiseItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseItem_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseItem.html#editContent">editContent</a></li><li><a href="module-CustomiseItem.html#editRawContent">editRawContent</a></li><li><a href="module-CustomiseItem.html#getPagesLink">getPagesLink</a></li><li><a href="module-CustomiseItem.html#getRelativeLink">getRelativeLink</a></li><li><a href="module-CustomiseItem.html#imgAdd">imgAdd</a></li><li><a href="module-CustomiseItem.html#install">install</a></li><li><a href="module-CustomiseItem.html#installMissingDependencies">installMissingDependencies</a></li><li><a href="module-CustomiseItem.html#pad">pad</a></li><li><a href="module-CustomiseItem.html#save">save</a></li></ul></div></li><li><a href="module-CustomiseWorkshop.html">CustomiseWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseWorkshop.html#editConfig">editConfig</a></li><li><a href="module-CustomiseWorkshop.html#pushConfig">pushConfig</a></li><li><a href="module-CustomiseWorkshop.html#refresh">refresh</a></li></ul></div></li><li><a href="module-EpisodeName.html">EpisodeName</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:EpisodeName_sub"></div></li><li><a href="module-GitHubLogin.html">GitHubLogin</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubLogin_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubLogin.html#loginRequest">loginRequest</a></li></ul></div></li><li><a href="module-GitHubMenu.html">GitHubMenu</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubMenu_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubMenu.html#reload">reload</a></li><li><a href="module-GitHubMenu.html#save">save</a></li></ul></div></li><li><a href="module-MakeSchedule.html">MakeSchedule</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:MakeSchedule_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-MakeSchedule.html#addRepositoryEpisodes">addRepositoryEpisodes</a></li><li><a href="module-MakeSchedule.html#clearStash">clearStash</a></li><li><a href="module-MakeSchedule.html#setEpisodeAvailable">setEpisodeAvailable</a></li><li><a href="module-MakeSchedule.html#updateEpisode">updateEpisode</a></li><li><a href="module-MakeSchedule.html#updateItemDay">updateItemDay</a></li></ul></div></li><li><a href="module-RemoteRepositoryView.html">RemoteRepositoryView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:RemoteRepositoryView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-RemoteRepositoryView.html#doLookup">doLookup</a></li></ul></div></li><li><a href="module-SelectWorkshop.html">SelectWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:SelectWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-SelectWorkshop.html#checkUserRepositories">checkUserRepositories</a></li><li><a href="module-SelectWorkshop.html#chooseWorkshop">chooseWorkshop</a></li><li><a href="module-SelectWorkshop.html#createRepository">createRepository</a></li></ul></div></li><li><a href="module-TextEditable.html">TextEditable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:TextEditable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-TextEditable.html#input">input</a></li><li><a href="module-TextEditable.html#keydown">keydown</a></li></ul></div></li><li><a href="module-WorkshopProperties.html">WorkshopProperties</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:WorkshopProperties_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-WorkshopProperties.html#registerSave">registerSave</a></li><li><a href="module-WorkshopProperties.html#save">save</a></li></ul></div></li><li><a href="module-YAMLField.html">YAMLField</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLField_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLField.html#getFileList">getFileList</a></li><li><a href="module-YAMLField.html#save">save</a></li><li><a href="module-YAMLField.html#setSaveStatus">setSaveStatus</a></li><li><a href="module-YAMLField.html#toBackendValue">toBackendValue</a></li><li><a href="module-YAMLField.html#validTime">validTime</a></li></ul></div></li><li><a href="module-YAMLFieldInput.html">YAMLFieldInput</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInput_sub"></div></li><li><a href="module-YAMLFieldInputArray.html">YAMLFieldInputArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInputArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLFieldInputArray.html#updateValue">updateValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="github.html">github</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="github_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="github.html#.Getters">Getters</a></li><li><a href="github.html#.Mutations">Mutations</a></li><li><a href="github.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="github.html#getBuildStatus">getBuildStatus</a></li><li><a href="github.html#getUserDetails">getUserDetails</a></li><li><a href="github.html#logout">logout</a></li><li><a href="github.html#processToken">processToken</a></li><li><a href="github.html#redeemCode">redeemCode</a></li><li><a href="github.html#registerBuildCheck">registerBuildCheck</a></li></ul></div></li><li><a href="GitHubAPI.html">GitHubAPI</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GitHubAPI_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GitHubAPI.html#.checkResponseCode">checkResponseCode</a></li><li><a href="GitHubAPI.html#.copyFile">copyFile</a></li><li><a href="GitHubAPI.html#.createRepository">createRepository</a></li><li><a href="GitHubAPI.html#.deleteFile">deleteFile</a></li><li><a href="GitHubAPI.html#.findRepositories">findRepositories</a></li><li><a href="GitHubAPI.html#.findRepositoryFiles">findRepositoryFiles</a></li><li><a href="GitHubAPI.html#.getLastBuild">getLastBuild</a></li><li><a href="GitHubAPI.html#.getTopics">getTopics</a></li><li><a href="GitHubAPI.html#.getUserDetails">getUserDetails</a></li><li><a href="GitHubAPI.html#.main">main</a></li><li><a href="GitHubAPI.html#.OK">OK</a></li><li><a href="GitHubAPI.html#.pullItem">pullItem</a></li><li><a href="GitHubAPI.html#.pushFile">pushFile</a></li><li><a href="GitHubAPI.html#.redeemCode">redeemCode</a></li><li><a href="GitHubAPI.html#.setTopics">setTopics</a></li></ul></div></li><li><a href="store.html">store</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="store_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="store.html#.Modules">Modules</a></li><li><a href="store.html#.Mutations">Mutations</a></li><li><a href="store.html#.State">State</a></li></ul></div></li><li><a href="template.html">template</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="template_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="template.html#.Mutations">Mutations</a></li><li><a href="template.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="template.html#handler">handler</a></li></ul></div></li><li><a href="workshop.html">workshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="workshop_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="workshop.html#.Getters">Getters</a></li><li><a href="workshop.html#.Mutations">Mutations</a></li><li><a href="workshop.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="workshop.html#addFile">addFile</a></li><li><a href="workshop.html#addRepository">addRepository</a></li><li><a href="workshop.html#createRepository">createRepository</a></li><li><a href="workshop.html#deleteFile">deleteFile</a></li><li><a href="workshop.html#duplicateFile">duplicateFile</a></li><li><a href="workshop.html#.fileInRepository">fileInRepository</a></li><li><a href="workshop.html#.findFileDependencies">findFileDependencies</a></li><li><a href="workshop.html#findRepositories">findRepositories</a></li><li><a href="workshop.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="workshop.html#.getRepoIntroFile">getRepoIntroFile</a></li><li><a href="workshop.html#installDependencies">installDependencies</a></li><li><a href="workshop.html#installFile">installFile</a></li><li><a href="workshop.html#loadRepository">loadRepository</a></li><li><a href="workshop.html#.parseYAML">parseYAML</a></li><li><a href="workshop.html#pullURL">pullURL</a></li><li><a href="workshop.html#pushFile">pushFile</a></li><li><a href="workshop.html#rewriteEpisodeOrders">rewriteEpisodeOrders</a></li><li><a href="workshop.html#saveRepositoryChanges">saveRepositoryChanges</a></li><li><a href="workshop.html#setFileContent">setFileContent</a></li><li><a href="workshop.html#setFileContentFromYAML">setFileContentFromYAML</a></li><li><a href="workshop.html#setTopics">setTopics</a></li><li><a href="workshop.html#uploadImage">uploadImage</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3><a href="global.html">Global</a></h3></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import fetch from 'node-fetch'
+require('dotenv').config();
+const {VUE_APP_GITHUB_ID, GH_APP_SECRET, GH_TOKEN_ENCRYPTION_KEY} = process.env;
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr(GH_TOKEN_ENCRYPTION_KEY);
+
+/**
+ * @class GitHubAPI
+ * @description The GitHubAPI backend is a lambda function invoked via Netlify's functions system. It receives HTTP requests and conducts GitHub API calls based on the instructions in the request header and data provided in the body.
+ */
+
+/**
+ * Callback to return the results of the API interaction to the client. Returns a status of 500 if error is set, otherwise returns the status given in response.
+ * @callback returnResponse
+ * @param error {Error} An error encountered while using the API.
+ * @param response {{statusText: string, body: string, statusCode: number}} HTTPResponse-like object returned to the client.
+ * @return {void}
+ */
+
+/**
+ * Process requests from a client.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @param context {object} environment details.
+ * @param callback {returnResponse} function to send the response to the client.
+ */
+async function main(event, context, callback) {
+    try {
+        console.log(`New request: task=${event.headers.task}`)
+        switch (event.headers.task) {
+            case "redeemCode":
+                return callback(null, await redeemCode(event));
+            case "getUserDetails":
+                return callback(null, await getUserDetails(event));
+            case "findRepositories":
+                return callback(null, await findRepositories(event));
+            case "findRepositoryFiles":
+                return callback(null, await findRepositoryFiles(event));
+            case "createRepository":
+                return callback(null, await createRepository(event));
+            case "pushFile":
+                return callback(null, await pushFile(event));
+            case "pullItem":
+                return callback(null, await pullItem(event));
+            case "setTopics":
+                return callback(null, await setTopics(event));
+            case "copyFile":
+                return callback(null, await copyFile(event));
+            case "deleteFile":
+                return callback(null, await deleteFile(event));
+            case "getLastBuild":
+                return callback(null, await getLastBuild(event));
+            default:
+                if(event.headers.task)
+                    throw new Error(`Unrecognised githubAPI task requested: ${event.headers.task}`);
+                else
+                    throw new Error("No githubAPI task specified");
+        }
+    } catch(e) {
+        console.error(e);
+        callback(e);
+    }
+}
+
+/**
+ * Send an OK response.
+ * @memberOf GitHubAPI
+ * @param obj {object} Body content to be JSON.stringified().
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+function OK(obj) {
+    return {
+        statusCode: 200, statusText: "OK",
+        body: JSON.stringify(obj)
+    };
+}
+
+
+/**
+ * Check a response code matches one of the expected codes.
+ * @memberOf GitHubAPI
+ * @param response {object} GitHub API response.
+ * @param code {number|number[]} status code to check for.
+ * @param method {string} request method.
+ * @return {Promise&lt;object>}
+ */
+async function checkResponseCode(response, code, method = 'GET') {
+    console.log(`${response.status} - ${response.statusText}: ${method} ${response.url.replace("https://api.github.com", "")}`);
+
+    if(typeof code === 'number')
+        code = [code];
+
+    const json = await response.json();
+    if(!code.includes(response.status))
+        throw new Error(`${response.statusText} (${response.status}): ${json.message}`);
+    return json;
+}
+
+/**
+ * Send a code to GitHub and request a token in exchange.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function redeemCode(event) {
+    console.log(`Exchanging code ${event.headers['github-code']} for token`)
+    const url = `https://github.com/login/oauth/access_token?client_id=${VUE_APP_GITHUB_ID}&amp;client_secret=${GH_APP_SECRET}&amp;code=${event.headers["github-code"]}`;
+    const access_token = await fetch(
+        url,
+        {headers: {"accept": "application/vnd.github.v3+json"}}
+    )
+        .then(r => checkResponseCode(r, 200, 'GET'))
+        .then(json => json.access_token)
+        .catch(e => {
+            console.error(e)
+            throw new Error(e)
+        });
+
+    return OK({access_token: cryptr.encrypt(access_token)});
+}
+
+/**
+ * Get the GitHub user details.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function getUserDetails(event) {
+    const d = JSON.parse(event.body);
+
+    const details = await fetch('https://api.github.com/user', {headers: {
+            "accept": "application/vnd.github.v3+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }})
+        .then(r => checkResponseCode(r, 200, 'GET'));
+    return OK(details);
+}
+
+/**
+ * Look up the repositories.
+ * @memberOf GitHubAPI
+ * @param event
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function findRepositories(event) {
+    const d = JSON.parse(event.body);
+    let topics = "";
+    let user = "";
+    if(d.topics)
+        topics = '+' + d.topics.map(t => `topic:${t}`).join('+');
+    if(d.owner)
+        user = `+user:${d.owner}`;
+    const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-open-research${user}${topics}`;
+    console.log(`findRepositories(${url})`)
+    const items = await fetch(url, {
+        method: "GET", headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200, 'GET'))
+        .then(json => json.items);
+    return OK(items);
+}
+
+/**
+ * Find all the files in a given repository.
+ * @memberOf GitHubAPI
+ * @param event
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function findRepositoryFiles(event) {
+    const d = JSON.parse(event.body);
+    const files = d.extraFiles.map(f => `${d.url}/contents/${f}`);
+    const dirs = [
+        d.includeEpisodes? "_episodes" : null,
+        d.includeEpisodes? "_episodes_rmd" : null,
+        d.extraFiles.length? "_includes/install_instructions" : null,
+        d.extraFiles.length? "_includes/intro/optional" : null
+    ]
+        .filter(p => p !== null);
+
+    // Fill in the file paths from the directory crawl
+    const fileList = await Promise.all(dirs.map(dir => fetch(`${d.url}/contents/${dir}`, {
+            method: "GET", headers: {
+                "accept": "application/vnd.github.v3+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            }
+        })
+            // Protect against 404 errors because some repos don't have some directories
+            .then(r => r.status === 404? [{}] : checkResponseCode(r, 200, 'GET'))
+            .then(json => json.map(i => {
+                if(i.type === "file" &amp;&amp; !/^[._]/.test(i.name))
+                    return i.url;
+                return null;
+            }))
+    ))
+        .then(r => {
+            const fList = files;
+            r.forEach(L => fList.push(...L));
+            return fList.filter(f => f !== null);
+        });
+    const response = await Promise.all(fileList.map(f => fetch(f, {
+            method: "GET",
+            headers: {
+                "accept": "application/vnd.github.v3+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            }
+        })
+            .then(r => r.status === 404? null : checkResponseCode(r, 200, 'GET'))
+    ));
+    return OK(response.filter(r => r !== null));
+}
+
+/**
+ * Create a repository on GitHub for the currently authorised user.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function createRepository(event) {
+    const d = JSON.parse(event.body);
+    const newRepo = await fetch(`https://api.github.com/repos/${d.template}/generate`, {
+        method: "POST",
+        headers: {
+            "accept": "application/vnd.github.baptiste-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        },
+        body: JSON.stringify({
+            name: d.name,
+            private: false
+        })
+    })
+        .then(r => checkResponseCode(r, 201, 'POST'));
+    await fetch(`${newRepo.url}/topics`, {
+        method: "PUT",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        },
+        body: JSON.stringify({
+            names: ['ukrn-open-research', 'ukrn-workshop']
+        })
+    })
+        .then(r => checkResponseCode(r, 200, 'PUT'));
+    // Fetch a fresh copy with the updated topics
+    return pullItem({body: JSON.stringify({
+            url: newRepo.url, token: d.token
+        })});
+}
+
+/**
+ * Replace a file with a new version via github commit.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function pushFile(event) {
+    const d = JSON.parse(event.body);
+    const upload = await fetch(d.url, {
+        method: "PUT",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        },
+        body: JSON.stringify({
+            content: d.content,
+            message: `${d.path} update by UKRN Workshop Builder`,
+            sha: d.sha
+        })
+    })
+        .then(r => checkResponseCode(r, [200, 201], 'PUT'));
+    // retrieve updated version
+    const file = await fetch(upload.content.url, {
+        method: "GET", headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200, 'GET'));
+    return OK(file);
+}
+
+/**
+ * Pull an item from GitHub by its URL.
+ * @memberOf GitHubAPI
+ * @param event
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function pullItem(event) {
+    const d = JSON.parse(event.body);
+    const item = await fetch(d.url, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200, 'GET'));
+    return OK(item);
+}
+
+/**
+ * Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function setTopics(event) {
+    const d = JSON.parse(event.body);
+    // Find current topics
+    const topics = await getTopics(event);
+    const setTopics = d.topics;
+    // To protect against removal of customised topics we use this approach
+    topics.forEach(t => {
+        if(!Object.keys(setTopics).includes(t))
+            setTopics[t] = true;
+    });
+    const newTopicList = Object.keys(setTopics).filter(k => setTopics[k]);
+
+    // Send the topic list
+    await fetch(`${d.url}/topics`, {
+        method: "PUT",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        },
+        body: JSON.stringify({names: newTopicList})
+    })
+        .then(r => checkResponseCode(r, 200, 'PUT'));
+    // Fetch final topic list for sanity
+    return OK(await getTopics(event));
+}
+
+/**
+ * Get the topics associated with a repository.
+ * @memberOf GitHubAPI
+ * @param event {{body: string, ...*:any}}
+ * @return {Promise&lt;Object>}
+ */
+async function getTopics(event) {
+    const d = JSON.parse(event.body);
+    const topics = await fetch(`${d.url}/topics`, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200, 'GET'));
+    return topics.names;
+}
+
+/**
+ * Copy a file from one repository to another, and return the copy.
+ * @memberOf GitHubAPI
+ * @param event {{body: string, ...*:any}}
+ * @return {Promise&lt;Object>}
+ */
+async function copyFile(event) {
+    const d = JSON.parse(event.body);
+    let file = null;
+    // Check if the target url already exists
+    if(d.returnExisting) {
+        const existing = await fetch(d.newURL, {
+            method: "GET",
+            headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            }
+        })
+            .then(r => checkResponseCode(r, 200, 'GET'))
+            .then(json => json.content)
+            .catch(() => null);
+        if(existing)
+            return OK(existing);
+    }
+
+    return await fetch(d.url, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.mercy-preview+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200, 'GET'))
+        .then(json => file = json)
+        .then(() => pushFile({body: JSON.stringify({
+                ...d, content: file.content, path: file.path, url: d.newURL
+            })}));
+}
+
+/**
+ * Delete a file via github commit.
+ * @memberOf GitHubAPI
+ * @param event {object} request details.
+ * @return {{statusText: string, body: string, statusCode: number}}
+ */
+async function deleteFile(event) {
+    const d = JSON.parse(event.body);
+    const file = await fetch(d.url, {
+        method: "GET",
+        headers: {
+            "accept": "application/vnd.github.v3+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }
+    })
+        .then(r => checkResponseCode(r, 200, 'GET'));
+
+    return OK(
+        await fetch(file.url, {
+            method: "DELETE",
+            headers: {
+                "accept": "application/vnd.github.v3+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            },
+            body: JSON.stringify({
+                message: `${file.path} deleted by UKRN Workshop Builder`,
+                sha: file.sha
+            })
+        })
+            .then(r => checkResponseCode(r, 200, 'DELETE'))
+    );
+}
+
+/**
+ * Retrieve the build status report for the last GitHub Pages build attempt.
+ * @memberOf GitHubAPI
+ * @param event {object} Should have body JSON string with repository URL and GitHub access token.
+ * @return {Promise&lt;{statusText: string, body: string, statusCode: number}>}
+ */
+async function getLastBuild(event) {
+    const d = JSON.parse(event.body);
+    const status = await fetch(`${d.url}/pages/builds/latest`, {
+        headers: {
+            "accept": "application/vnd.github.v3+json",
+            "authorization": `token ${cryptr.decrypt(d.token)}`
+        }})
+        .then(r => checkResponseCode(r, 200, 'GET'))
+    return OK(status);
+}
+
+if(process.env.NODE_ENV === 'test') {
+    module.exports = {
+        main,
+        OK,
+        checkResponseCode,
+        redeemCode,
+        getUserDetails,
+        findRepositories,
+        findRepositoryFiles,
+        createRepository,
+        pushFile,
+        pullItem,
+        setTopics,
+        getTopics,
+        copyFile,
+        deleteFile,
+        getLastBuild
+    }
+}
+exports.handler = main;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">Documentation generated by JSDOC. Template by TOAST UI.</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>
