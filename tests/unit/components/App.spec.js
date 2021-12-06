@@ -14,6 +14,11 @@ describe('App.vue', () => {
             getters: {
                 'workshop/Repository': () => null,
                 'github/login': () => false,
+            },
+            state: {
+                github: {errors: []},
+                template: {errors: []},
+                workshop: {errors: []}
             }
         }
         const wrapper = shallowMount(
