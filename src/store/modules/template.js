@@ -1,5 +1,7 @@
 /**
  * @class template
+ *
+ * @description The template store module handles the basic template from which a workshop is created. This is likely to change in future when forking existing workshops becomes an option in the Builder Tool.
  */
 export default {
     namespaced: true,
@@ -35,7 +37,6 @@ export default {
              * Fetch the _config.yml file from repo to use as a template.
              * @memberOf template
              * @action fetchTemplateMaster=master
-             * @method Actions/fetchTemplateMaster
              * @param {StoreContext} nsContext
              * @param {string} repo Repository to use as a template.
              * @returns {Promise<void>|void}

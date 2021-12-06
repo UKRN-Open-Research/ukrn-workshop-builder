@@ -151,6 +151,38 @@
   import RemoteRepositoryView from "./RemoteRepositoryView";
   import CustomiseItem
     from "./CustomiseItem";
+
+  /**
+   * @typedef Schedule
+   * A schedule contains a number of days, each of which contains episodes in a particular order. There are also episodes that are not assigned to days in the stash.
+   * @property days {Array<ScheduleDay>} The days in the schedule.
+   * @property unassignedItems {Array<File>} The episodes not assigned to any day.
+   */
+
+  /**
+   * @typedef ScheduleDay
+   * A schedule day represents a single day in the schedule. It has a number of episodes in a given order and an identifier for which day it is.
+   * @property number {Number} The number of the day in the schedule.
+   * @property items {Array<File>} The episodes occurring on the day.
+   */
+
+  /**
+   * @description The MakeSchedule component separates a repository's files into three groups: extra files, which are displayed at the top of the page for customisation; scheduled episodes, which are displayed in the day to which they have been assigned and which show their start time; and unscheduled episodes, which are displayed in a stash for allocation to the schedule by the user. The stash offers a button to add additional episodes by conducting a GitHub search.
+   *
+   * @vue-prop [recalculateItems=true] {Boolean} Whether the time-consuming operation of detecting the files available should be conducted.
+   *
+   * @vue-data addRemoteItems=false {Boolean} Whether the modal for adding remote items to the stash is open.
+   * @vue-data remoteRepositoryName="" {String} Search string used for filtering repositories when adding items to the stash.
+   * @vue-data availableEpisodes=[] {Array<File>|Array} Episodes available scheduling.
+   * @vue-data expandedRepo="" {String} Name of the repository currently expanded in the add-items-to-stash modal.
+   *
+   * @vue-computed mainRepo {Repository} Repository currently being created by the Workshop Builder Tool.
+   * @vue-computed allItems {Array<File>} Items available for scheduling, including both local and remote episodes.
+   * @vue-computed schedule {Schedule} The schedule for the workshop.
+   * @vue-computed filteredTopicRepositories {Array<Repository>} A list of repositories matching the current text filter in the add-items-to-stash search box.
+   * @vue-computed autoCompleteOptions {Array<String>} Autocomplete prompts for entering remoteRepositoryName filter string.
+   * @vue-computed remoteRepositoryEpisodes {Array<File>} Currently unused.
+   */
   export default {
     name: 'MakeSchedule',
     components: {
@@ -270,13 +302,15 @@
     },
     methods: {
       /**
-       * Clear stash episodes
+       * Clear stash episodes.
        */
       clearStash() {
         this.availableEpisodes = this.availableEpisodes.filter(f => f.yaml.day);
       },
       /**
-       * Mark an episode as available for including in the current project
+       * Mark an episode as available for including in the current project.
+       * @param E {File} Episode to mark.
+       * @param available {boolean} Whether the episode should be available.
        */
       setEpisodeAvailable(E, available) {
         if(this.availableEpisodes.filter(e => e.url === E.url).length > 0 === available)
@@ -286,15 +320,21 @@
         else
           this.availableEpisodes = this.availableEpisodes.filter(e => e.url !== E.url)
       },
+      /**
+       * Update an episode to mark its new place in the schedule.
+       * @param episode {File} Episode to update.
+       */
       updateEpisode(episode) {
         this.$store.dispatch('workshop/setFileContentFromYAML', {
           url: episode.url, yaml: episode.yaml, body: episode.body
         })
       },
       /**
-       * Update the scheduled day for an item
-       * @param item {object} item to update
-       * @param dayId {number|""} day to set
+       * Update the scheduled day for an item. If attempting to update a duplicatable item, the item will be duplicated. If stashing an item that deletes when stashed, that item will be deleted.
+       * @param item {File} Episode to update.
+       * @param dayId {Number|""} Day to which the episode belongs.
+       * @param [prevOrder] {Number} The order number of the episode before this one.
+       * @param [nextOrder] {Number} The order number of the episode after this one.
        */
       async updateItemDay({item, dayId, prevOrder, nextOrder}) {
         console.log(`${item.path} DAY => ${dayId} [${prevOrder}, ${nextOrder}]`)
@@ -334,6 +374,10 @@
           newYAML.order = 100000;
         this.updateEpisode({...item, yaml: newYAML});
       },
+      /**
+       * Add episodes into the stash from a remote repository by marking them as available.
+       * @param episodes {Array<File>} Episodes to add.
+       */
       addRepositoryEpisodes(episodes) {
         // Close modal
         this.addRemoteItems = false;

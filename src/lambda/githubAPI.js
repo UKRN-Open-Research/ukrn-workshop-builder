@@ -5,6 +5,11 @@ const Cryptr = require('cryptr');
 const cryptr = new Cryptr(GH_TOKEN_ENCRYPTION_KEY);
 
 /**
+ * @class GitHubAPI
+ * @description The GitHubAPI backend is a lambda function invoked via Netlify's functions system. It receives HTTP requests and conducts GitHub API calls based on the instructions in the request header and data provided in the body.
+ */
+
+/**
  * Callback to return the results of the API interaction to the client. Returns a status of 500 if error is set, otherwise returns the status given in response.
  * @callback returnResponse
  * @param error {Error} An error encountered while using the API.
@@ -14,6 +19,7 @@ const cryptr = new Cryptr(GH_TOKEN_ENCRYPTION_KEY);
 
 /**
  * Process requests from a client.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @param context {object} environment details.
  * @param callback {returnResponse} function to send the response to the client.
@@ -58,6 +64,7 @@ async function main(event, context, callback) {
 
 /**
  * Send an OK response.
+ * @memberOf GitHubAPI
  * @param obj {object} Body content to be JSON.stringified().
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -70,7 +77,8 @@ function OK(obj) {
 
 
 /**
- *
+ * Check a response code matches one of the expected codes.
+ * @memberOf GitHubAPI
  * @param response {object} GitHub API response.
  * @param code {number|number[]} status code to check for.
  * @param method {string} request method.
@@ -90,6 +98,7 @@ async function checkResponseCode(response, code, method = 'GET') {
 
 /**
  * Send a code to GitHub and request a token in exchange.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -112,6 +121,7 @@ async function redeemCode(event) {
 
 /**
  * Get the GitHub user details.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -128,6 +138,7 @@ async function getUserDetails(event) {
 
 /**
  * Look up the repositories.
+ * @memberOf GitHubAPI
  * @param event
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -154,6 +165,7 @@ async function findRepositories(event) {
 
 /**
  * Find all the files in a given repository.
+ * @memberOf GitHubAPI
  * @param event
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -202,6 +214,7 @@ async function findRepositoryFiles(event) {
 
 /**
  * Create a repository on GitHub for the currently authorised user.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -238,6 +251,7 @@ async function createRepository(event) {
 
 /**
  * Replace a file with a new version via github commit.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -269,6 +283,7 @@ async function pushFile(event) {
 
 /**
  * Pull an item from GitHub by its URL.
+ * @memberOf GitHubAPI
  * @param event
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -287,6 +302,7 @@ async function pullItem(event) {
 
 /**
  * Set the topics on a newly created workshop so we can check custom repository submissions' eligibility easily.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -318,7 +334,8 @@ async function setTopics(event) {
 
 /**
  * Get the topics associated with a repository.
- * @param event {{body: string, ...etc:any}}
+ * @memberOf GitHubAPI
+ * @param event {{body: string, ...*:any}}
  * @return {Promise<Object>}
  */
 async function getTopics(event) {
@@ -336,7 +353,8 @@ async function getTopics(event) {
 
 /**
  * Copy a file from one repository to another, and return the copy.
- * @param event {{body: string, ...etc:any}}
+ * @memberOf GitHubAPI
+ * @param event {{body: string, ...*:any}}
  * @return {Promise<Object>}
  */
 async function copyFile(event) {
@@ -374,6 +392,7 @@ async function copyFile(event) {
 
 /**
  * Delete a file via github commit.
+ * @memberOf GitHubAPI
  * @param event {object} request details.
  * @return {{statusText: string, body: string, statusCode: number}}
  */
@@ -405,7 +424,8 @@ async function deleteFile(event) {
 }
 
 /**
- *
+ * Retrieve the build status report for the last GitHub Pages build attempt.
+ * @memberOf GitHubAPI
  * @param event {object} Should have body JSON string with repository URL and GitHub access token.
  * @return {Promise<{statusText: string, body: string, statusCode: number}>}
  */

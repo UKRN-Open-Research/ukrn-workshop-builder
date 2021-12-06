@@ -21,6 +21,18 @@
 <script>
 import draggable from "vuedraggable"
 import CustomiseItem from "./CustomiseItem";
+
+
+/**
+ * @description The ArrangeItems component uses vue-draggable to enable CustomiseItem components to be rearranged.
+ * @vue-prop {Array} items List of episodes in the draggable box.
+ * @vue-prop {Number} [dayId=null] The id of the day that this component represents.
+ *
+ * @vue-computed times {Array<{start: Number, end: Number}>} The start and end times for each item.
+ *
+ * @vue-event assignItem {{item: HTMLElement, dayId: Number, prevOrder: Number, nextOrder: Number}} Emit a command to move an HTMLElement to a particular slot on a particular day.
+ * @vue-event removeItem {{item: CustomiseItem, dayId: string}} Emit a command to remove an item from this component.
+ */
 export default {
   name: 'ArrangeItems',
   components: {
@@ -59,6 +71,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * Check a draggable event and process any updates needed.
+     * @param evt {{added: Array<Object>, moved: Array<Object>}} Draggable drop event.
+     */
     change(evt) {
       // Only monitor add events because the store will handle removals
       if(!evt.added && !evt.moved)
@@ -76,6 +92,10 @@ export default {
         nextOrder: safeOrder(nextOrder)
       });
     },
+    /**
+     * Remove an child item from the component.
+     * @param item {Object} Item to remove.
+     */
     remove(item) {this.$emit('assignItem', {item: item, dayId: ''})}
   }
 }

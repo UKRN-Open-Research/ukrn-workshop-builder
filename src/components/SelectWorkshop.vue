@@ -63,7 +63,19 @@
 </template>
 
 <script>
-export default {
+  /**
+   * The SelectWorkshop component offers a user a list of their UKRN workshop repositories from which they can select a repository to edit. Alternatively the user can enter a new repository name to create a new workshop repository from a template repository.
+   *
+   * @vue-prop [templateRepository] {String} The template repository from which the create new workshop will be created.
+   *
+   * @vue-data chosenTemplateRepository {String} The template repository currently selected as the template for created workshops.
+   * @vue-data newRepositoryName="" {String} Name for the new repository to be created.
+   * @vue-data remoteRepositoryURL=null {String|null} The URL of the currently selected repository.
+   *
+   * @vue-computed userRepositories {Array<Repository>} URKN workshop GitHub repositories belonging to the user.
+   * @vue-computed newRepositoryNameSafe {String} A version of the newRepositoryName string suitable for use as a GitHub repository name.
+   */
+  export default {
   components: {
   },
   name: 'SelectWorkshop',
@@ -87,12 +99,18 @@ export default {
     }
   },
   methods: {
+    /**
+     * Refresh the list of the user's repositories.
+     */
     checkUserRepositories() {
       console.log(`checkUserRepositories(user=${this.$store.getters['github/login']})`)
       this.$store.dispatch('workshop/findRepositories', {
         owner: this.$store.getters['github/login']
       });
     },
+    /**
+     * Set a repository as the main repository for customisation. Fetch the repository files for that repository, and fetch a list of other UKRN workshop repositories with the same open science topic. Schedule a build status check for the immediate future.
+     */
     chooseWorkshop() {
       // Load local files for this workshop
       this.$store.commit('workshop/setMainRepository',
@@ -110,6 +128,9 @@ export default {
       // Fetch build info for selected repository
       this.$store.dispatch('github/registerBuildCheck', {delay: 100});
     },
+    /**
+     * Create a new UKRN workshop repository on GitHub by copying from a template.
+     */
     createRepository() {
       this.$store.dispatch('workshop/createRepository', {
         name: this.newRepositoryNameSafe, template: this.chosenTemplateRepository

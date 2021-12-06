@@ -65,7 +65,19 @@
 </template>
 
 <script>
-export default {
+  /**
+   * @description The GitHubMenu component provides a sidebar with buttons and information relevant to the GitHub instance of the current main repository. It offers a link to the GitHub repository, options to discard or push all changes to local files, a link to the GitHub Pages render of the repository, and details of the last Build Status Check.
+   *
+   * @vue-data expanded=false {Boolean} Whether the sidebar is expanded.
+   *
+   * @vue-computed mainRepo {Repository} Repository currently being edited in the Workshop Builder tool.
+   * @vue-computed pagesURL {String} Link to homepage of the repository as rendered by GitHub Pages.
+   * @vue-computed buildType {String} Buefy class string representing how the build status should be styled.
+   * @vue-computed buildIcon {String} MDI icon name for the build status icon.
+   * @vue-computed buildMessage {String} Description of the build status.
+   * @vue-computed lastCheck {String|null} Pretty datetime string giving the time of the last build.
+   */
+  export default {
   name: 'GitHubMenu',
   components: {},
   props: {},
@@ -119,6 +131,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * Discard local store copies of all files and retrieve fresh versions from GitHub.
+     * @return {Promise<BNoticeComponent>}
+     */
     reload() {
       const self = this;
       return this.$store.dispatch('workshop/loadRepository', {url: self.mainRepo.url})
@@ -130,6 +146,10 @@ export default {
                 message: "Failed to reload repository", type: "is-danger"
               })})
     },
+    /**
+     * Push all changes to all altered local store files to the remote GitHub repository.
+     * @return {Promise<BNoticeComponent>}
+     */
     save() {
       const self = this;
       return this.$store.dispatch('workshop/saveRepositoryChanges')

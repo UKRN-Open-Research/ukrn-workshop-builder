@@ -36,6 +36,25 @@
 <script>
 import YAMLFieldInput from "./YAMLFieldInput";
 import YAMLFieldInputArray from "./YAMLFieldInputArray";
+
+/**
+ * @description The YAMLField component displays a single YAML field for editing using the appropriate input option.
+ *
+ * @vue-prop field {Field} YAML Field to display.
+ * @vue-prop [saveStatusLinger=1000] {Number} Display duration (ms) for the save indicator.
+ *
+ * @vue-data currentValue=null {any} Current value of the YAML field.
+ * @vue-data valueChanged=false {Boolean} Whether the current value matches the value saved in the store.
+ * @vue-data loadingFileList=true {Boolean} Whether the list of files required for the field's options is being fetched.
+ * @vue-data [fileList=[]] {Array<String>} List of filenames for files required for the field's options.
+ * @vue-data saveStatus='' {String} Description of the current save status. "clean" = unchanged, "saved" = freshly saved to store, "dirty" = changes pending save
+ * @vue-data saveStatusTimeout=null {Number} Timeout handle for the event cancelling the 'recently saved' display.
+ *
+ * @vue-computed value {any} Value of the YAML field in the store.
+ * @vue-computed status='' {String} The Buefy style class for displaying the field's save status.
+ *
+ * @vue-event save {{key: String, value: any}} Indicate that a new value should be saved as this field's value.
+ */
 export default {
     name: "YAMLField",
     components: {YAMLFieldInput, YAMLFieldInputArray},
@@ -45,8 +64,8 @@ export default {
     },
     data: function() {
         return {
-            currentValue: null, // dictionary of values indexed by YAML keys
-            valueChanged: false, // dictionary of change flags indexed by YAML keys
+            currentValue: null,
+            valueChanged: false,
             loadingFileList: true,
             fileList: [],
             saveStatus: '',
@@ -83,6 +102,11 @@ export default {
         }
     },
     methods: {
+        /**
+         * Convert values to the format in which they are saved in the store.
+         * @param v {any} Value to convert.
+         * @return {any} Value in the format expected by the back end.
+         */
         toBackendValue(v) {
             if(v === null)
                 return v;
@@ -92,6 +116,9 @@ export default {
                 v = v.map(x => `${x.substr(0, 2)}|${x.substr(2,2)}`);
             return v;
         },
+        /**
+         * Save the value of the field to the store.
+         */
         save() {
             console.log(`Save: ${this.field.value} -> ${this.value}`)
             let input = this.toBackendValue(this.value);
@@ -100,12 +127,21 @@ export default {
             this.setSaveStatus('saved');
             this.$emit('save', {key: this.field.key, value: input});
         },
+        /**
+         * Check whether a string is a valid 12h60m format string.
+         * @param tag {String} Time string to check.
+         * @return {boolean}
+         */
         validTime(tag) {
             const match = /^(?<h>[0-9]{2})(?<m>[0-9]{2})$/.exec(tag);
             if(!match || !match.groups) return false;
             if(match.groups.h >= 24) return false;
             return match.groups.m < 60;
         },
+        /**
+         * Search through a repository's path to determine the files that are valid completion values for the field. This is triggered when the component is mounted.
+         * @return {Array<String>|null}
+         */
         getFileList() {
             if(!this.field.special || this.field.type !== 'filename') {
                 this.loadingFileList = false;
@@ -132,6 +168,10 @@ export default {
                     .catch(() => null)
             })
         },
+        /**
+         * Set the save status of the field. Setting the status to "saved" will set the status back to "clean" after a delay.
+         * @param status {String} Status ("clean", "dirty", or "saved") to set the save status to.
+         */
         setSaveStatus(status) {
             if(this.saveStatusTimeout)
                 clearTimeout(this.saveStatusTimeout);

@@ -14,13 +14,17 @@ import workshop from "./modules/workshop";
 
 /**
  * @class store
- * @property modules {Object[]} Modules used in the store.
- * @property modules.template {template} Template store module.
- * @property modules.github {github} GitHub store module.
- * @property modules.workshop {workshop} Workshop store module.
+ * @description The VueX store allows all components to share a single set of data. The majority of the store is partitioned into namespaced modules that take care of GitHub login and build monitoring, Workshop creation and editing, and Template management.
  */
 const store = {
     strict: process.env.NODE_ENV !== 'production',
+    /**
+     * @name Modules
+     * @memberOf store
+     * @property template {template} Template store module.
+     * @property github {github} GitHub store module.
+     * @property workshop {workshop} Workshop store module.
+     */
     modules: {
         github,
         template,

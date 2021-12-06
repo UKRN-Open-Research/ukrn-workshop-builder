@@ -1,24 +1,48 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: store/modules/workshop.js</title>
+    <title>Source: store/modules/workshop.js | UKRN Workshop Builder Tool</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="jsdoc-tweaks.css">
+        
+    
 </head>
-
 <body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">UKRN Workshop Builder Tool</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-App.html">App</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:App_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-App.html#stepType">stepType</a></li></ul></div></li><li><a href="module-ArrangeItems.html">ArrangeItems</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:ArrangeItems_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-ArrangeItems.html#change">change</a></li><li><a href="module-ArrangeItems.html#remove">remove</a></li></ul></div></li><li><a href="module-CustomiseItem.html">CustomiseItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseItem_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseItem.html#editContent">editContent</a></li><li><a href="module-CustomiseItem.html#editRawContent">editRawContent</a></li><li><a href="module-CustomiseItem.html#getPagesLink">getPagesLink</a></li><li><a href="module-CustomiseItem.html#getRelativeLink">getRelativeLink</a></li><li><a href="module-CustomiseItem.html#imgAdd">imgAdd</a></li><li><a href="module-CustomiseItem.html#install">install</a></li><li><a href="module-CustomiseItem.html#installMissingDependencies">installMissingDependencies</a></li><li><a href="module-CustomiseItem.html#pad">pad</a></li><li><a href="module-CustomiseItem.html#save">save</a></li></ul></div></li><li><a href="module-CustomiseWorkshop.html">CustomiseWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseWorkshop.html#editConfig">editConfig</a></li><li><a href="module-CustomiseWorkshop.html#pushConfig">pushConfig</a></li><li><a href="module-CustomiseWorkshop.html#refresh">refresh</a></li></ul></div></li><li><a href="module-EpisodeName.html">EpisodeName</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:EpisodeName_sub"></div></li><li><a href="module-GitHubLogin.html">GitHubLogin</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubLogin_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubLogin.html#loginRequest">loginRequest</a></li></ul></div></li><li><a href="module-GitHubMenu.html">GitHubMenu</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubMenu_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubMenu.html#reload">reload</a></li><li><a href="module-GitHubMenu.html#save">save</a></li></ul></div></li><li><a href="module-MakeSchedule.html">MakeSchedule</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:MakeSchedule_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-MakeSchedule.html#addRepositoryEpisodes">addRepositoryEpisodes</a></li><li><a href="module-MakeSchedule.html#clearStash">clearStash</a></li><li><a href="module-MakeSchedule.html#setEpisodeAvailable">setEpisodeAvailable</a></li><li><a href="module-MakeSchedule.html#updateEpisode">updateEpisode</a></li><li><a href="module-MakeSchedule.html#updateItemDay">updateItemDay</a></li></ul></div></li><li><a href="module-RemoteRepositoryView.html">RemoteRepositoryView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:RemoteRepositoryView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-RemoteRepositoryView.html#doLookup">doLookup</a></li></ul></div></li><li><a href="module-SelectWorkshop.html">SelectWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:SelectWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-SelectWorkshop.html#checkUserRepositories">checkUserRepositories</a></li><li><a href="module-SelectWorkshop.html#chooseWorkshop">chooseWorkshop</a></li><li><a href="module-SelectWorkshop.html#createRepository">createRepository</a></li></ul></div></li><li><a href="module-TextEditable.html">TextEditable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:TextEditable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-TextEditable.html#input">input</a></li><li><a href="module-TextEditable.html#keydown">keydown</a></li></ul></div></li><li><a href="module-WorkshopProperties.html">WorkshopProperties</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:WorkshopProperties_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-WorkshopProperties.html#registerSave">registerSave</a></li><li><a href="module-WorkshopProperties.html#save">save</a></li></ul></div></li><li><a href="module-YAMLField.html">YAMLField</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLField_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLField.html#getFileList">getFileList</a></li><li><a href="module-YAMLField.html#save">save</a></li><li><a href="module-YAMLField.html#setSaveStatus">setSaveStatus</a></li><li><a href="module-YAMLField.html#toBackendValue">toBackendValue</a></li><li><a href="module-YAMLField.html#validTime">validTime</a></li></ul></div></li><li><a href="module-YAMLFieldInput.html">YAMLFieldInput</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInput_sub"></div></li><li><a href="module-YAMLFieldInputArray.html">YAMLFieldInputArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInputArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLFieldInputArray.html#updateValue">updateValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="github.html">github</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="github_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="github.html#.Getters">Getters</a></li><li><a href="github.html#.Mutations">Mutations</a></li><li><a href="github.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="github.html#getBuildStatus">getBuildStatus</a></li><li><a href="github.html#getUserDetails">getUserDetails</a></li><li><a href="github.html#logout">logout</a></li><li><a href="github.html#processToken">processToken</a></li><li><a href="github.html#redeemCode">redeemCode</a></li><li><a href="github.html#registerBuildCheck">registerBuildCheck</a></li></ul></div></li><li><a href="GitHubAPI.html">GitHubAPI</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GitHubAPI_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GitHubAPI.html#.checkResponseCode">checkResponseCode</a></li><li><a href="GitHubAPI.html#.copyFile">copyFile</a></li><li><a href="GitHubAPI.html#.createRepository">createRepository</a></li><li><a href="GitHubAPI.html#.deleteFile">deleteFile</a></li><li><a href="GitHubAPI.html#.findRepositories">findRepositories</a></li><li><a href="GitHubAPI.html#.findRepositoryFiles">findRepositoryFiles</a></li><li><a href="GitHubAPI.html#.getLastBuild">getLastBuild</a></li><li><a href="GitHubAPI.html#.getTopics">getTopics</a></li><li><a href="GitHubAPI.html#.getUserDetails">getUserDetails</a></li><li><a href="GitHubAPI.html#.main">main</a></li><li><a href="GitHubAPI.html#.OK">OK</a></li><li><a href="GitHubAPI.html#.pullItem">pullItem</a></li><li><a href="GitHubAPI.html#.pushFile">pushFile</a></li><li><a href="GitHubAPI.html#.redeemCode">redeemCode</a></li><li><a href="GitHubAPI.html#.setTopics">setTopics</a></li></ul></div></li><li><a href="store.html">store</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="store_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="store.html#.Modules">Modules</a></li><li><a href="store.html#.Mutations">Mutations</a></li><li><a href="store.html#.State">State</a></li></ul></div></li><li><a href="template.html">template</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="template_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="template.html#.Mutations">Mutations</a></li><li><a href="template.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="template.html#handler">handler</a></li></ul></div></li><li><a href="workshop.html">workshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="workshop_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="workshop.html#.Getters">Getters</a></li><li><a href="workshop.html#.Mutations">Mutations</a></li><li><a href="workshop.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="workshop.html#addFile">addFile</a></li><li><a href="workshop.html#addRepository">addRepository</a></li><li><a href="workshop.html#createRepository">createRepository</a></li><li><a href="workshop.html#deleteFile">deleteFile</a></li><li><a href="workshop.html#duplicateFile">duplicateFile</a></li><li><a href="workshop.html#.fileInRepository">fileInRepository</a></li><li><a href="workshop.html#.findFileDependencies">findFileDependencies</a></li><li><a href="workshop.html#findRepositories">findRepositories</a></li><li><a href="workshop.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="workshop.html#.getRepoIntroFile">getRepoIntroFile</a></li><li><a href="workshop.html#installDependencies">installDependencies</a></li><li><a href="workshop.html#installFile">installFile</a></li><li><a href="workshop.html#loadRepository">loadRepository</a></li><li><a href="workshop.html#.parseYAML">parseYAML</a></li><li><a href="workshop.html#pullURL">pullURL</a></li><li><a href="workshop.html#pushFile">pushFile</a></li><li><a href="workshop.html#rewriteEpisodeOrders">rewriteEpisodeOrders</a></li><li><a href="workshop.html#saveRepositoryChanges">saveRepositoryChanges</a></li><li><a href="workshop.html#setFileContent">setFileContent</a></li><li><a href="workshop.html#setFileContentFromYAML">setFileContentFromYAML</a></li><li><a href="workshop.html#setTopics">setTopics</a></li><li><a href="workshop.html#uploadImage">uploadImage</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3><a href="global.html">Global</a></h3></div>
+</nav>
+<div id="resizer"></div>
 
-<div id="main">
-
-    <h1 class="page-title">Source: store/modules/workshop.js</h1>
-
+<div class="main" id="main">
     
 
 
@@ -88,10 +112,10 @@ const state = {
  * @name Mutations
  * @memberOf workshop
  * @type {Object}
- * @mutator {{array:string, item:{url:string, ...etc:any}}} setItem=files|repositories Change an item in the repositories or files state arrays.
- * @mutator {{array:string, item:{url:string, ...etc:any}}} removeItem=files|repositories Remove an item from the repositories or files state arrays.
+ * @mutator {{array:string, item:{url:string, ...*:any}}} setItem=files|repositories Change an item in the repositories or files state arrays.
+ * @mutator {{array:string, item:{url:string, ...*:any}}} removeItem=files|repositories Remove an item from the repositories or files state arrays.
  * @mutator {{flag: string, value: boolean}} setBusyFlag=busyFlags Set or unset a busy flag by item URL.
- * @mutator {{url:string, ...etc:any}} setMainRepository=repositories Set the repository with the specified URL as the main repository.
+ * @mutator {{url:string, ...*:any}} setMainRepository=repositories Set the repository with the specified URL as the main repository.
  * @mutator {{Error}} addError=errors Add an error to the list of encountered errors.
  */
 const mutations = {
@@ -994,11 +1018,14 @@ const actions = {
         nsContext.commit('setBusyFlag', {flag: url, value: false});
         return out;
     },
-    /****
+    /**
      * Reassign episode order numbers to keep the same order but add distance for inserting other episodes between them.
-     * @param nsContext {object}
-     * @param dayId {number} Day whose episodes should have their order numbers adjusted
-     * @param ignore_episodes {string[]} URLs of episodes to ignore
+     * @memberOf workshop
+     * @action rewriteEpisodeOrders=files
+     * @param {StoreContext} nsContext
+     * @param payload {Object}
+     * @param payload.dayId {number} Day whose episodes should have their order numbers adjusted.
+     * @param payload.ignore_episodes {string[]} URLs of episodes to ignore.
      * @return {Promise&lt;void>}
      */
     async rewriteEpisodeOrders(nsContext, {dayId, ignore_episodes}) {
@@ -1023,8 +1050,10 @@ const actions = {
 };
 
 /**
- * Parse a YAML-headed file into YAML key-value and body
- * @param content {string}
+ * Parse a YAML-headed file into YAML key-value and body.
+ * @memberOf workshop
+ * @requires yaml
+ * @param content {string} File content to be parsed.
  * @return {{yamlParseError: null|string, body: string|null, yaml: null|{}}}
  */
 function parseYAML(content) {
@@ -1046,10 +1075,26 @@ function parseYAML(content) {
     return {yaml, body, yamlParseError};
 }
 
+/**
+ * Return whether a given file is in a given repository.
+ * @memberOf workshop
+ *
+ * @description All repository files' URLs begin with the URL of their repository, meaning repository URL is always a substring of file URL. This property is used to check membership.
+ *
+ * @param fileURL {string} The URL of the file.
+ * @param repositoryURL {string} The URL of the repository.
+ * @return {boolean} Whether the file is in the repository.
+ */
 function fileInRepository(fileURL, repositoryURL){
     return fileURL.indexOf(repositoryURL) !== -1;
 }
 
+/**
+ * Scrape a markdown file to identify image files that are embedded in it. Handles both direct inclusion and the Workshop Builder's own &lt;code>{% include installedFile.lqd path="..." }&lt;/code> approach.
+ * @memberOf workshop
+ * @param File {File} Markdown file to scrape.
+ * @return {Array&lt;String>} List of paths to required files.
+ */
 function findFileDependencies(File) {
     // Check for Markdown image links
     const references = [];
@@ -1071,10 +1116,12 @@ function findFileDependencies(File) {
 }
 
 /**
- * Fetch the intro file for a repository
- * @param files {object[]} list of files
- * @param topic {string} topic name
- * @return {object} File
+ * Fetch the intro file for a repository.
+ * @memberOf workshop
+ * @description Each repository has template introduction files for each of the possible topics. The introduction actually used by the repository is determined by the repository's topic. This function filters the repository's files to retrieve the introduction actually used by the repository.
+ * @param files {File[]} Repository's files.
+ * @param topic {string} The topic of the repository.
+ * @return {null|File} Repository's intro file
  */
 function getRepoIntroFile(files, topic) {
     const topics = [topic, 'unknown-topic'];
@@ -1089,6 +1136,14 @@ function getRepoIntroFile(files, topic) {
 // Export module
 /**
  * @class workshop
+ * @description The Workshop store module is responsible for managing GitHub repositories. At any one time there will be zero or more repositories loaded in the module state. Up to one of these will be designated as the main repository. The main repository is the repository that is being edited in the Workshop Builder Tool. Other repositories are loaded so that their files can be copied into the main repository.
+ * This module also handles files, which are the markdown files in the relevant GitHub repository and the _config.yml configuration file for the repository.
+ *
+ * This module is the primary GitHub interface: most calls to the GitHub API come from this module (via the lambda functions in githubAPI.js).
+ *
+ * @requires yaml
+ * @requires query-string
+ * @requires js-base64
  */
 export default {
     namespaced: true,
@@ -1106,17 +1161,24 @@ export default {
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-CustomiseItem.computed.Fields.html">Fields</a></li><li><a href="module-WorkshopProperties.computed.Fields.html">Fields</a></li><li><a href="store.html">store</a></li><li><a href="template.html">template</a></li><li><a href="workshop.html">workshop</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkResponseCode">checkResponseCode</a></li><li><a href="global.html#copyFile">copyFile</a></li><li><a href="global.html#createRepository">createRepository</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#findRepositories">findRepositories</a></li><li><a href="global.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="global.html#getLastBuild">getLastBuild</a></li><li><a href="global.html#getRepoIntroFile">getRepoIntroFile</a></li><li><a href="global.html#getTopics">getTopics</a></li><li><a href="global.html#getUserDetails">getUserDetails</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#OK">OK</a></li><li><a href="global.html#onConfirm">onConfirm</a></li><li><a href="global.html#parseYAML">parseYAML</a></li><li><a href="global.html#pullItem">pullItem</a></li><li><a href="global.html#pushFile">pushFile</a></li><li><a href="global.html#redeemCode">redeemCode</a></li><li><a href="global.html#setTopics">setTopics</a></li></ul>
-</nav>
-
-<br class="clear">
-
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Dec 03 2021 18:21:22 GMT+0000 (Greenwich Mean Time)
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">Documentation generated by JSDOC. Template by TOAST UI.</div>
 </footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
 </body>
 </html>

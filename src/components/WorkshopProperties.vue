@@ -14,6 +14,27 @@
 
 <script>
 import YAMLField from "./YAMLField";
+
+/**
+ * @description The WorkshopProperties component lists the fields described in the workshop metadata and allows a user to customise their content.
+ *
+ * @vue-prop template {File} Template workshop with metadata describing the fields to display.
+ *
+ * @vue-data currentValue={} {Object<key, any>} Dictionary of values indexed by YAML keys.
+ * @vue-data valueChanged={} {Object<key, boolean>} Dictionary of change flags indexed by YAML keys.
+ * @vue-data loadingFileList=true {Boolean} Whether the file list special property of any field is being determined.
+ * @vue-data [fileList=[]] {Array<String>} List of files that can be selected as options for certain special fields.
+ * @vue-data saving=false {Boolean} Whether the local changes to the fields are being saved to the store.
+ * @vue-data saveTimeout=null {null|Number} Timeout index for the store save event.
+ * @vue-data minSaveDelay=500 {Number} Minimum delay between editing a field and its content being saved to the store.
+ * @vue-data lastSaveTime=0 {Number} Time the last save occurred.
+ * @vue-data saveOperations={} {Object} Dictionary of pending save operations.
+ * @vue-data [checkboxGroup=[]] {Array} Currently unused.
+ *
+ * @vue-computed Fields {Array<Field>} YAML Fields that can be edited.
+ *
+ * @vue-event refresh Signal that the _config.yml file in the store has been changed.
+ */
 export default {
     name: "WorkshopProperties",
     components: {YAMLField},
@@ -35,11 +56,6 @@ export default {
         }
     },
     computed: {
-        /**
-         * Rip properties and keys from their respective YAML lists and combine
-         * @return {Array<{name: string, type: string, is_required: boolean, is_array: boolean, format: string, special: string|string[], value: any, key: string}>}
-         * @constructor
-         */
         Fields() {
             const out = [];
             // Find the keys
@@ -64,12 +80,21 @@ export default {
         },
     },
     methods: {
+        /**
+         * Set a save operation to happen because a change has occurred.
+         * @param key {String} Key of the YAML field that should be saved.
+         * @param value {any} Value of the YAML field to save.
+         */
         registerSave({key, value}) {
             this.saveOperations[key] = value;
             if(this.saveTimeout)
                 clearTimeout(this.saveTimeout);
             this.saveTimeout = setTimeout(() => this.save(), this.minSaveDelay);
         },
+        /**
+         * Save the content of any changed YAML fields to the _config.yml file in the store.
+         * @return {Promise<boolean>}
+         */
         save() {
             this.saving = true;
             const me = this;

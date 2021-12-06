@@ -87,6 +87,19 @@
 
 <script>
 import WorkshopProperties from "./WorkshopProperties";
+
+/**
+ * @description The CustomiseWorkshop component provides an interface for editing the YAML properties detailed in the main workshop's _config.yml file. This is accomplished by providing a form that allows users to change the properties of the YAML fields in constrained ways. Advanced users may edit the file directly using the mavon-editor.
+ *
+ * @requires mavon-editor
+ *
+ * @vue-data currentTemplate=null {File} Config file of the main repository in local memory.
+ * @vue-data isEditingTemplate=false {Boolean} Whether the template is being edited.
+ * @vue-data bannerImg=null {null} Currently unsupported.
+ *
+ * @vue-computed template {File} Config file of the main repository in the store.
+ * @vue-computed configIssues {Array<Error>} List of compile issues with the current template.
+ */
 export default {
   name: 'CustomiseWorkshop',
   components: {WorkshopProperties},
@@ -116,10 +129,17 @@ export default {
     template(newValue) {this.currentTemplate = newValue}
   },
   methods: {
+    /**
+     * Begin direct template editing.
+     */
     editConfig: function() {
       this.currentTemplate = this.template;
       this.isEditingTemplate = true;
     },
+    /**
+     * Upload the local config to GitHub.
+     * @return {Promise<BNoticeComponent>}
+     */
     pushConfig: function() {
       const self = this;
       return this.$store.dispatch('workshop/pushFile', {url: self.template.url})
@@ -133,6 +153,9 @@ export default {
                 type: F? 'is-success' : 'is-danger'
               }));
     },
+    /**
+     * Reload the template from the store, discarding unsaved changes.
+     */
     refresh() {this.currentTemplate = this.template}
   }
 }

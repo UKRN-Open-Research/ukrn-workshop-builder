@@ -2,23 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>Home | UKRN Workshop Builder Tool</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="jsdoc-tweaks.css">
+        
+    
 </head>
-
 <body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+        
+            <img src="img/toast-ui.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">UKRN Workshop Builder Tool</a></h1>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+    <div class="lnb-api hidden"><h3>Modules</h3><ul><li><a href="module-App.html">App</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:App_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-App.html#stepType">stepType</a></li></ul></div></li><li><a href="module-ArrangeItems.html">ArrangeItems</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:ArrangeItems_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-ArrangeItems.html#change">change</a></li><li><a href="module-ArrangeItems.html#remove">remove</a></li></ul></div></li><li><a href="module-CustomiseItem.html">CustomiseItem</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseItem_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseItem.html#editContent">editContent</a></li><li><a href="module-CustomiseItem.html#editRawContent">editRawContent</a></li><li><a href="module-CustomiseItem.html#getPagesLink">getPagesLink</a></li><li><a href="module-CustomiseItem.html#getRelativeLink">getRelativeLink</a></li><li><a href="module-CustomiseItem.html#imgAdd">imgAdd</a></li><li><a href="module-CustomiseItem.html#install">install</a></li><li><a href="module-CustomiseItem.html#installMissingDependencies">installMissingDependencies</a></li><li><a href="module-CustomiseItem.html#pad">pad</a></li><li><a href="module-CustomiseItem.html#save">save</a></li></ul></div></li><li><a href="module-CustomiseWorkshop.html">CustomiseWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:CustomiseWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-CustomiseWorkshop.html#editConfig">editConfig</a></li><li><a href="module-CustomiseWorkshop.html#pushConfig">pushConfig</a></li><li><a href="module-CustomiseWorkshop.html#refresh">refresh</a></li></ul></div></li><li><a href="module-EpisodeName.html">EpisodeName</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:EpisodeName_sub"></div></li><li><a href="module-GitHubLogin.html">GitHubLogin</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubLogin_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubLogin.html#loginRequest">loginRequest</a></li></ul></div></li><li><a href="module-GitHubMenu.html">GitHubMenu</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:GitHubMenu_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-GitHubMenu.html#reload">reload</a></li><li><a href="module-GitHubMenu.html#save">save</a></li></ul></div></li><li><a href="module-MakeSchedule.html">MakeSchedule</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:MakeSchedule_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-MakeSchedule.html#addRepositoryEpisodes">addRepositoryEpisodes</a></li><li><a href="module-MakeSchedule.html#clearStash">clearStash</a></li><li><a href="module-MakeSchedule.html#setEpisodeAvailable">setEpisodeAvailable</a></li><li><a href="module-MakeSchedule.html#updateEpisode">updateEpisode</a></li><li><a href="module-MakeSchedule.html#updateItemDay">updateItemDay</a></li></ul></div></li><li><a href="module-RemoteRepositoryView.html">RemoteRepositoryView</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:RemoteRepositoryView_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-RemoteRepositoryView.html#doLookup">doLookup</a></li></ul></div></li><li><a href="module-SelectWorkshop.html">SelectWorkshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:SelectWorkshop_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-SelectWorkshop.html#checkUserRepositories">checkUserRepositories</a></li><li><a href="module-SelectWorkshop.html#chooseWorkshop">chooseWorkshop</a></li><li><a href="module-SelectWorkshop.html#createRepository">createRepository</a></li></ul></div></li><li><a href="module-TextEditable.html">TextEditable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:TextEditable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-TextEditable.html#input">input</a></li><li><a href="module-TextEditable.html#keydown">keydown</a></li></ul></div></li><li><a href="module-WorkshopProperties.html">WorkshopProperties</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:WorkshopProperties_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-WorkshopProperties.html#registerSave">registerSave</a></li><li><a href="module-WorkshopProperties.html#save">save</a></li></ul></div></li><li><a href="module-YAMLField.html">YAMLField</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLField_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLField.html#getFileList">getFileList</a></li><li><a href="module-YAMLField.html#save">save</a></li><li><a href="module-YAMLField.html#setSaveStatus">setSaveStatus</a></li><li><a href="module-YAMLField.html#toBackendValue">toBackendValue</a></li><li><a href="module-YAMLField.html#validTime">validTime</a></li></ul></div></li><li><a href="module-YAMLFieldInput.html">YAMLFieldInput</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInput_sub"></div></li><li><a href="module-YAMLFieldInputArray.html">YAMLFieldInputArray</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="module:YAMLFieldInputArray_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="module-YAMLFieldInputArray.html#updateValue">updateValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="github.html">github</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="github_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="github.html#.Getters">Getters</a></li><li><a href="github.html#.Mutations">Mutations</a></li><li><a href="github.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="github.html#getBuildStatus">getBuildStatus</a></li><li><a href="github.html#getUserDetails">getUserDetails</a></li><li><a href="github.html#logout">logout</a></li><li><a href="github.html#processToken">processToken</a></li><li><a href="github.html#redeemCode">redeemCode</a></li><li><a href="github.html#registerBuildCheck">registerBuildCheck</a></li></ul></div></li><li><a href="GitHubAPI.html">GitHubAPI</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="GitHubAPI_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="GitHubAPI.html#.checkResponseCode">checkResponseCode</a></li><li><a href="GitHubAPI.html#.copyFile">copyFile</a></li><li><a href="GitHubAPI.html#.createRepository">createRepository</a></li><li><a href="GitHubAPI.html#.deleteFile">deleteFile</a></li><li><a href="GitHubAPI.html#.findRepositories">findRepositories</a></li><li><a href="GitHubAPI.html#.findRepositoryFiles">findRepositoryFiles</a></li><li><a href="GitHubAPI.html#.getLastBuild">getLastBuild</a></li><li><a href="GitHubAPI.html#.getTopics">getTopics</a></li><li><a href="GitHubAPI.html#.getUserDetails">getUserDetails</a></li><li><a href="GitHubAPI.html#.main">main</a></li><li><a href="GitHubAPI.html#.OK">OK</a></li><li><a href="GitHubAPI.html#.pullItem">pullItem</a></li><li><a href="GitHubAPI.html#.pushFile">pushFile</a></li><li><a href="GitHubAPI.html#.redeemCode">redeemCode</a></li><li><a href="GitHubAPI.html#.setTopics">setTopics</a></li></ul></div></li><li><a href="store.html">store</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="store_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="store.html#.Modules">Modules</a></li><li><a href="store.html#.Mutations">Mutations</a></li><li><a href="store.html#.State">State</a></li></ul></div></li><li><a href="template.html">template</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="template_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="template.html#.Mutations">Mutations</a></li><li><a href="template.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="template.html#handler">handler</a></li></ul></div></li><li><a href="workshop.html">workshop</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="workshop_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="workshop.html#.Getters">Getters</a></li><li><a href="workshop.html#.Mutations">Mutations</a></li><li><a href="workshop.html#.State">State</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="workshop.html#addFile">addFile</a></li><li><a href="workshop.html#addRepository">addRepository</a></li><li><a href="workshop.html#createRepository">createRepository</a></li><li><a href="workshop.html#deleteFile">deleteFile</a></li><li><a href="workshop.html#duplicateFile">duplicateFile</a></li><li><a href="workshop.html#.fileInRepository">fileInRepository</a></li><li><a href="workshop.html#.findFileDependencies">findFileDependencies</a></li><li><a href="workshop.html#findRepositories">findRepositories</a></li><li><a href="workshop.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="workshop.html#.getRepoIntroFile">getRepoIntroFile</a></li><li><a href="workshop.html#installDependencies">installDependencies</a></li><li><a href="workshop.html#installFile">installFile</a></li><li><a href="workshop.html#loadRepository">loadRepository</a></li><li><a href="workshop.html#.parseYAML">parseYAML</a></li><li><a href="workshop.html#pullURL">pullURL</a></li><li><a href="workshop.html#pushFile">pushFile</a></li><li><a href="workshop.html#rewriteEpisodeOrders">rewriteEpisodeOrders</a></li><li><a href="workshop.html#saveRepositoryChanges">saveRepositoryChanges</a></li><li><a href="workshop.html#setFileContent">setFileContent</a></li><li><a href="workshop.html#setFileContentFromYAML">setFileContentFromYAML</a></li><li><a href="workshop.html#setTopics">setTopics</a></li><li><a href="workshop.html#uploadImage">uploadImage</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3><a href="global.html">Global</a></h3></div>
+</nav>
+<div id="resizer"></div>
 
-<div id="main">
-
-    <h1 class="page-title">Home</h1>
-
+<div class="main" id="main">
     
 
 
@@ -26,10 +48,6 @@
     
 
 
-    <h3> </h3>
-
-
-
 
 
 
@@ -40,7 +58,87 @@
     
 
 
-
+    <section>
+        <article class="readme"><p><a href="https://zenodo.org/badge/latestdoi/331747772"><img src="https://zenodo.org/badge/331747772.svg" alt="DOI"></a>
+<a href="https://app.netlify.com/sites/ukrn-wb/deploys"><img src="https://api.netlify.com/api/v1/badges/e38e5eae-c1e1-434e-85a7-b761c0d40806/deploy-status" alt="Netlify Status"></a>
+<a href="https://codecov.io/gh/UKRN-Open-Research/ukrn-workshop-builder"><img src="https://codecov.io/gh/UKRN-Open-Research/ukrn-workshop-builder/branch/dev/graph/badge.svg?token=JCV0CNRKMF" alt="codecov"></a>
+<a href="https://github.com/UKRN-Open-Research/ukrn-workshop-builder/actions/workflows/main.yml"><img src="https://github.com/UKRN-Open-Research/ukrn-workshop-builder/actions/workflows/main.yml/badge.svg" alt="Parallel Cypress Tests"></a></p>
+<h1>UKRN Workshop Builder Tool</h1>
+<h2>About</h2>
+<p>The <a href="https://ukrn.org/">UK Reproducibility Network (UKRN)</a> is an organisation that promotes open research practices in the United Kingdom.
+As part of its operations, it runs a train-the-trainer Open Research Workshop programme in which researchers familiar with a specific open research practice design and build workshops which will equip their colleagues with the necessary skills to embed the open research practice in their own workflows.
+This localised approach is designed to overcome the difficulties of adapting general open research materials to the specific needs of particular research fields.</p>
+<p>The <strong>Workshop Builder Tool</strong> has two primary purposes:</p>
+<ul>
+<li>Make workshop construction more efficient by providing an easy-to-use interface to GitHub Pages website development</li>
+<li>Allow discovery and sharing of similar workshop components built by others</li>
+</ul>
+<p>The Workshop Builder generates websites based on a <a href="https://github.com/UKRN-Open-Research/workshop-template">workshop template</a> adapted from <a href="https://carpentries.org/">The Carpentries'</a> workshop template.
+It is designed to work in companionship with the <a href="https://ukrn-orr.netlify.app/">UKRN Open Research Resources Browser</a>, which allows course participants to find resources to include in their workshops.</p>
+<h2>How it works</h2>
+<p>The Workshop Builder requires that users sign in with a GitHub account.</p>
+<p>Once this is done, users can create workshops and customise their metadata, including the topic, title, instructors and their contact details, etc.
+This step creates a GitHub repository for the user based on the <a href="https://github.com/UKRN-Open-Research/workshop-template">template</a>, tags it with the <code>ukrn-open-research</code> topic so it shows up in searches, and saves the metadata to <code>_config.yml</code>.</p>
+<p>The workshop can then be populated by searching for existing lessons (in repositories with the <code>ukrn-open-research</code> topic).
+All workshops with the same open research topic as the existing workshop will show up in the resource list, and their lessons can be added by adding them to the stash and then dragging them into a schedule timeline.</p>
+<p>When a lesson is placed in the timeline it can be installed - doing this copies it from its existing location into the <code>_episodes/</code> directory, and copies any images linked with markdown syntax (<code>![img alt text](img-link)</code>) into the <code>fig/</code> directory with a subdirectory path of the original repository.
+Once installed, a lesson's metadata and content can be edited.
+New lessons cannot be created from scratch, but there are <a href="https://github.com/UKRN-Open-Research/ukrn-wb-lesson-templates">barebones templates</a> which can be used for this.</p>
+<p>Several non-lesson files can also be edited, such as the workshop instructor notes (<code>./notes.md</code>) and the introductory text.</p>
+<p>As files are edited, changes are made to the locally cached versions.
+Files changes can then be pushed to GitHub individually or collectively committed or discarded.
+Triggering GitHub commits schedules a check on the build status to occur in the next few minutes, allowing users to see that their changes have been published on their workshop website.</p>
+<h2>Local development</h2>
+<p>This project's dependencies are managed by npm.
+To get started, fork this repository and then navigate to the project directory and follow the instructions below:</p>
+<h3>Project setup</h3>
+<p>To install the project dependencies run:</p>
+<pre class="prettyprint source"><code>npm install
+</code></pre>
+<h4><code>.env</code> and <code>.env.local</code> files</h4>
+<p>The project is powered by its connectivity to the GitHub API, via the UKRN Workshop Builder OAuth app.
+For local development, you will need to create your own OAuth app on GitHub.
+The app's Client ID should be listed in <code>.env</code> with the key <code>VUE_APP_GITHUB_ID</code>.
+The app's Client Secret should be listed in <code>.env.local</code> with the key <code>GITHUB_APP_SECRET</code>.
+The app should be configured to redirect to your local server, e.g. <code>http://localhost:8080/</code>.</p>
+<p>The Workshop Builder also has the user keep track of an encrypted version of their GitHub authorisation token, which is sent to the user with each GitHub interaction.
+The key for this encryption can be anything you like, but you must include it in your <code>.env.local</code> file as <code>GH_TOKEN_ENCRYPTION_KEY</code>, e.g.: <code>GH_TOKEN_ENCRYPTION_KEY=ThisIsOnlyAnExample</code>.</p>
+<h4>Serve for local testing</h4>
+<p>Uses webpack compiling and supports hot-reloading of files.</p>
+<pre class="prettyprint source"><code>npm run serve
+</code></pre>
+<h4>Run unit tests</h4>
+<pre class="prettyprint source"><code>npm run test:unit
+</code></pre>
+<h4>Compiles and minifies for production</h4>
+<pre class="prettyprint source"><code>npm run build
+</code></pre>
+<h4>Lints and fixes files</h4>
+<pre class="prettyprint source"><code>npm run lint
+</code></pre>
+<h4>Documentation</h4>
+<p>The documentation is produced by <a href="https://jsdoc.app/index.html">JSDoc</a>, relying on <a href="https://github.com/Kocal/jsdoc-vuejs/tree/3.x">jsdoc-vuejs</a> and [jsdoc-vuex-plugin](https://github.com/martiensk/vuex-jsdoc, and styled with the <a href="https://github.com/nhn/tui.jsdoc-template">tui-jsdoc-template</a>.
+To generate documentation use:</p>
+<pre class="prettyprint source"><code>npm run document
+</code></pre>
+<p>Documentation can be viewed by serving the contents of <code>./docs</code>.
+The live documentation can be viewed on the GitHub Pages <a href="https://UKRN-Open-Research.github.io/ukrn-workshop-builder/">site</a> for the repository.</p>
+<h4>Customize configuration</h4>
+<p>See <a href="https://cli.vuejs.org/config/">Configuration Reference</a>.</p>
+<h3>Component Guides</h3>
+<p>The project is built on several core components.
+If you run into difficulty with them, more information can be found at:</p>
+<ul>
+<li><a href="https://vuejs.org/">VueJS</a></li>
+<li><a href="https://vuex.vuejs.org/">VueX</a></li>
+<li><a href="https://bulma.io/">Bulma</a> / <a href="https://buefy.org/">Buefy</a></li>
+<li><a href="https://github.com/hinesboy/mavonEditor/blob/master/README-EN.md">Mavon editor</a></li>
+<li><a href="https://docs.github.com/en/rest">GitHub API</a></li>
+<li><a href="https://docs.netlify.com/">Netlify</a></li>
+</ul>
+<h2>License</h2>
+<p>This project is licensed under the <a href="https://github.com/UKRN-Open-Research/ukrn-workshop-builder/blob/master/LICENSE.txt">MIT license</a>.</p></article>
+    </section>
 
 
 
@@ -49,17 +147,24 @@
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-CustomiseItem.computed.Fields.html">Fields</a></li><li><a href="module-WorkshopProperties.computed.Fields.html">Fields</a></li><li><a href="store.html">store</a></li><li><a href="template.html">template</a></li><li><a href="workshop.html">workshop</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkResponseCode">checkResponseCode</a></li><li><a href="global.html#copyFile">copyFile</a></li><li><a href="global.html#createRepository">createRepository</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#findRepositories">findRepositories</a></li><li><a href="global.html#findRepositoryFiles">findRepositoryFiles</a></li><li><a href="global.html#getLastBuild">getLastBuild</a></li><li><a href="global.html#getRepoIntroFile">getRepoIntroFile</a></li><li><a href="global.html#getTopics">getTopics</a></li><li><a href="global.html#getUserDetails">getUserDetails</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#OK">OK</a></li><li><a href="global.html#onConfirm">onConfirm</a></li><li><a href="global.html#parseYAML">parseYAML</a></li><li><a href="global.html#pullItem">pullItem</a></li><li><a href="global.html#pushFile">pushFile</a></li><li><a href="global.html#redeemCode">redeemCode</a></li><li><a href="global.html#setTopics">setTopics</a></li></ul>
-</nav>
-
-<br class="clear">
-
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Fri Dec 03 2021 18:21:22 GMT+0000 (Greenwich Mean Time)
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">Documentation generated by JSDOC. Template by TOAST UI.</div>
 </footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+    <script>
+        var id = 'package:undefined_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
 </body>
 </html>

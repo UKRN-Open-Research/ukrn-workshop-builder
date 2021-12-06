@@ -60,10 +60,10 @@ const state = {
  * @name Mutations
  * @memberOf workshop
  * @type {Object}
- * @mutator {{array:string, item:{url:string, ...etc:any}}} setItem=files|repositories Change an item in the repositories or files state arrays.
- * @mutator {{array:string, item:{url:string, ...etc:any}}} removeItem=files|repositories Remove an item from the repositories or files state arrays.
+ * @mutator {{array:string, item:{url:string, ...*:any}}} setItem=files|repositories Change an item in the repositories or files state arrays.
+ * @mutator {{array:string, item:{url:string, ...*:any}}} removeItem=files|repositories Remove an item from the repositories or files state arrays.
  * @mutator {{flag: string, value: boolean}} setBusyFlag=busyFlags Set or unset a busy flag by item URL.
- * @mutator {{url:string, ...etc:any}} setMainRepository=repositories Set the repository with the specified URL as the main repository.
+ * @mutator {{url:string, ...*:any}} setMainRepository=repositories Set the repository with the specified URL as the main repository.
  * @mutator {{Error}} addError=errors Add an error to the list of encountered errors.
  */
 const mutations = {
@@ -966,11 +966,14 @@ const actions = {
         nsContext.commit('setBusyFlag', {flag: url, value: false});
         return out;
     },
-    /****
+    /**
      * Reassign episode order numbers to keep the same order but add distance for inserting other episodes between them.
-     * @param nsContext {object}
-     * @param dayId {number} Day whose episodes should have their order numbers adjusted
-     * @param ignore_episodes {string[]} URLs of episodes to ignore
+     * @memberOf workshop
+     * @action rewriteEpisodeOrders=files
+     * @param {StoreContext} nsContext
+     * @param payload {Object}
+     * @param payload.dayId {number} Day whose episodes should have their order numbers adjusted.
+     * @param payload.ignore_episodes {string[]} URLs of episodes to ignore.
      * @return {Promise<void>}
      */
     async rewriteEpisodeOrders(nsContext, {dayId, ignore_episodes}) {
@@ -995,8 +998,10 @@ const actions = {
 };
 
 /**
- * Parse a YAML-headed file into YAML key-value and body
- * @param content {string}
+ * Parse a YAML-headed file into YAML key-value and body.
+ * @memberOf workshop
+ * @requires yaml
+ * @param content {string} File content to be parsed.
  * @return {{yamlParseError: null|string, body: string|null, yaml: null|{}}}
  */
 function parseYAML(content) {
@@ -1018,10 +1023,26 @@ function parseYAML(content) {
     return {yaml, body, yamlParseError};
 }
 
+/**
+ * Return whether a given file is in a given repository.
+ * @memberOf workshop
+ *
+ * @description All repository files' URLs begin with the URL of their repository, meaning repository URL is always a substring of file URL. This property is used to check membership.
+ *
+ * @param fileURL {string} The URL of the file.
+ * @param repositoryURL {string} The URL of the repository.
+ * @return {boolean} Whether the file is in the repository.
+ */
 function fileInRepository(fileURL, repositoryURL){
     return fileURL.indexOf(repositoryURL) !== -1;
 }
 
+/**
+ * Scrape a markdown file to identify image files that are embedded in it. Handles both direct inclusion and the Workshop Builder's own <code>{% include installedFile.lqd path="..." }</code> approach.
+ * @memberOf workshop
+ * @param File {File} Markdown file to scrape.
+ * @return {Array<String>} List of paths to required files.
+ */
 function findFileDependencies(File) {
     // Check for Markdown image links
     const references = [];
@@ -1043,10 +1064,12 @@ function findFileDependencies(File) {
 }
 
 /**
- * Fetch the intro file for a repository
- * @param files {object[]} list of files
- * @param topic {string} topic name
- * @return {object} File
+ * Fetch the intro file for a repository.
+ * @memberOf workshop
+ * @description Each repository has template introduction files for each of the possible topics. The introduction actually used by the repository is determined by the repository's topic. This function filters the repository's files to retrieve the introduction actually used by the repository.
+ * @param files {File[]} Repository's files.
+ * @param topic {string} The topic of the repository.
+ * @return {null|File} Repository's intro file
  */
 function getRepoIntroFile(files, topic) {
     const topics = [topic, 'unknown-topic'];
@@ -1061,6 +1084,14 @@ function getRepoIntroFile(files, topic) {
 // Export module
 /**
  * @class workshop
+ * @description The Workshop store module is responsible for managing GitHub repositories. At any one time there will be zero or more repositories loaded in the module state. Up to one of these will be designated as the main repository. The main repository is the repository that is being edited in the Workshop Builder Tool. Other repositories are loaded so that their files can be copied into the main repository.
+ * This module also handles files, which are the markdown files in the relevant GitHub repository and the _config.yml configuration file for the repository.
+ *
+ * This module is the primary GitHub interface: most calls to the GitHub API come from this module (via the lambda functions in githubAPI.js).
+ *
+ * @requires yaml
+ * @requires query-string
+ * @requires js-base64
  */
 export default {
     namespaced: true,

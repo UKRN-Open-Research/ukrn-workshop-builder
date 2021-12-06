@@ -58,6 +58,12 @@
 
 <script>
     import EpisodeName from "./EpisodeName";
+
+    /**
+     * The RemoteRepositoryView component shows a remote repository. When expanded, the episodes within the remote repository are retrieved and can be added to the user's schedule stash.
+     * @vue-prop repo {Repository} Repository to view.
+     * @vue-prop [isOpen=false] {Boolean} Whether the repository view is expanded.
+     */
     export default {
         name: 'RemoteRepositoryView',
         components: {EpisodeName},
@@ -70,6 +76,10 @@
         },
         computed: {},
         methods: {
+            /**
+             * Fetch the markdown episode files for this repository. Triggered when the view is expanded. When remote repository episodes are fetched, their day and order properties are voided so that they do not enter the schedule automatically and instead go into the stash.
+             * @return {Promise<void>}
+             */
             doLookup() {
                 if(!this.repo.episodes.length)
                     return this.$store.dispatch(
