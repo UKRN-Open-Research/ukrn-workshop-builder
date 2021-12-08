@@ -21,9 +21,9 @@
       <b-step-item step="2" label="Select workshop" icon="circle-edit-outline" :type="stepType(2)" :clickable="latestStep >= 1">
         <h1 class="title has-text-centered">Create a workshop</h1>
         <p class="explainer content">
-          We will create the workshop from a <a :href="`https://github.com/${templateRepository}`">template</a>. There are a few steps we need to go through to make sure the version of the template we create for you is properly customised for your workshop.
+          We will create the workshop from a template. There are a few steps we need to go through to make sure the version of the template we create for you is properly customised for your workshop.
         </p>
-        <SelectWorkshop :template-repository="templateRepository"/>
+        <SelectWorkshop/>
       </b-step-item>
 
       <b-step-item step="3" label="Customize workshop" icon="check-box-multiple-outline" :type="stepType(3)" :clickable="latestStep >= 2">
@@ -55,7 +55,6 @@ import Vue
 /**
  * @description The UKRN Workshop Builder is an interface for GitHub that enables users to clone and customise GitHub Pages websites based on The Carpentries' workshop template. Users require a GitHub account. Once they have logged in an authorised the app to make changes on their behalf, they can create a new workshop website using the tool (creating a new GitHub repository), find content created by other users of the tool, and customise content.
  *
- * @vue-data templateRepository="UKRN-Open-Research/workshop-template" {String} Owner/Repo string for the main template repository.
  * @vue-data activeStep=0 {Number} Progression stage through the workshop creation and customisation process. Used to navigate between the Buefy step children.
  * @vue-data preambleRead=false {Boolean} Whether the user has read the initial preamble and attempted to log into GitHub.
  * @vue-data workshopTemplate=null {null} Currently unused.
@@ -76,7 +75,6 @@ export default {
   },
   data: function() {
     return {
-      templateRepository: "UKRN-Open-Research/workshop-template",
       activeStep: 0,
       preambleRead: false,
       workshopTemplate: null,

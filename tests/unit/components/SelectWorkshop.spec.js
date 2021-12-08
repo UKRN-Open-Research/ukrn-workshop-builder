@@ -21,7 +21,8 @@ describe('SelectWorkshop.vue', () => {
             },
             workshop: {
                 state: {
-                    repositories: []
+                    repositories: [],
+                    templates: [{ownerLogin: 'foo', name: 'bar', url: 'https://foobar', description: 'Dummy template'}]
                 },
                 getters: {
                     isBusy: () => () => false
@@ -35,6 +36,7 @@ describe('SelectWorkshop.vue', () => {
                             }
                         }
                     ),
+                    findTemplates: jest.fn(),
                     registerBuildCheck: jest.fn(),
                     createRepository: jest.fn()
                 },
@@ -64,11 +66,15 @@ describe('SelectWorkshop.vue', () => {
         await button.trigger('click')
         expect(modules.workshop.actions.findRepositories).toHaveBeenCalled()
 
-        expect(wrapper.element.innerHTML).toContain('Create a New Workshop')
+        expect(wrapper.element.innerHTML).toContain('Create a new workshop from a template')
         const newRepoButton = wrapper.get('.control > button')
         expect(newRepoButton.element.disabled).toBe(true)
         const newRepoName = wrapper.get('.control > input')
         await newRepoName.setValue('testWorkshop')
+        expect(newRepoButton.element.disabled).toBe(true)
+        const selectTemplate = wrapper.get('.control select')
+        expect(selectTemplate.element.value).toBe('')
+        await selectTemplate.setValue(modules.workshop.state.templates[0].url)
         expect(newRepoButton.element.disabled).toBe(false)
         await newRepoButton.trigger('click')
         expect(modules.workshop.actions.createRepository).toHaveBeenCalled()
@@ -102,6 +108,6 @@ describe('SelectWorkshop.vue', () => {
         expect(modules.github.actions.registerBuildCheck).toHaveBeenCalled()
 
         // New workshops should be creatable by returning users, too
-        expect(wrapper.element.innerHTML).toContain('Create a New Workshop')
+        expect(wrapper.element.innerHTML).toContain('create a new workshop from a template')
     })
 })

@@ -304,6 +304,14 @@ describe('Github.actions', () => {
                 {
                     t: {
                         type: TRIGGER_TYPE_DISPATCH,
+                        name: 'workshop/findTemplates',
+                        payload: {},
+                        options: {root: true}
+                    }
+                },
+                {
+                    t: {
+                        type: TRIGGER_TYPE_DISPATCH,
                         name: 'workshop/findRepositories',
                         payload: {owner: "testUser"},
                         options: {root: true}

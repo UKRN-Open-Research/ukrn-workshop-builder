@@ -110,7 +110,7 @@ describe('Workshop.getters', () => {
         state = {
             files: [
                 {url: "https://foo.bar/test/workshop/_episodes/test-episode.md", title: "Test lesson", path: "_episodes/test-episode.md", yaml: {}},
-                {url: "https://foo.bar/test/workshop/_config.yml", title: "Config", path: "_config.yml", yaml: {title: 'Test workshop', topic: 'test-topic', setup_files: '_includes/install_instructions/test-install.html'}},
+                {url: "https://foo.bar/test/workshop/_config.yml", title: "Config", path: "_config.yml", yaml: {workshop_id: "testID001_01", title: 'Test workshop', topic: 'test-topic', setup_files: '_includes/install_instructions/test-install.html'}},
                 {url: "https://foo.bar/test/workshop/_includes/install_instructions/test-install.html", title: "Install Test program", path: "_includes/install_instructions/test-install.html", yaml: {}},
                 {url: "https://foo.bar/test/workshop/_episodes/another-test-episode.md", title: "Another Test lesson", path: "_episodes/another-test-episode.md", yaml: {}},
                 {url: "https://foo.bar/some/other/file.md", title: "Foobar", yaml: {}}
@@ -207,9 +207,11 @@ describe('Workshop.getters', () => {
 
         f().yaml = {};
         expect(workshop.getters.listConfigErrors(state)(f())).toEqual({
+            id: "The workshop must have an identifier",
             title: "The title cannot be blank",
             topic: "The topic cannot be empty"
         });
+        f().yaml.workshop_id = "X";
         f().yaml.topic = "X";
         f().yaml.title = "X";
         expect(workshop.getters.listConfigErrors(state)(f())).toEqual({})
