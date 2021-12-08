@@ -155,9 +155,7 @@
         })
       }
     },
-    mounted() {
-      this.$store.dispatch('workshop/findTemplates');
-    }
+    mounted() {}
   }
 </script>
 
