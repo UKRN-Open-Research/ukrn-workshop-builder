@@ -234,6 +234,8 @@ const getters = {
         const errors = {};
         if(!config.yaml)
             return {yaml: "The config must have YAML content signified by ---"};
+        if(!config.yaml.workshop_id)
+            errors.id = "The workshop must have an identifier";
         if(!config.yaml.title)
             errors.title = "The title cannot be blank";
         if(!config.yaml.topic)
