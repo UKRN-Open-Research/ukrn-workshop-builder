@@ -33,6 +33,15 @@ const queryString = require('query-string');
  * @property extraFiles {Object<string, File|File[]>} Additional non-episode files that can be customised.
  */
 
+/**
+ * A GitHub Template repository. Templates are used to create new repositories. When a repository is created form a template, the files from the template are copied, but the git history is not.
+ * @typedef {Object} Template
+ * @property url {string} GitHub URL of the repository.
+ * @property topics {string[]} GitHub tags for the repository.
+ * @property name {string} Repository name on GitHub.
+ * @property ownerLogin {string} Repository owner login name on GitHub.
+ * @property description {string} Repository description on GitHub.
+ */
 
 /**
  * The Workshop state object.
@@ -41,18 +50,21 @@ const queryString = require('query-string');
  * @type {Object}
  * @property {Repository[]} repositories The Repositories loaded from GitHub.
  * @property {File[]} files Files loaded from GitHub.
+ * @property {Template[]} templates Template repositories loaded from GitHub.
  * @property {Error[]} errors Errors encountered.
  * @property {string[]} busyFlags URLs marked as currently busy.
  */
 const state = {
     // Repositories {object[]}
     repositories: [],
-        // Files {object[]}
-        files: [],
-        // Error stack {string[]}
-        errors: [],
-        // Busy flags {string[]}
-        busyFlags: []
+    // Files {object[]}
+    files: [],
+    // Templates {Template[]}
+    templates: [],
+    // Error stack {string[]}
+    errors: [],
+    // Busy flags {string[]}
+    busyFlags: []
 };
 
 /**
@@ -132,16 +144,16 @@ const getters = {
             hasChanged: () => getters.hasChanged(url)
         }
     },
-        /****
-         * Return Files matched by a specified filter_function
-         */
-        FilesByFilter: (state, getters) => filter_function => {
+    /****
+     * Return Files matched by a specified filter_function
+     */
+    FilesByFilter: (state, getters) => filter_function => {
         return state.files.filter(filter_function).map(f => getters.File(f.url))
     },
-        /****
-         * Return a Repository object from a URL with its Files included. If empty, return the main repository.
-         */
-        Repository: (state, getters) => url => {
+    /****
+     * Return a Repository object from a URL with its Files included. If empty, return the main repository.
+     */
+    Repository: (state, getters) => url => {
         if(!url) {
             const main = state.repositories.filter(r => r.isMain);
             if(!main.length)
@@ -194,20 +206,20 @@ const getters = {
             extraFiles
         };
     },
-        /****
-         * Return Repositories matched by a specified filter_function
-         */
-        RepositoriesByFilter: (state, getters) => filter_function => {
+    /****
+     * Return Repositories matched by a specified filter_function
+     */
+    RepositoriesByFilter: (state, getters) => filter_function => {
         return state.repositories.filter(filter_function).map(r => getters.Repository(r.url))
     },
-        isBusy: state => url => state.busyFlags.includes(url),
-        hasChanged: state => url => {
+    isBusy: state => url => state.busyFlags.includes(url),
+    hasChanged: state => url => {
         const files = state.files.filter(f => f.url === url);
         if(!files.length)
             throw new Error(`Cannot read hasChanged of unknown file: ${url}`);
         return files[0].remoteContent !== files[0].content;
     },
-        lastError(state) {
+    lastError(state) {
         if(state.errors.length)
             return state.errors[state.errors.length - 1];
         return null;
@@ -228,7 +240,7 @@ const getters = {
             errors.topic = "The topic cannot be empty";
         return errors;
     },
-        isConfigValid: (state, getters) => config => {
+    isConfigValid: (state, getters) => config => {
         return !Object.keys(getters.listConfigErrors(config)).length;
     }
 };
@@ -625,6 +637,50 @@ const actions = {
             .catch(e => {
                 nsContext.commit('addError', e);
                 nsContext.commit('setBusyFlag', {flag: url, value: false});
+                console.error(e);
+                return null;
+            })
+    },
+    /**
+     * Fetch a list of available templates from GitHub.
+     * @memberOf workshop
+     * @action findTemplates=templates
+     * @param {StoreContext} nsContext
+     */
+    findTemplates(nsContext) {
+        const flag = "findTemplates";
+        if(nsContext.getters.isBusy(flag))
+            return null;
+        nsContext.commit('setBusyFlag', {flag, value: true});
+        return fetch("/.netlify/functions/githubAPI", {
+            method: "POST", headers: {task: 'findRepositories'},
+            body: JSON.stringify({
+                topics: ["ukrn-wb-template"], token: nsContext.rootGetters['github/token']
+            })
+        })
+            .then(r => {
+                if(r.status !== 200)
+                    throw new Error(`findTemplates received ${r.statusText} (${r.status})`)
+                return r.json();
+            })
+            .then(async json => {
+                await Promise.all(
+                    json.map(j => nsContext.commit('setItem', {
+                        array: 'templates',
+                        item: {
+                            url: j.url,
+                            ownerLogin: j.owner.login,
+                            topics: j.topics,
+                            name: j.name,
+                            description: j.description
+                        }
+                    }))
+                );
+                nsContext.commit('setBusyFlag', {flag, value: false});
+            })
+            .catch(e => {
+                nsContext.commit('addError', e);
+                nsContext.commit('setBusyFlag', {flag, value: false});
                 console.error(e);
                 return null;
             })

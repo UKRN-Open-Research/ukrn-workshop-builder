@@ -1,7 +1,6 @@
 [![DOI](https://zenodo.org/badge/331747772.svg)](https://zenodo.org/badge/latestdoi/331747772)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e38e5eae-c1e1-434e-85a7-b761c0d40806/deploy-status)](https://app.netlify.com/sites/ukrn-wb/deploys)
 [![codecov](https://codecov.io/gh/UKRN-Open-Research/ukrn-workshop-builder/branch/dev/graph/badge.svg?token=JCV0CNRKMF)](https://codecov.io/gh/UKRN-Open-Research/ukrn-workshop-builder)
-[![Parallel Cypress Tests](https://github.com/UKRN-Open-Research/ukrn-workshop-builder/actions/workflows/main.yml/badge.svg)](https://github.com/UKRN-Open-Research/ukrn-workshop-builder/actions/workflows/main.yml)
 
 # UKRN Workshop Builder Tool
 
