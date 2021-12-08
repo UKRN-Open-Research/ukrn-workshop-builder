@@ -174,9 +174,9 @@ export default {
                 })
                 .then(user => nsContext.commit('setUser', user))
                 .then(() => nsContext.commit('setLoginFlag', false))
+                .then(() => nsContext.dispatch('workshop/findTemplates', {}, {root: true}))
                 .then(() => nsContext.dispatch('workshop/findRepositories',
                     {owner: nsContext.getters.login}, {root: true}))
-                .then(() => nsContext.dispatch('workshop/findTemplates', {}, {root: true}))
                 .catch(e => {
                     console.error(e);
                     nsContext.commit('addError', e);
