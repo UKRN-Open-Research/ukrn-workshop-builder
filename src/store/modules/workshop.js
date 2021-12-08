@@ -356,6 +356,8 @@ const actions = {
             path: newPath,
             remoteContent: ""
         };
+        if(item.yaml && item.yaml.ukrn_wb_rules)
+            item.yaml.ukrn_wb_rules = item.yaml.ukrn_wb_rules.filter(x => x !== "allow-multiple")
         nsContext.commit('setItem', {array: 'files', item});
         return nsContext.getters.File(newURL);
     },
