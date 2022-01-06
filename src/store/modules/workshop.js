@@ -356,8 +356,8 @@ const actions = {
             path: newPath,
             remoteContent: ""
         };
-        if(item.yaml && item.yaml.ukrn_wb_rules)
-            item.yaml.ukrn_wb_rules = item.yaml.ukrn_wb_rules.filter(x => x !== "allow-multiple")
+        if(item.yaml)
+            item.yaml.ukrn_wb_rules = []
         nsContext.commit('setItem', {array: 'files', item});
         return nsContext.getters.File(newURL);
     },
@@ -941,14 +941,22 @@ const actions = {
      * @param payload {Object}
      * @param payload.url {string} URL of the file to delete.
      * @param [payload.deleteDependencies=true] {boolean} Whether or not to delete the file's dependencies. Deleting dependencies will preserve any dependencies that are also dependencies of other files.
-     * @return {Promise<{deleted: Array<{fileName: string, deleted: boolean, skipped: boolean}>, failed: Array<{fileName: string, deleted: boolean, skipped: boolean}>, skipped: Array<{fileName: string, deleted: boolean, skipped: boolean}>}>} The results of the delete operation: which files were successfully deleted, which were skipped, and which failed.
+     * @return {File|boolean|Promise<{deleted: Array<{fileName: string, deleted: boolean, skipped: boolean}>, failed: Array<{fileName: string, deleted: boolean, skipped: boolean}>, skipped: Array<{fileName: string, deleted: boolean, skipped: boolean}>}>} The file on failure, true when a local-only file has been deleted, or the results of the delete operation: which files were successfully deleted, which were skipped, and which failed.
      */
     async deleteFile(nsContext, {url, deleteDependencies = true}) {
         const main = nsContext.getters.Repository();
         if(!main || !fileInRepository(url, main.url))
             throw new Error('Only files in the main repository can be removed');
-        nsContext.commit('setBusyFlag', {flag: url, value: true});
+
         const file = nsContext.getters.File(url);
+
+        // Remove local-only files directly, no need to faff about with remote stuff
+        if(file.remoteContent === "") {
+            nsContext.commit('removeItem', {array: 'files', item: file});
+            return true;
+        }
+
+        nsContext.commit('setBusyFlag', {flag: url, value: true});
         let dependencies = [];
         if(deleteDependencies && file.yaml.dependencies && file.yaml.dependencies.length) {
             // Check and remove dependencies which will be orphaned
