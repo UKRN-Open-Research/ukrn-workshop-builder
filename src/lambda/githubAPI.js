@@ -152,14 +152,25 @@ async function findRepositories(event) {
         user = `+user:${d.owner}`;
     const url = `https://api.github.com/search/repositories?q=fork:true+topic:ukrn-open-research${user}${topics}`;
     console.log(`findRepositories(${url})`)
-    const items = await fetch(url, {
-        method: "GET", headers: {
-            "accept": "application/vnd.github.mercy-preview+json",
-            "authorization": `token ${cryptr.decrypt(d.token)}`
-        }
-    })
-        .then(r => checkResponseCode(r, 200, 'GET'))
-        .then(json => json.items);
+    let items = []
+    let page = "&page=1"
+    while(page !== "") {
+        await fetch(`${url}${page}`, {
+            method: "GET", headers: {
+                "accept": "application/vnd.github.mercy-preview+json",
+                "authorization": `token ${cryptr.decrypt(d.token)}`
+            }
+        })
+            .then(r => {
+                // Paginate if required
+                const link = r.headers.get('link')
+                const match = /(&page=[0-9]+)>; rel="next"/.exec(link)
+                page = match? match[1] : ""
+                return r
+            })
+            .then(r => checkResponseCode(r, 200, 'GET'))
+            .then(json => items = [...items, ...json.items]);
+    }
     return OK(items);
 }
 
